@@ -105,6 +105,11 @@ export const MISSIONS: Mission[] = [
 
 export const TOTAL_DAYS = MISSIONS.length;
 
+// El reto de 7 días + el cofre es el "Episodio 1". Cuando se agreguen más
+// días más adelante (Episodio 2, etc.), esto pasará a ser una lista.
+export const CURRENT_EPISODE_TITLE = "Episodio 1: Crea tu Skool";
+export const NEXT_EPISODE_TEASER = "Episodio 2: Próximamente";
+
 export function getMission(day: number): Mission | undefined {
   return MISSIONS.find((m) => m.day === day);
 }

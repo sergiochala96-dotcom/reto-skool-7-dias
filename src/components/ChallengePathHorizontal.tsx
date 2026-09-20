@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
+import { CURRENT_EPISODE_TITLE, MISSIONS, NEXT_EPISODE_TEASER, TOTAL_DAYS } from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 
 export default function ChallengePathHorizontal({
@@ -10,21 +10,18 @@ export default function ChallengePathHorizontal({
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const currentMission = MISSIONS.find(
+  const firstAvailable = MISSIONS.find(
     (m) => !done.has(m.day) && (m.day === 1 || done.has(m.day - 1))
-  );
-  const firstAvailable = currentMission?.day;
+  )?.day;
 
   return (
     <div className="mx-auto mb-12 hidden md:block">
       <h2 className="mb-6 text-center text-3xl font-extrabold text-white lg:text-4xl">
-        {allDone
-          ? "¡Reto completado! 🏆"
-          : `Episodio ${currentMission?.day}: ${currentMission?.title}`}
+        {CURRENT_EPISODE_TITLE}
       </h2>
 
-      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] p-6 shadow-2xl shadow-fuchsia-900/40 lg:p-8">
-        <div className="flex items-center gap-6 overflow-x-auto">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-6 pt-3 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-8 lg:pt-5">
+        <div className="flex items-center gap-6 overflow-x-auto pt-8">
           <Image
             src="/mascota-skooly.png"
             alt="Mascota Skooly"
@@ -126,6 +123,11 @@ export default function ChallengePathHorizontal({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-4 text-white/40">
+        <span className="text-2xl grayscale">🔒</span>
+        <span className="font-semibold">{NEXT_EPISODE_TEASER}</span>
       </div>
     </div>
   );

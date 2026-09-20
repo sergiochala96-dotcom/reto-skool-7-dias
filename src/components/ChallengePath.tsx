@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
+import { CURRENT_EPISODE_TITLE, MISSIONS, NEXT_EPISODE_TEASER, TOTAL_DAYS } from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 
 const AMPLITUDE = 55;
 const SPACING = 160;
 const NODE = 76;
+const TOP_BUFFER = 40; // espacio para que el badge "EMPEZAR" no se corte
 const OFFSETS = [0, 1, 1.4, 1, 0, -1, -1.4]; // patrón zigzag por día
 
 export default function ChallengePath({
@@ -15,19 +16,18 @@ export default function ChallengePath({
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const currentMission = MISSIONS.find(
+  const firstAvailable = MISSIONS.find(
     (m) => !done.has(m.day) && (m.day === 1 || done.has(m.day - 1))
-  );
-  const firstAvailable = currentMission?.day;
+  )?.day;
 
   const points = MISSIONS.map((m, i) => ({
     x: OFFSETS[i] * AMPLITUDE,
-    y: i * SPACING + NODE / 2,
+    y: i * SPACING + NODE / 2 + TOP_BUFFER,
     mission: m,
   }));
   const chestPoint = {
     x: 0,
-    y: MISSIONS.length * SPACING + NODE / 2,
+    y: MISSIONS.length * SPACING + NODE / 2 + TOP_BUFFER,
   };
 
   const width = AMPLITUDE * 2 * 1.4 + NODE + 100;
@@ -56,9 +56,7 @@ export default function ChallengePath({
   return (
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-4 px-4 text-center text-xl font-extrabold text-white">
-        {allDone
-          ? "¡Reto completado! 🏆"
-          : `Episodio ${currentMission?.day}: ${currentMission?.title}`}
+        {CURRENT_EPISODE_TITLE}
       </h2>
 
       <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-5 shadow-2xl shadow-fuchsia-900/40">
@@ -194,6 +192,11 @@ export default function ChallengePath({
         </div>
         </div>
         </div>
+      </div>
+
+      <div className="mx-4 mt-4 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/40">
+        <span className="text-xl grayscale">🔒</span>
+        <span className="text-sm font-semibold">{NEXT_EPISODE_TEASER}</span>
       </div>
     </div>
   );
