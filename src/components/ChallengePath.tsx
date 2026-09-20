@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   CURRENT_EPISODE_LABEL,
@@ -8,6 +7,7 @@ import {
   TOTAL_DAYS,
 } from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
+import MascotCashButton from "@/components/MascotCashButton";
 
 const AMPLITUDE = 55;
 const SPACING = 160;
@@ -67,13 +67,9 @@ export default function ChallengePath({
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
-        <Image
-          src="/mascota-skooly.png"
-          alt="Mascota Skooly"
-          width={72}
-          height={72}
-          className="mx-auto mb-2 h-16 w-16 object-contain drop-shadow-[0_0_16px_rgba(217,70,239,0.35)]"
-        />
+        <div className="mb-2 flex justify-center">
+          <MascotCashButton className="h-16 w-16" />
+        </div>
 
         <div className="overflow-x-auto">
           <div className="relative mx-auto" style={{ width, height: height + 90 }}>

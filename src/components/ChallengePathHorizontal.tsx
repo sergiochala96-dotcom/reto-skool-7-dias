@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   CURRENT_EPISODE_LABEL,
@@ -8,6 +7,7 @@ import {
   TOTAL_DAYS,
 } from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
+import MascotCashButton from "@/components/MascotCashButton";
 
 export default function ChallengePathHorizontal({
   completedDays,
@@ -29,13 +29,7 @@ export default function ChallengePathHorizontal({
         </h2>
 
         <div className="flex items-center gap-6 overflow-x-auto pt-8">
-          <Image
-            src="/mascota-skooly.png"
-            alt="Mascota Skooly"
-            width={160}
-            height={160}
-            className="hidden h-32 w-32 flex-shrink-0 object-contain drop-shadow-[0_0_25px_rgba(217,70,239,0.35)] lg:block lg:h-40 lg:w-40"
-          />
+          <MascotCashButton className="hidden h-32 w-32 lg:block lg:h-40 lg:w-40" />
 
           <div className="flex items-start">
             {MISSIONS.map((mission, i) => {
