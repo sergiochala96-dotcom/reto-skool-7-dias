@@ -177,12 +177,7 @@ export async function saveMissionAnswers(
       .upsert({ user_id: user.id, day }, { onConflict: "user_id,day" });
 
     revalidatePath("/dashboard");
-    revalidatePath(`/dia/${day}`);
-    revalidatePath(`/dia/${day + 1}`);
     revalidatePath("/cofre");
-
-    if (day === TOTAL_DAYS) redirect("/cofre");
-    redirect(`/dia/${day + 1}`);
   }
 
   revalidatePath(`/dia/${day}`);

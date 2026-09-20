@@ -748,9 +748,9 @@ export default function MissionForm({
     <div className="flex flex-col gap-6">
       <div>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-            Día {day} de {totalDays}
-          </p>
+          <span className="inline-flex max-w-[75%] items-center truncate rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-fuchsia-700">
+            Día {day}: {title}
+          </span>
           {allDone && (
             <button
               type="button"
@@ -856,7 +856,9 @@ export default function MissionForm({
 
       {state?.saved && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700">
-          Guardado ✓ — te faltan {state.missing} de {state.total} campos para completar este día.
+          {state.missing === 0
+            ? "🎉 ¡Día completado! Guardado ✓"
+            : `Guardado ✓ — te faltan ${state.missing} de ${state.total} campos para completar este día.`}
         </p>
       )}
 
