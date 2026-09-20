@@ -41,7 +41,7 @@ export type MissionField = {
   sliderMax?: number;
   sliderStep?: number;
   sliderUnit?: string;
-  moodMap?: { max: number; emoji: string }[];
+  moodMap?: { max: number; emoji: string; text: string; color: "red" | "orange" | "green" }[];
   required?: boolean;
   showIf?: { field: string; equals: string };
 };
@@ -50,6 +50,10 @@ export type MissionSection = {
   id: string;
   heading: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imagePosition?: "above-heading" | "below-heading";
+  layout?: "default" | "split-calendar";
   fields: MissionField[];
 };
 
@@ -190,6 +194,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       id: "crea-skool",
       heading: "Crea tu Skool",
       image: "/skool-ejemplo-cta.png",
+      imageWidth: 1369,
+      imageHeight: 825,
       fields: [
         {
           id: "crear_skool_link",
@@ -212,6 +218,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       id: "identidad",
       heading: "Identidad de tu comunidad",
       image: "/skool-ejemplo-identidad.png",
+      imageWidth: 1091,
+      imageHeight: 280,
       fields: [
         {
           id: "nombre_comunidad",
@@ -304,6 +312,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "presentacion",
       heading: "Presentación",
+      image: "/skool-ejemplo-about.png",
+      imageWidth: 1080,
+      imageHeight: 1080,
+      imagePosition: "above-heading",
       fields: [
         {
           id: "video_prompt",
@@ -360,6 +372,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "post-bienvenida",
       heading: "Post fijado de bienvenida",
+      image: "/skool-ejemplo-post.png",
+      imageWidth: 993,
+      imageHeight: 621,
+      imagePosition: "above-heading",
       fields: [
         { id: "post_titulo", type: "text", label: "Título del post de bienvenida" },
         {
@@ -386,6 +402,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "calendario",
       heading: "Calendario",
+      layout: "split-calendar",
       fields: [
         {
           id: "clases_en_vivo",
@@ -440,6 +457,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "modulos",
       heading: "Módulos",
+      image: "/skool-ejemplo-cursos.webp",
+      imageWidth: 1223,
+      imageHeight: 916,
+      imagePosition: "above-heading",
       fields: [
         {
           id: "modulo1_titulo",
@@ -640,9 +661,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           sliderStep: 1,
           sliderUnit: "veces",
           moodMap: [
-            { max: 4, emoji: "😢" },
-            { max: 7, emoji: "😐" },
-            { max: 14, emoji: "😃" },
+            { max: 4, emoji: "😢", text: "Uy, es muy poquito", color: "red" },
+            { max: 6, emoji: "😐", text: "Uhm, podría ser mejor", color: "orange" },
+            { max: 14, emoji: "😃", text: "Eso me gusta, publicarás con frecuencia", color: "green" },
           ],
         },
       ],

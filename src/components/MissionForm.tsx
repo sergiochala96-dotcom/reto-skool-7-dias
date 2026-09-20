@@ -8,6 +8,7 @@ import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
 import OfferField from "@/components/OfferField";
 import PlatformIcon from "@/components/PlatformIcon";
+import CalendarMockup from "@/components/CalendarMockup";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -196,6 +197,12 @@ function RangeField({
   );
 }
 
+const MOOD_COLOR_CLASSES: Record<string, string> = {
+  red: "text-red-600",
+  orange: "text-orange-500",
+  green: "text-emerald-600",
+};
+
 function SliderField({
   field,
   value,
@@ -209,22 +216,29 @@ function SliderField({
   const max = field.sliderMax ?? 100;
   const current = value !== undefined && value !== "" ? Number(value) : min;
   const percent = max > min ? ((current - min) / (max - min)) * 100 : 0;
-  const mood = field.moodMap?.find((m) => current <= m.max)?.emoji;
+  const mood = field.moodMap?.find((m) => current <= m.max);
 
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
       {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
-      <div className="rounded-xl border border-gray-200 bg-white px-4 pb-4 pt-12">
-        <div className="relative">
+      <div className="rounded-xl border border-gray-200 bg-white px-4 pb-4 pt-5">
+        {mood && (
+          <div className="mb-4 flex flex-col items-center text-center">
+            <span className="text-6xl leading-none">{mood.emoji}</span>
+            <span className={`mt-2 text-base font-bold ${MOOD_COLOR_CLASSES[mood.color]}`}>
+              {mood.text}
+            </span>
+          </div>
+        )}
+        <div className="relative mt-7">
           <div
-            className="pointer-events-none absolute -top-11 flex -translate-x-1/2 flex-col items-center gap-1"
+            className="pointer-events-none absolute -top-9 flex -translate-x-1/2 flex-col items-center"
             style={{ left: `${percent}%` }}
           >
             <span className="whitespace-nowrap rounded-full bg-gray-900 px-3 py-1 text-sm font-bold text-white shadow-lg">
               {current} {field.sliderUnit ?? ""}
             </span>
-            {mood && <span className="text-2xl leading-none">{mood}</span>}
           </div>
           <input
             type="range"
@@ -422,9 +436,11 @@ function FieldInput({
           {(() => {
             const selectedOption = field.options?.find((opt) => opt.value === textValue);
             return selectedOption?.description ? (
-              <p className="mt-2 rounded-lg bg-fuchsia-50 px-3 py-2 text-xs text-fuchsia-700">
-                {selectedOption.description}
-              </p>
+              <div className="mt-3 rounded-xl border-2 border-violet-300 bg-violet-50 px-4 py-3">
+                <p className="text-base font-bold leading-snug text-violet-800">
+                  {selectedOption.description}
+                </p>
+              </div>
             ) : null;
           })()}
         </div>
@@ -508,39 +524,46 @@ export default function MissionForm({
         </div>
       )}
 
-      {sections.map((section) => (
-        <section
-          key={section.id}
-          className="rounded-2xl border border-gray-200 bg-gray-50 p-5 lg:p-7"
-        >
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
-            {section.heading}
-          </h2>
-          {section.image && (
-            <div className="relative mb-5 w-full overflow-hidden rounded-xl border border-gray-200">
-              <Image
-                src={section.image}
-                alt={section.heading}
-                width={1200}
-                height={675}
-                className="h-auto w-full object-contain"
-              />
-            </div>
-          )}
-          <div className="flex flex-col gap-5">
-            {section.fields
-              .filter((f) => !f.showIf || answers[f.showIf.field] === f.showIf.equals)
-              .map((field) => (
-                <FieldInput
-                  key={field.id}
-                  field={field}
-                  value={answers[field.id]}
-                  onChange={handleChange}
-                />
-              ))}
+      {sections.map((section) => {
+        const visibleFields = section.fields.filter(
+          (f) => !f.showIf || answers[f.showIf.field] === f.showIf.equals
+        );
+        const sectionImage = section.image && (
+          <div className="relative mb-5 w-full overflow-hidden rounded-xl border border-gray-200">
+            <Image
+              src={section.image}
+              alt={section.heading}
+              width={section.imageWidth ?? 1200}
+              height={section.imageHeight ?? 675}
+              className="h-auto w-full object-contain"
+            />
           </div>
-        </section>
-      ))}
+        );
+        const fieldsList = visibleFields.map((field) => (
+          <FieldInput key={field.id} field={field} value={answers[field.id]} onChange={handleChange} />
+        ));
+
+        return (
+          <section
+            key={section.id}
+            className="rounded-2xl border border-gray-200 bg-gray-50 p-5 lg:p-7"
+          >
+            {section.imagePosition === "above-heading" && sectionImage}
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
+              {section.heading}
+            </h2>
+            {section.imagePosition !== "above-heading" && sectionImage}
+            {section.layout === "split-calendar" ? (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <CalendarMockup />
+                <div className="flex flex-col gap-5">{fieldsList}</div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">{fieldsList}</div>
+            )}
+          </section>
+        );
+      })}
 
       {state?.saved && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700">
