@@ -51,9 +51,10 @@ export default async function DiaPage({
         <div className="mx-auto max-w-2xl">
           <Link
             href="/dashboard"
-            className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-white/60 transition hover:text-white"
+            aria-label="Volver al inicio"
+            className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl text-white transition hover:bg-white/20"
           >
-            ← Volver al inicio
+            ←
           </Link>
 
           <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">

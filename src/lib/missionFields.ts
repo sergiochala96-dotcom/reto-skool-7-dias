@@ -18,7 +18,7 @@ export type MissionField = {
   type: FieldType;
   helper?: string;
   placeholder?: string;
-  options?: { value: string; label: string }[];
+  options?: { value: string; label: string; description?: string }[];
   display?: "pills" | "dropdown";
   promptText?: string;
   infoText?: string;
@@ -37,6 +37,7 @@ export type MissionField = {
   sliderMax?: number;
   sliderStep?: number;
   sliderUnit?: string;
+  moodMap?: { max: number; emoji: string }[];
   required?: boolean;
   showIf?: { field: string; equals: string };
 };
@@ -84,6 +85,20 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "Seguidores o lista que tienes",
           placeholder: "Ej: 1.200 seguidores en Instagram + 300 en mi lista de email",
         },
+        {
+          id: "red_favorita",
+          type: "select",
+          label: "¿Cuál es tu red social favorita?",
+          options: [
+            { value: "instagram", label: "📸 Instagram" },
+            { value: "tiktok", label: "🎵 TikTok" },
+            { value: "facebook", label: "📘 Facebook" },
+            { value: "youtube", label: "▶️ YouTube" },
+            { value: "linkedin", label: "💼 LinkedIn" },
+            { value: "email", label: "📧 Email" },
+            { value: "otra", label: "🔗 Otra" },
+          ],
+        },
       ],
     },
     {
@@ -127,6 +142,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 3,
           addLabel: "+ Añadir problema",
           itemPlaceholder: "Ej: no sabe por dónde empezar",
+          badgeLabel: "Problema",
         },
         {
           id: "deseos_avatar",
@@ -136,6 +152,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 3,
           addLabel: "+ Añadir deseo",
           itemPlaceholder: "Ej: quiere generar ingresos extra",
+          badgeLabel: "Deseo",
         },
       ],
     },
@@ -150,6 +167,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Escribe mínimo 3",
           minItems: 3,
           addLabel: "+ Añadir diferencial",
+          badgeLabel: "Diferencia",
         },
         {
           id: "oferta_grand_slam",
@@ -239,6 +257,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Escribe mínimo 3",
           minItems: 3,
           addLabel: "+ Añadir categoría",
+          badgeLabel: "Categoría",
         },
         {
           id: "reglas",
@@ -249,6 +268,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           maxItems: 3,
           itemMaxLength: 30,
           addLabel: "+ Añadir regla",
+          badgeLabel: "Regla",
         },
       ],
     },
@@ -521,6 +541,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "Nombres de los videos dentro de cada módulo/curso",
           minItems: 1,
           addLabel: "+ Añadir video",
+          badgeLabel: "Video",
         },
         {
           id: "modulos_subidos",
@@ -602,13 +623,47 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "select",
           label: "¿Qué nivel de comisión definirás?",
           options: [
-            { value: "off", label: "OFF" },
-            { value: "30", label: "30%" },
-            { value: "40", label: "40%" },
-            { value: "50", label: "50%" },
-            { value: "60", label: "60%" },
-            { value: "70", label: "70%" },
+            {
+              value: "off",
+              label: "OFF",
+              description: "No vas a recibir tráfico de Skool, no vas a tener descubrimiento.",
+            },
+            {
+              value: "30",
+              label: "30%",
+              description: "Skool te da miembros y tú te quedas con el 70%.",
+            },
+            {
+              value: "40",
+              label: "40%",
+              description: "Skool te trae miembros y vamos 50-50.",
+            },
+            {
+              value: "50",
+              label: "50%",
+              description: "Skool te trae miembros y vamos 50-50.",
+            },
+            {
+              value: "60",
+              label: "60%",
+              description:
+                "Skool te traerá el máximo de miembros. Sin embargo, va a sacrificar algo de ganancia por ese crecimiento.",
+            },
+            {
+              value: "70",
+              label: "70%",
+              description:
+                "Skool te traerá el máximo de miembros. Sin embargo, va a sacrificar algo de ganancia por ese crecimiento.",
+            },
           ],
+          showIf: { field: "boost_activado", equals: "si" },
+        },
+        {
+          id: "boost_disclaimer",
+          type: "info",
+          label: "Antes de decidir",
+          infoText:
+            "Cambiar tu % de impulso de crecimiento no se aplica a los clientes existentes: ellos mantienen el % con el que se unieron. Si no está pasando nada, considera empezar alto y luego bajarlo gradualmente una vez que empiece a funcionar. Si las cosas están funcionando, no necesitas cambiar nada; sin embargo, pujar más siempre te dará más. Puede tardar hasta 30 días en ver el impacto de los cambios: no lo cambies todo el tiempo, ten paciencia.",
           showIf: { field: "boost_activado", equals: "si" },
         },
       ],
@@ -629,6 +684,11 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           sliderMax: 14,
           sliderStep: 1,
           sliderUnit: "veces",
+          moodMap: [
+            { max: 4, emoji: "😢" },
+            { max: 7, emoji: "😐" },
+            { max: 14, emoji: "😃" },
+          ],
         },
       ],
     },
@@ -642,6 +702,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "¿Qué temáticas publicarás?",
           minItems: 1,
           addLabel: "+ Añadir temática",
+          badgeLabel: "Temática",
         },
         {
           id: "como_conversacion",
@@ -649,6 +710,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "¿Cómo crearás conversación en tus publicaciones?",
           minItems: 1,
           addLabel: "+ Añadir idea",
+          badgeLabel: "Idea",
         },
       ],
     },
@@ -668,6 +730,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "Cuéntanos brevemente qué tipo de dinámicas o retos",
           minItems: 1,
           addLabel: "+ Añadir dinámica",
+          badgeLabel: "Dinámica/Reto",
           showIf: { field: "dinamicas", equals: "si" },
         },
       ],

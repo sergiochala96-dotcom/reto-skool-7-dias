@@ -30,7 +30,7 @@ function PromptField({ field }: { field: MissionField }) {
       <button
         type="button"
         onClick={copy}
-        className="mt-2 rounded-lg border border-fuchsia-400/30 px-3 py-1.5 text-xs font-semibold text-fuchsia-200 transition hover:bg-fuchsia-400/10"
+        className="mt-3 rounded-full bg-amber-300 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition hover:brightness-105"
       >
         {copied ? "Copiado ✓" : "📋 Copiar prompt"}
       </button>
@@ -193,32 +193,65 @@ function SliderField({
   const min = field.sliderMin ?? 0;
   const max = field.sliderMax ?? 100;
   const current = value !== undefined && value !== "" ? Number(value) : min;
+  const percent = max > min ? ((current - min) / (max - min)) * 100 : 0;
+  const mood = field.moodMap?.find((m) => current <= m.max)?.emoji;
 
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
       {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
-      <div className="rounded-xl border border-white/15 bg-white/5 px-4 py-4">
-        <div className="mb-2 text-center">
-          <span className="rounded-full bg-fuchsia-500/20 px-3 py-1 text-sm font-bold text-fuchsia-200">
-            {current} {field.sliderUnit ?? ""}
-          </span>
+      <div className="rounded-xl border border-black/10 bg-white px-4 pb-4 pt-12">
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute -top-11 flex -translate-x-1/2 flex-col items-center gap-1"
+            style={{ left: `${percent}%` }}
+          >
+            <span className="whitespace-nowrap rounded-full bg-fuchsia-600 px-3 py-1 text-sm font-bold text-white shadow-lg">
+              {current} {field.sliderUnit ?? ""}
+            </span>
+            {mood && <span className="text-2xl leading-none">{mood}</span>}
+          </div>
+          <input
+            type="range"
+            name={`field_${field.id}`}
+            min={min}
+            max={max}
+            step={field.sliderStep ?? 1}
+            value={current}
+            onChange={(e) => onChange(field.id, e.target.value)}
+            className="slider-big w-full accent-fuchsia-500"
+          />
         </div>
-        <input
-          type="range"
-          name={`field_${field.id}`}
-          min={min}
-          max={max}
-          step={field.sliderStep ?? 1}
-          value={current}
-          onChange={(e) => onChange(field.id, e.target.value)}
-          className="w-full accent-fuchsia-500"
-        />
-        <div className="mt-1 flex justify-between text-[11px] text-white/40">
+        <div className="mt-1 flex justify-between text-[11px] text-slate-400">
           <span>{min}</span>
           <span>{max}</span>
         </div>
       </div>
+      <style jsx>{`
+        .slider-big {
+          height: 8px;
+        }
+        .slider-big::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 9999px;
+          background: #d946ef;
+          border: 4px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+          cursor: pointer;
+        }
+        .slider-big::-moz-range-thumb {
+          width: 30px;
+          height: 30px;
+          border-radius: 9999px;
+          background: #d946ef;
+          border: 4px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 }
@@ -309,25 +342,35 @@ function FieldInput({
       )}
 
       {(field.type === "yesno" || (field.type === "select" && field.display !== "dropdown")) && (
-        <div className="flex flex-wrap gap-2">
-          {field.options?.map((opt) => {
-            const selected = value === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onChange(field.id, opt.value)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                  selected
-                    ? "border-fuchsia-400 bg-fuchsia-500/20 text-white"
-                    : "border-white/15 text-white/60 hover:bg-white/5"
-                }`}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-          <input type="hidden" name={`field_${field.id}`} value={textValue} />
+        <div>
+          <div className="flex flex-wrap gap-2">
+            {field.options?.map((opt) => {
+              const selected = value === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => onChange(field.id, opt.value)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    selected
+                      ? "border-fuchsia-400 bg-fuchsia-500/20 text-white"
+                      : "border-white/15 text-white/60 hover:bg-white/5"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+            <input type="hidden" name={`field_${field.id}`} value={textValue} />
+          </div>
+          {(() => {
+            const selectedOption = field.options?.find((opt) => opt.value === textValue);
+            return selectedOption?.description ? (
+              <p className="mt-2 rounded-lg bg-fuchsia-500/10 px-3 py-2 text-xs text-fuchsia-100">
+                {selectedOption.description}
+              </p>
+            ) : null;
+          })()}
         </div>
       )}
 
