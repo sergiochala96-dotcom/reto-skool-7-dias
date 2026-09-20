@@ -19,13 +19,13 @@ export default async function DashboardPage() {
       />
 
       <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-2xl md:max-w-6xl">
-          <div className="mb-8 text-center">
-            <p className="text-sm text-white/50">Hola, {nombre} 👋</p>
-            <h1 className="text-2xl font-bold text-white">
+        <div className="mx-auto max-w-2xl md:max-w-7xl">
+          <div className="mb-8 text-center md:mb-10">
+            <p className="text-sm text-white/50 md:text-xl">Hola, {nombre} 👋</p>
+            <h1 className="text-2xl font-bold text-white md:mt-1 md:text-5xl md:font-extrabold">
               Tu progreso en Skooly
             </h1>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-white/60 md:mt-3 md:text-xl">
               {completedCount}/{TOTAL_DAYS} días completados
             </p>
           </div>

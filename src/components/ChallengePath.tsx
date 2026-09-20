@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
+import TreasureChestIcon from "@/components/TreasureChestIcon";
 
 const AMPLITUDE = 55;
 const SPACING = 160;
@@ -13,9 +15,10 @@ export default function ChallengePath({
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const firstAvailable = MISSIONS.find(
+  const currentMission = MISSIONS.find(
     (m) => !done.has(m.day) && (m.day === 1 || done.has(m.day - 1))
-  )?.day;
+  );
+  const firstAvailable = currentMission?.day;
 
   const points = MISSIONS.map((m, i) => ({
     x: OFFSETS[i] * AMPLITUDE,
@@ -51,8 +54,24 @@ export default function ChallengePath({
   }
 
   return (
-    <div className="mx-auto max-w-2xl overflow-x-auto pb-8">
-      <div className="relative mx-auto" style={{ width, height: height + 90 }}>
+    <div className="mx-auto max-w-2xl">
+      <h2 className="mb-4 px-4 text-center text-xl font-extrabold text-white">
+        {allDone
+          ? "¡Reto completado! 🏆"
+          : `Episodio ${currentMission?.day}: ${currentMission?.title}`}
+      </h2>
+
+      <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-5 shadow-2xl shadow-fuchsia-900/40">
+        <Image
+          src="/mascota-skooly.png"
+          alt="Mascota Skooly"
+          width={72}
+          height={72}
+          className="mx-auto mb-2 h-16 w-16 object-contain drop-shadow-[0_0_16px_rgba(217,70,239,0.35)]"
+        />
+
+        <div className="overflow-x-auto">
+          <div className="relative mx-auto" style={{ width, height: height + 90 }}>
         <svg
           width={width}
           height={height + 90}
@@ -147,17 +166,17 @@ export default function ChallengePath({
           {allDone ? (
             <Link
               href="/cofre"
-              className="flex animate-bounce items-center justify-center rounded-full border-4 border-amber-300 bg-gradient-to-br from-amber-400 to-yellow-300 text-4xl shadow-xl shadow-amber-500/30"
+              className="flex animate-bounce items-center justify-center drop-shadow-[0_0_18px_rgba(245,158,11,0.6)]"
               style={{ width: NODE + 16, height: NODE + 16 }}
             >
-              🎁
+              <TreasureChestIcon locked={false} className="h-full w-full" />
             </Link>
           ) : (
             <div
-              className="flex items-center justify-center rounded-full border-4 border-white/10 bg-white/5 text-3xl grayscale"
+              className="flex items-center justify-center opacity-70"
               style={{ width: NODE + 16, height: NODE + 16 }}
             >
-              🔒
+              <TreasureChestIcon locked className="h-full w-full" />
             </div>
           )}
           <div className="mt-2 w-28 text-center">
@@ -172,6 +191,8 @@ export default function ChallengePath({
               Premio final
             </p>
           </div>
+        </div>
+        </div>
         </div>
       </div>
     </div>
