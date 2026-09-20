@@ -16,7 +16,6 @@ export default function Avatar({
   size?: number;
   editable?: boolean;
 }) {
-  const initial = nombre.charAt(0).toUpperCase();
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     updateAvatar,
     undefined
@@ -25,8 +24,8 @@ export default function Avatar({
 
   const circle = (
     <span
-      className="relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 font-bold text-white"
-      style={{ width: size, height: size, fontSize: size * 0.4 }}
+      className="relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-fuchsia-400/30 to-purple-500/30"
+      style={{ width: size, height: size }}
     >
       {avatarUrl ? (
         <Image
@@ -37,7 +36,14 @@ export default function Avatar({
           className="object-cover"
         />
       ) : (
-        initial
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="text-fuchsia-200/80"
+          style={{ width: size * 0.6, height: size * 0.6 }}
+        >
+          <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2.5c-3.33 0-10 1.67-10 5V22h20v-2.5c0-3.33-6.67-5-10-5Z" />
+        </svg>
       )}
     </span>
   );
