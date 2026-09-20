@@ -8,6 +8,7 @@ export type FieldType =
   | "list"
   | "range"
   | "slider"
+  | "pricing"
   | "prompt"
   | "link"
   | "info";
@@ -287,69 +288,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       heading: "Modelo de monetización",
       fields: [
         {
-          id: "modelo",
-          type: "select",
+          id: "monetizacion_modelo",
+          type: "pricing",
           label: "Elige tu modelo de monetización",
-          options: [
-            { value: "dos_comunidades", label: "Dos comunidades (gratis + pagada)" },
-            { value: "freemium", label: "Freemium (1 plan gratis + planes de pago)" },
-            { value: "pagada", label: "Comunidad 100% pagada" },
-            { value: "gratis", label: "Acceso gratuito" },
-          ],
-        },
-        {
-          id: "nombres_comunidades",
-          type: "text",
-          label: "Nombre de tus 2 comunidades",
-          helper: "Ej: 'Nombre Free' y 'Nombre Pro'",
-          showIf: { field: "modelo", equals: "dos_comunidades" },
-        },
-        {
-          id: "niveles_freemium",
-          type: "select",
-          label: "¿Cuántos niveles de pago tendrás además del gratis?",
-          options: [
-            { value: "2", label: "2 niveles" },
-            { value: "3", label: "3 niveles" },
-          ],
-          showIf: { field: "modelo", equals: "freemium" },
-        },
-        {
-          id: "contenido_planes",
-          type: "list",
-          label: "¿Qué incluye cada plan?",
-          helper: "Mínimo 5 cosas",
-          minItems: 5,
-          addLabel: "+ Añadir beneficio",
-          showIf: { field: "modelo", equals: "freemium" },
-        },
-        {
-          id: "tipo_cobro",
-          type: "select",
-          label: "¿Cómo vas a cobrar?",
-          options: [
-            { value: "unico", label: "Cobro único" },
-            { value: "mensual", label: "Suscripción mensual" },
-            { value: "anual", label: "Suscripción anual" },
-            { value: "ambos", label: "Mensual y anual" },
-            { value: "niveles", label: "Diferentes niveles" },
-          ],
-          showIf: { field: "modelo", equals: "pagada" },
-        },
-        {
-          id: "beneficios_niveles",
-          type: "list",
-          label: "3 a 5 cosas que ofreces por cada nivel",
-          minItems: 3,
-          addLabel: "+ Añadir beneficio",
-          showIf: { field: "tipo_cobro", equals: "niveles" },
-        },
-        {
-          id: "prueba_gratis",
-          type: "yesno",
-          label: "¿Tendrás prueba gratis de 7 días?",
-          options: SI_NO,
-          showIf: { field: "modelo", equals: "pagada" },
         },
       ],
     },
@@ -769,6 +710,63 @@ export function isMultiValueField(field: MissionField): boolean {
 export type AnswerValue = string | string[];
 export type Answers = Record<string, AnswerValue>;
 
+export type PricingTier = {
+  nombre: string;
+  activo: boolean;
+  precio: string;
+  periodo: "mes" | "año" | "unico";
+  beneficios: string[];
+};
+
+export type PricingData = {
+  modelo?: "gratis" | "suscripcion" | "freemium" | "niveles" | "pago_unico";
+  periodo?: "mensual" | "ambos" | "anual";
+  precioMensual?: string;
+  precioAnual?: string;
+  precioUnico?: string;
+  tiers?: PricingTier[];
+};
+
+export function parsePricing(value: string | undefined): PricingData {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as PricingData) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isPricingAnswered(data: PricingData): boolean {
+  if (!data.modelo) return false;
+
+  if (data.modelo === "gratis") return true;
+
+  if (data.modelo === "pago_unico") return !!data.precioUnico?.trim();
+
+  if (data.modelo === "suscripcion") {
+    if (!data.periodo) return false;
+    if (data.periodo !== "anual" && !data.precioMensual?.trim()) return false;
+    if (data.periodo !== "mensual" && !data.precioAnual?.trim()) return false;
+    return true;
+  }
+
+  if (data.modelo === "freemium" || data.modelo === "niveles") {
+    const tiers = data.tiers ?? [];
+    const tierOk = (t: PricingTier | undefined) =>
+      !!t && !!t.precio.trim() && t.beneficios.some((b) => b.trim());
+    const startIndex = data.modelo === "freemium" ? 1 : 0;
+    for (let i = startIndex; i < 2; i++) {
+      if (!tierOk(tiers[i])) return false;
+    }
+    const third = tiers[2];
+    if (third?.activo && !tierOk(third)) return false;
+    return true;
+  }
+
+  return false;
+}
+
 function isVisible(field: MissionField, answers: Answers): boolean {
   if (!field.showIf) return true;
   return answers[field.showIf.field] === field.showIf.equals;
@@ -776,6 +774,10 @@ function isVisible(field: MissionField, answers: Answers): boolean {
 
 function isAnswered(field: MissionField, answers: Answers): boolean {
   const v = answers[field.id];
+
+  if (field.type === "pricing") {
+    return isPricingAnswered(parsePricing(typeof v === "string" ? v : undefined));
+  }
 
   if (field.type === "multiselect") {
     const arr = Array.isArray(v) ? v : [];

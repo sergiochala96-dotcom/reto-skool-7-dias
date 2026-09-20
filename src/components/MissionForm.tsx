@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { MissionField, MissionSection, Answers } from "@/lib/missionFields";
 import { countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
+import PricingField from "@/components/PricingField";
 
 const inputBase =
   "w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-fuchsia-400";
@@ -275,6 +276,8 @@ function FieldInput({
     return <RangeField field={field} value={value as string[]} onChange={onChange} />;
   if (field.type === "slider")
     return <SliderField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "pricing")
+    return <PricingField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

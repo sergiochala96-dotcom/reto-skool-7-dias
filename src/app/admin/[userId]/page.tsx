@@ -3,10 +3,52 @@ import { createClient } from "@/lib/supabase/server";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
-import { getMissionSections, type Answers, type MissionField } from "@/lib/missionFields";
+import {
+  getMissionSections,
+  parsePricing,
+  type Answers,
+  type MissionField,
+  type PricingTier,
+} from "@/lib/missionFields";
+
+const MODELO_LABELS: Record<string, string> = {
+  gratis: "Gratis",
+  suscripcion: "Suscripción",
+  freemium: "Freemium",
+  niveles: "Niveles",
+  pago_unico: "1 pago único",
+};
+
+function formatTier(t: PricingTier): string {
+  const precio =
+    t.precio && t.precio !== "0"
+      ? `$${t.precio}${t.periodo === "unico" ? "" : `/${t.periodo}`}`
+      : "Gratis";
+  const beneficios = t.beneficios.filter(Boolean).join(", ");
+  return `${t.nombre}: ${precio}${beneficios ? ` — ${beneficios}` : ""}`;
+}
+
+function formatPricing(value: string | undefined): string {
+  const data = parsePricing(value);
+  if (!data.modelo) return "";
+  const parts = [MODELO_LABELS[data.modelo] ?? data.modelo];
+
+  if (data.modelo === "suscripcion") {
+    if (data.periodo !== "anual" && data.precioMensual) parts.push(`$${data.precioMensual}/mes`);
+    if (data.periodo !== "mensual" && data.precioAnual) parts.push(`$${data.precioAnual}/año`);
+  }
+  if (data.modelo === "pago_unico" && data.precioUnico) parts.push(`$${data.precioUnico}`);
+  if (data.modelo === "freemium" || data.modelo === "niveles") {
+    (data.tiers ?? [])
+      .filter((t) => t.activo)
+      .forEach((t) => parts.push(formatTier(t)));
+  }
+  return parts.join("\n");
+}
 
 function formatAnswer(field: MissionField, value: string | string[]): string {
   const labelFor = (v: string) => field.options?.find((o) => o.value === v)?.label ?? v;
+  if (field.type === "pricing") return formatPricing(value as string);
   if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
   if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
@@ -79,6 +121,7 @@ export default async function AdminUserPage({
                 .filter((f) => f.type !== "info" && f.type !== "prompt" && f.type !== "link");
               const answeredFields = fields.filter((f) => {
                 const v = answers[f.id];
+                if (f.type === "pricing") return formatPricing(v as string) !== "";
                 if (Array.isArray(v)) return v.some((x) => x !== "");
                 return v !== undefined && v !== "";
               });
