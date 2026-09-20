@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getMission, TOTAL_DAYS } from "@/lib/challenge";
-import { completeDay } from "@/app/actions";
+import { completeDay, uncompleteDay } from "@/app/actions";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 
@@ -21,6 +21,7 @@ export default async function DiaPage({
 
   const done = completedDays.has(day);
   const completeDayWithDay = completeDay.bind(null, day);
+  const uncompleteDayWithDay = uncompleteDay.bind(null, day);
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
@@ -74,8 +75,18 @@ export default async function DiaPage({
 
             <div className="mt-8">
               {done ? (
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
-                  ✓ Misión completada
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
+                    ✓ Misión completada
+                  </div>
+                  <form action={uncompleteDayWithDay}>
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/5 hover:text-white"
+                    >
+                      Desmarcar como completada
+                    </button>
+                  </form>
                 </div>
               ) : (
                 <form action={completeDayWithDay}>

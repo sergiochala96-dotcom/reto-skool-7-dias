@@ -37,7 +37,13 @@ export default function Sidebar({
         >
           ☰
         </button>
-        <span className="text-lg font-extrabold text-white">Skooly</span>
+        <Link
+          href="/dashboard"
+          onClick={() => setMobileOpen(false)}
+          className="text-lg font-extrabold text-white"
+        >
+          Skooly
+        </Link>
       </div>
 
       {mobileOpen && (
@@ -52,10 +58,14 @@ export default function Sidebar({
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center gap-2 px-5 py-6">
+        <Link
+          href="/dashboard"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-2 px-5 py-6"
+        >
           <span className="text-2xl">🎮</span>
           <span className="text-xl font-extrabold text-white">Skooly</span>
-        </div>
+        </Link>
 
         <nav className="flex-1 overflow-y-auto px-3">
           <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-white/30">

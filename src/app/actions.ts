@@ -88,6 +88,27 @@ export async function completeDay(day: number): Promise<void> {
   redirect("/dashboard");
 }
 
+export async function uncompleteDay(day: number): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  // Desmarcar un día también desmarca los siguientes, para no dejar
+  // días "completados" que dependían de uno que ya no lo está.
+  await supabase
+    .from("challenge_progress")
+    .delete()
+    .eq("user_id", user.id)
+    .gte("day", day);
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dia/${day}`);
+  revalidatePath("/cofre");
+}
+
 export async function updateProfile(
   _prevState: AuthState,
   formData: FormData
