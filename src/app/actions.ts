@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
+import { isAdmin } from "@/lib/admin";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -107,6 +108,36 @@ export async function uncompleteDay(day: number): Promise<void> {
   revalidatePath("/dashboard");
   revalidatePath(`/dia/${day}`);
   revalidatePath("/cofre");
+}
+
+export async function adminUnlockAll(): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  const rows = Array.from({ length: TOTAL_DAYS }, (_, i) => ({
+    user_id: user.id,
+    day: i + 1,
+  }));
+  await supabase.from("challenge_progress").upsert(rows, { onConflict: "user_id,day" });
+
+  revalidatePath("/", "layout");
+}
+
+export async function adminResetProgress(): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  await supabase.from("challenge_progress").delete().eq("user_id", user.id);
+
+  revalidatePath("/", "layout");
 }
 
 export async function updateProfile(
