@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthForm from "@/components/AuthForm";
 import GoogleButton from "@/components/GoogleButton";
+import SkoolyLogo from "@/components/SkoolyLogo";
 import { signInWithEmail } from "@/app/actions";
 
 export default function LoginPage() {
@@ -18,7 +19,9 @@ export default function LoginPage() {
               className="mx-auto mb-2 h-24 w-24 object-contain"
               priority
             />
-            <h1 className="text-2xl font-bold text-white">Skooly</h1>
+            <h1 className="text-2xl font-extrabold">
+              <SkoolyLogo />
+            </h1>
             <p className="mt-1 text-sm text-white/60">
               Inicia sesión para continuar tu misión
             </p>

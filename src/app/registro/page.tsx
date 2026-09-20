@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthForm from "@/components/AuthForm";
 import GoogleButton from "@/components/GoogleButton";
+import SkoolyLogo from "@/components/SkoolyLogo";
 import { signUpWithEmail } from "@/app/actions";
 
 export default function RegistroPage() {
@@ -17,7 +18,9 @@ export default function RegistroPage() {
             className="mx-auto mb-2 h-24 w-24 object-contain"
             priority
           />
-          <h1 className="text-2xl font-bold text-white">Únete a Skooly</h1>
+          <h1 className="text-2xl font-extrabold text-white">
+            Únete a <SkoolyLogo />
+          </h1>
           <p className="mt-1 text-sm text-white/60">
             Reto de Skool en 7 Días · 7 misiones, 1 tesoro final
           </p>

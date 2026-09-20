@@ -8,6 +8,7 @@ import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import { adminResetProgress, adminUnlockAll, signOut } from "@/app/actions";
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
+import SkoolyLogo from "@/components/SkoolyLogo";
 
 export default function Sidebar({
   nombre,
@@ -52,7 +53,7 @@ export default function Sidebar({
             height={32}
             className="h-8 w-8 object-contain"
           />
-          Skooly
+          <SkoolyLogo />
         </Link>
       </div>
 
@@ -80,7 +81,7 @@ export default function Sidebar({
             height={40}
             className="h-10 w-10 object-contain"
           />
-          <span className="text-xl font-extrabold text-white">Skooly</span>
+          <SkoolyLogo className="text-xl font-extrabold" />
         </Link>
 
         <div className="px-3 pb-3">

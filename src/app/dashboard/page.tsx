@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
 import ChallengePathHorizontal from "@/components/ChallengePathHorizontal";
 import Avatar from "@/components/Avatar";
+import SkoolyLogo from "@/components/SkoolyLogo";
 
 export default async function DashboardPage() {
   const { nombre, user, avatarUrl, admin, completedDays } = await getSidebarData();
@@ -28,7 +29,7 @@ export default async function DashboardPage() {
             </div>
             <p className="text-sm text-white/50 md:text-xl">Hola, {nombre} 👋</p>
             <h1 className="text-2xl font-bold text-white md:mt-1 md:text-5xl md:font-extrabold">
-              Tu progreso en Skooly
+              Tu progreso en <SkoolyLogo />
             </h1>
             <p className="mt-1 text-sm text-white/60 md:mt-3 md:text-xl">
               {completedCount}/{TOTAL_DAYS} días completados
