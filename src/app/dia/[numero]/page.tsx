@@ -58,27 +58,13 @@ export default async function DiaPage({
           </Link>
 
           <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl lg:p-10">
-            <div className="mb-4 flex items-center gap-4">
-              <span className="text-5xl">{mission.emoji}</span>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                  Día {mission.day} de {TOTAL_DAYS}
-                </p>
-                <h1 className="text-2xl font-bold text-gray-900">{mission.title}</h1>
-              </div>
-            </div>
-
-            <p className="mb-6 text-gray-600">{mission.intro}</p>
-
-            {done && (
-              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 font-semibold text-emerald-700">
-                ✓ Misión completada
-              </div>
-            )}
-
             <MissionForm
               day={day}
               totalDays={TOTAL_DAYS}
+              emoji={mission.emoji}
+              title={mission.title}
+              intro={mission.intro}
+              completed={done}
               sections={sections}
               initialAnswers={initialAnswers}
               saveAction={saveAction}

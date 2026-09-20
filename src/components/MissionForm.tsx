@@ -483,12 +483,20 @@ function FieldInput({
 export default function MissionForm({
   day,
   totalDays,
+  emoji,
+  title,
+  intro,
+  completed,
   sections,
   initialAnswers,
   saveAction,
 }: {
   day: number;
   totalDays: number;
+  emoji: string;
+  title: string;
+  intro: string;
+  completed: boolean;
   sections: MissionSection[];
   initialAnswers: Answers;
   saveAction: (state: MissionState, formData: FormData) => Promise<MissionState>;
@@ -572,6 +580,36 @@ export default function MissionForm({
   );
 
   return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            Día {day} de {totalDays}
+          </p>
+          {allDone && (
+            <button
+              type="button"
+              onClick={toggleExpanded}
+              className="rounded-lg border-2 border-fuchsia-300 bg-white px-3 py-1.5 text-xs font-bold text-fuchsia-700 shadow-sm transition hover:bg-fuchsia-50"
+            >
+              {showAllExpanded ? `Ocultar Respuestas Día ${day}` : `Todas Respuestas Día ${day}`}
+            </button>
+          )}
+        </div>
+        <div className="mt-1 flex items-center gap-4">
+          <span className="text-5xl">{emoji}</span>
+          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+        </div>
+      </div>
+
+      <p className="text-gray-600">{intro}</p>
+
+      {completed && (
+        <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 font-semibold text-emerald-700">
+          ✓ Misión completada
+        </div>
+      )}
+
     <form action={formAction} className="flex flex-col gap-6">
       {total > 0 && (
         <div className="relative rounded-xl border border-gray-200 bg-gray-50 p-3">
@@ -592,18 +630,6 @@ export default function MissionForm({
               +1 XP
             </span>
           )}
-        </div>
-      )}
-
-      {allDone && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={toggleExpanded}
-            className="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-4 py-1.5 text-xs font-semibold text-fuchsia-700 transition hover:bg-fuchsia-100"
-          >
-            {showAllExpanded ? "Ocultar todas mis respuestas" : "Ver todas mis respuestas"}
-          </button>
         </div>
       )}
 
@@ -720,5 +746,6 @@ export default function MissionForm({
         </>
       )}
     </form>
+    </div>
   );
 }

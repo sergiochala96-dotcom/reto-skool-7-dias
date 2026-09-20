@@ -178,10 +178,11 @@ export async function saveMissionAnswers(
 
     revalidatePath("/dashboard");
     revalidatePath(`/dia/${day}`);
+    revalidatePath(`/dia/${day + 1}`);
     revalidatePath("/cofre");
 
     if (day === TOTAL_DAYS) redirect("/cofre");
-    redirect("/dashboard");
+    redirect(`/dia/${day + 1}`);
   }
 
   revalidatePath(`/dia/${day}`);
