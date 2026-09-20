@@ -204,11 +204,9 @@ export async function updateAvatar(
   } = supabase.storage.from("avatars").getPublicUrl(path);
   const avatarUrl = `${publicUrl}?v=${Date.now()}`;
 
-  const { error: authError } = await supabase.auth.updateUser({
-    data: { avatar_url: avatarUrl },
-  });
-  if (authError) return { error: authError.message };
-
+  // Se guarda solo en profiles (no en user_metadata): al iniciar sesión con
+  // Google, Supabase re-sincroniza user_metadata con los datos de Google en
+  // cada login y sobreescribía la foto subida aquí.
   const { error: profileError } = await supabase
     .from("profiles")
     .update({ avatar_url: avatarUrl })
