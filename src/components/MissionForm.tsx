@@ -501,6 +501,7 @@ export default function MissionForm({
   const [currentStep, setCurrentStep] = useState(0);
   const [xpPop, setXpPop] = useState(false);
   const [sectionCelebrate, setSectionCelebrate] = useState(false);
+  const [showAllExpanded, setShowAllExpanded] = useState(false);
 
   const { total, done } = countRequiredFields(day, answers);
   const allDone = total > 0 && done >= total;
@@ -548,6 +549,28 @@ export default function MissionForm({
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, sections.length - 1));
   const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
+  const toggleExpanded = () => {
+    setShowAllExpanded((prev) => {
+      const next = !prev;
+      if (!next) setCurrentStep(0);
+      return next;
+    });
+  };
+
+  const submitButton = (
+    <button
+      type="submit"
+      disabled={pending}
+      className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black disabled:opacity-60"
+    >
+      {pending
+        ? "Guardando..."
+        : allDone
+        ? `🎉 Completar Día ${day}${day < totalDays ? " y desbloquear el siguiente" : ""}`
+        : `Guardar avance (${done}/${total})`}
+    </button>
+  );
+
   return (
     <form action={formAction} className="flex flex-col gap-6">
       {total > 0 && (
@@ -572,31 +595,15 @@ export default function MissionForm({
         </div>
       )}
 
-      {sections.length > 1 && (
-        <div>
-          <div className="mb-2 flex items-center justify-between text-xs font-medium text-gray-500">
-            <span>
-              Paso {currentStep + 1} de {sections.length}
-            </span>
-            <span className="truncate pl-3 text-gray-400">{currentSection?.heading}</span>
-          </div>
-          <div className="flex gap-1.5">
-            {sections.map((s, i) => {
-              const stat = sectionStats[i];
-              const complete = stat.total > 0 && stat.done >= stat.total;
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setCurrentStep(i)}
-                  aria-label={`Ir a ${s.heading}`}
-                  className={`h-2 flex-1 rounded-full transition ${
-                    complete ? "bg-emerald-400" : i === currentStep ? "bg-fuchsia-400" : "bg-gray-200"
-                  }`}
-                />
-              );
-            })}
-          </div>
+      {allDone && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={toggleExpanded}
+            className="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-4 py-1.5 text-xs font-semibold text-fuchsia-700 transition hover:bg-fuchsia-100"
+          >
+            {showAllExpanded ? "Ocultar todas mis respuestas" : "Ver todas mis respuestas"}
+          </button>
         </div>
       )}
 
@@ -618,7 +625,7 @@ export default function MissionForm({
         const fieldsList = visibleFields.map((field) => (
           <FieldInput key={field.id} field={field} value={answers[field.id]} onChange={handleChange} />
         ));
-        const isActive = index === currentStep;
+        const isActive = showAllExpanded || index === currentStep;
         const celebrating = isActive && sectionCelebrate;
 
         return (
@@ -656,38 +663,62 @@ export default function MissionForm({
         </p>
       )}
 
-      <div className="flex gap-3">
-        {currentStep > 0 && (
-          <button
-            type="button"
-            onClick={goPrev}
-            className="rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-          >
-            ← Anterior
-          </button>
-        )}
-        {!isLastStep ? (
-          <button
-            type="button"
-            onClick={goNext}
-            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black"
-          >
-            Siguiente →
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={pending}
-            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black disabled:opacity-60"
-          >
-            {pending
-              ? "Guardando..."
-              : allDone
-              ? `🎉 Completar Día ${day}${day < totalDays ? " y desbloquear el siguiente" : ""}`
-              : `Guardar avance (${done}/${total})`}
-          </button>
-        )}
-      </div>
+      {showAllExpanded ? (
+        <div className="flex gap-3">{submitButton}</div>
+      ) : (
+        <>
+          <div className="flex gap-3">
+            {currentStep > 0 && (
+              <button
+                type="button"
+                onClick={goPrev}
+                className="rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                ← Anterior
+              </button>
+            )}
+            {!isLastStep ? (
+              <button
+                type="button"
+                onClick={goNext}
+                className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black"
+              >
+                Siguiente →
+              </button>
+            ) : (
+              submitButton
+            )}
+          </div>
+
+          {sections.length > 1 && (
+            <div>
+              <div className="mb-2 flex items-center justify-between text-xs font-medium text-gray-500">
+                <span>
+                  Paso {currentStep + 1} de {sections.length}
+                </span>
+                <span className="truncate pl-3 text-gray-400">{currentSection?.heading}</span>
+              </div>
+              <div className="flex gap-1.5">
+                {sections.map((s, i) => {
+                  const stat = sectionStats[i];
+                  const complete = stat.total > 0 && stat.done >= stat.total;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setCurrentStep(i)}
+                      aria-label={`Ir a ${s.heading}`}
+                      className={`h-2 flex-1 rounded-full transition ${
+                        complete ? "bg-emerald-400" : i === currentStep ? "bg-fuchsia-400" : "bg-gray-200"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </form>
   );
 }
