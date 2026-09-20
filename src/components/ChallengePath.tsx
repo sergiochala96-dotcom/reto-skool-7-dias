@@ -36,17 +36,17 @@ export default function ChallengePath({
     y: MISSIONS.length * SPACING + NODE / 2 + TOP_BUFFER,
   };
 
+  // Mascota en los huecos que deja la curva (como en Duolingo). Se posicionan
+  // pegadas al borde de la TARJETA (no del canvas del camino) para que no
+  // obliguen a hacer scroll horizontal ni descentren los checkpoints.
+  const MASCOT_SIZE = 130;
+  const TITLE_BLOCK_HEIGHT = 62; // alto aprox. del título arriba del canvas
+  const mascotLeftY = TITLE_BLOCK_HEIGHT + points[2].y;
+  const mascotRightY = TITLE_BLOCK_HEIGHT + (points[5].y + points[6].y) / 2;
+
   const width = AMPLITUDE * 2 * 1.4 + NODE + 100;
   const height = chestPoint.y + NODE;
   const cx = width / 2;
-
-  // Mascota en los huecos que deja la curva (como en Duolingo): una a la
-  // izquierda mientras el camino se va a la derecha (días 2-4), y otra a
-  // la derecha mientras el camino se va a la izquierda (días 6-7).
-  const MASCOT_SIZE = 64;
-  const GAP_OFFSET = AMPLITUDE + 55;
-  const mascotLeftY = points[2].y;
-  const mascotRightY = (points[5].y + points[6].y) / 2;
 
   const segments: { d: string; active: boolean }[] = [];
   for (let i = 0; i < points.length - 1; i++) {
@@ -69,11 +69,25 @@ export default function ChallengePath({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-8 shadow-2xl shadow-fuchsia-900/40">
+      <div className="relative mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-8 shadow-2xl shadow-fuchsia-900/40">
         <h2 className="mb-1 px-4 text-center text-base">
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
+
+        <div
+          className="absolute z-10"
+          style={{ left: 4, top: mascotLeftY - MASCOT_SIZE / 2 }}
+        >
+          <MascotCashButton className="h-[130px] w-[130px]" />
+        </div>
+
+        <div
+          className="absolute z-10"
+          style={{ right: 4, top: mascotRightY - MASCOT_SIZE / 2 }}
+        >
+          <MascotCashButton className="h-[130px] w-[130px]" />
+        </div>
 
         <div className="overflow-x-auto">
           <div className="relative mx-auto" style={{ width, height: height + 90 }}>
@@ -196,26 +210,6 @@ export default function ChallengePath({
               Premio final
             </p>
           </div>
-        </div>
-
-        <div
-          className="absolute"
-          style={{
-            left: cx - GAP_OFFSET - MASCOT_SIZE / 2,
-            top: mascotLeftY - MASCOT_SIZE / 2,
-          }}
-        >
-          <MascotCashButton className="h-16 w-16" />
-        </div>
-
-        <div
-          className="absolute"
-          style={{
-            left: cx + GAP_OFFSET - MASCOT_SIZE / 2,
-            top: mascotRightY - MASCOT_SIZE / 2,
-          }}
-        >
-          <MascotCashButton className="h-16 w-16" />
         </div>
         </div>
         </div>
