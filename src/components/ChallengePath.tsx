@@ -40,6 +40,14 @@ export default function ChallengePath({
   const height = chestPoint.y + NODE;
   const cx = width / 2;
 
+  // Mascota en los huecos que deja la curva (como en Duolingo): una a la
+  // izquierda mientras el camino se va a la derecha (días 2-4), y otra a
+  // la derecha mientras el camino se va a la izquierda (días 6-7).
+  const MASCOT_SIZE = 64;
+  const GAP_OFFSET = AMPLITUDE + 55;
+  const mascotLeftY = points[2].y;
+  const mascotRightY = (points[5].y + points[6].y) / 2;
+
   const segments: { d: string; active: boolean }[] = [];
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i];
@@ -66,10 +74,6 @@ export default function ChallengePath({
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
-
-        <div className="mb-2 flex justify-center">
-          <MascotCashButton className="h-16 w-16" />
-        </div>
 
         <div className="overflow-x-auto">
           <div className="relative mx-auto" style={{ width, height: height + 90 }}>
@@ -192,6 +196,26 @@ export default function ChallengePath({
               Premio final
             </p>
           </div>
+        </div>
+
+        <div
+          className="absolute"
+          style={{
+            left: cx - GAP_OFFSET - MASCOT_SIZE / 2,
+            top: mascotLeftY - MASCOT_SIZE / 2,
+          }}
+        >
+          <MascotCashButton className="h-16 w-16" />
+        </div>
+
+        <div
+          className="absolute"
+          style={{
+            left: cx + GAP_OFFSET - MASCOT_SIZE / 2,
+            top: mascotRightY - MASCOT_SIZE / 2,
+          }}
+        >
+          <MascotCashButton className="h-16 w-16" />
         </div>
         </div>
         </div>
