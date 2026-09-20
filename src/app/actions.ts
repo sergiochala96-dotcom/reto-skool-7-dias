@@ -88,6 +88,34 @@ export async function completeDay(day: number): Promise<void> {
   redirect("/dashboard");
 }
 
+export async function updateProfile(
+  _prevState: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const nombre = String(formData.get("nombre") || "").trim();
+  if (!nombre) return { error: "El nombre no puede estar vacío." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error: authError } = await supabase.auth.updateUser({
+    data: { display_name: nombre },
+  });
+  if (authError) return { error: authError.message };
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ display_name: nombre })
+    .eq("id", user.id);
+  if (profileError) return { error: profileError.message };
+
+  revalidatePath("/", "layout");
+  return { error: undefined };
+}
+
 function traducirError(message: string): string {
   if (message.includes("Invalid login credentials"))
     return "Email o contraseña incorrectos.";
