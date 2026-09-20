@@ -889,11 +889,15 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
   return true;
 }
 
-function requiredVisibleFields(day: number, answers: Answers): MissionField[] {
-  return flatFields(day)
+function requiredVisibleFrom(fields: MissionField[], answers: Answers): MissionField[] {
+  return fields
     .filter((f) => !NO_INFO_TYPES.includes(f.type))
     .filter((f) => f.required !== false)
     .filter((f) => isVisible(f, answers));
+}
+
+function requiredVisibleFields(day: number, answers: Answers): MissionField[] {
+  return requiredVisibleFrom(flatFields(day), answers);
 }
 
 export function getMissingRequiredFieldIds(day: number, answers: Answers): string[] {
@@ -907,6 +911,18 @@ export function countRequiredFields(
   answers: Answers
 ): { total: number; done: number } {
   const required = requiredVisibleFields(day, answers);
+  const done = required.filter((f) => isAnswered(f, answers)).length;
+  return { total: required.length, done };
+}
+
+// Igual que countRequiredFields pero acotado a un subconjunto de campos
+// (por ejemplo, los de una sola sección), para mostrar el avance paso a
+// paso dentro de una misión.
+export function countFieldsAnswered(
+  fields: MissionField[],
+  answers: Answers
+): { total: number; done: number } {
+  const required = requiredVisibleFrom(fields, answers);
   const done = required.filter((f) => isAnswered(f, answers)).length;
   return { total: required.length, done };
 }

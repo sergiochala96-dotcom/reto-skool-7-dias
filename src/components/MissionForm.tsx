@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { MissionField, MissionSection, Answers } from "@/lib/missionFields";
-import { countRequiredFields } from "@/lib/missionFields";
+import { countFieldsAnswered, countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
 import OfferField from "@/components/OfferField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
+import { playSuccessDing } from "@/lib/successSound";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -497,6 +498,9 @@ export default function MissionForm({
     saveAction,
     undefined
   );
+  const [currentStep, setCurrentStep] = useState(0);
+  const [xpPop, setXpPop] = useState(false);
+  const [sectionCelebrate, setSectionCelebrate] = useState(false);
 
   const { total, done } = countRequiredFields(day, answers);
   const allDone = total > 0 && done >= total;
@@ -505,14 +509,53 @@ export default function MissionForm({
     setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
+  // "+1 XP" cada vez que sube el número de campos completados del día.
+  const prevDoneRef = useRef(done);
+  useEffect(() => {
+    if (done > prevDoneRef.current) {
+      setXpPop(true);
+      playSuccessDing();
+      const t = setTimeout(() => setXpPop(false), 900);
+      prevDoneRef.current = done;
+      return () => clearTimeout(t);
+    }
+    prevDoneRef.current = done;
+  }, [done]);
+
+  const sectionStats = sections.map((s) => countFieldsAnswered(s.fields, answers));
+  const currentSection = sections[currentStep];
+  const currentStat = sectionStats[currentStep];
+
+  // Festejo cuando la sección que se está viendo queda completa.
+  const celebratedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (
+      currentSection &&
+      currentStat &&
+      currentStat.total > 0 &&
+      currentStat.done >= currentStat.total &&
+      !celebratedRef.current.has(currentSection.id)
+    ) {
+      celebratedRef.current.add(currentSection.id);
+      setSectionCelebrate(true);
+      const t = setTimeout(() => setSectionCelebrate(false), 1300);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, currentStat?.done, currentStat?.total]);
+
+  const isLastStep = currentStep === sections.length - 1;
+  const goNext = () => setCurrentStep((s) => Math.min(s + 1, sections.length - 1));
+  const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
+
   return (
     <form action={formAction} className="flex flex-col gap-6">
       {total > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+        <div className="relative rounded-xl border border-gray-200 bg-gray-50 p-3">
           <div className="mb-1.5 flex items-center justify-between text-xs font-medium text-gray-500">
-            <span>Progreso de la misión</span>
+            <span>⭐ Progreso de la misión</span>
             <span>
-              {done}/{total}
+              {done}/{total} XP
             </span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-gray-200">
@@ -521,10 +564,43 @@ export default function MissionForm({
               style={{ width: `${total ? (done / total) * 100 : 0}%` }}
             />
           </div>
+          {xpPop && (
+            <span className="pointer-events-none absolute -top-3 right-3 animate-bounce rounded-full bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white shadow-lg">
+              +1 XP
+            </span>
+          )}
         </div>
       )}
 
-      {sections.map((section) => {
+      {sections.length > 1 && (
+        <div>
+          <div className="mb-2 flex items-center justify-between text-xs font-medium text-gray-500">
+            <span>
+              Paso {currentStep + 1} de {sections.length}
+            </span>
+            <span className="truncate pl-3 text-gray-400">{currentSection?.heading}</span>
+          </div>
+          <div className="flex gap-1.5">
+            {sections.map((s, i) => {
+              const stat = sectionStats[i];
+              const complete = stat.total > 0 && stat.done >= stat.total;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setCurrentStep(i)}
+                  aria-label={`Ir a ${s.heading}`}
+                  className={`h-2 flex-1 rounded-full transition ${
+                    complete ? "bg-emerald-400" : i === currentStep ? "bg-fuchsia-400" : "bg-gray-200"
+                  }`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {sections.map((section, index) => {
         const visibleFields = section.fields.filter(
           (f) => !f.showIf || answers[f.showIf.field] === f.showIf.equals
         );
@@ -542,12 +618,21 @@ export default function MissionForm({
         const fieldsList = visibleFields.map((field) => (
           <FieldInput key={field.id} field={field} value={answers[field.id]} onChange={handleChange} />
         ));
+        const isActive = index === currentStep;
+        const celebrating = isActive && sectionCelebrate;
 
         return (
           <section
             key={section.id}
-            className="rounded-2xl border border-gray-200 bg-gray-50 p-5 lg:p-7"
+            className={`relative rounded-2xl border p-5 transition lg:p-7 ${
+              isActive ? "" : "hidden"
+            } ${celebrating ? "border-emerald-400 bg-emerald-50/60" : "border-gray-200 bg-gray-50"}`}
           >
+            {celebrating && (
+              <span className="absolute -top-3 right-4 animate-bounce rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                ✓ ¡Sección completa!
+              </span>
+            )}
             {section.imagePosition === "above-heading" && sectionImage}
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
               {section.heading}
@@ -571,17 +656,38 @@ export default function MissionForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black disabled:opacity-60"
-      >
-        {pending
-          ? "Guardando..."
-          : allDone
-          ? `🎉 Completar Día ${day}${day < totalDays ? " y desbloquear el siguiente" : ""}`
-          : `Guardar avance (${done}/${total})`}
-      </button>
+      <div className="flex gap-3">
+        {currentStep > 0 && (
+          <button
+            type="button"
+            onClick={goPrev}
+            className="rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            ← Anterior
+          </button>
+        )}
+        {!isLastStep ? (
+          <button
+            type="button"
+            onClick={goNext}
+            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black"
+          >
+            Siguiente →
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={pending}
+            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black disabled:opacity-60"
+          >
+            {pending
+              ? "Guardando..."
+              : allDone
+              ? `🎉 Completar Día ${day}${day < totalDays ? " y desbloquear el siguiente" : ""}`
+              : `Guardar avance (${done}/${total})`}
+          </button>
+        )}
+      </div>
     </form>
   );
 }
