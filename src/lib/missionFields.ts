@@ -20,8 +20,8 @@ export type MissionField = {
   type: FieldType;
   helper?: string;
   placeholder?: string;
-  options?: { value: string; label: string; description?: string }[];
-  display?: "pills" | "dropdown";
+  options?: { value: string; label: string; description?: string; icon?: string }[];
+  display?: "pills" | "dropdown" | "icon-cards";
   promptText?: string;
   infoText?: string;
   url?: string;
@@ -79,6 +79,21 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       heading: "Tu canal y tu audiencia",
       fields: [
         {
+          id: "red_favorita",
+          type: "select",
+          display: "icon-cards",
+          label: "Tu red social principal",
+          options: [
+            { value: "instagram", label: "Instagram", icon: "instagram" },
+            { value: "youtube", label: "YouTube", icon: "youtube" },
+            { value: "linkedin", label: "LinkedIn", icon: "linkedin" },
+            { value: "tiktok", label: "TikTok", icon: "tiktok" },
+            { value: "facebook", label: "Facebook", icon: "facebook" },
+            { value: "email", label: "Email", icon: "email" },
+            { value: "otra", label: "Otra", icon: "otra" },
+          ],
+        },
+        {
           id: "canal_usuario",
           type: "text",
           label: "Tu usuario en tu canal preferido",
@@ -89,20 +104,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "text",
           label: "Seguidores o lista que tienes",
           placeholder: "Ej: 1.200 seguidores en Instagram + 300 en mi lista de email",
-        },
-        {
-          id: "red_favorita",
-          type: "select",
-          label: "¿Cuál es tu red social favorita?",
-          options: [
-            { value: "instagram", label: "📸 Instagram" },
-            { value: "tiktok", label: "🎵 TikTok" },
-            { value: "facebook", label: "📘 Facebook" },
-            { value: "youtube", label: "▶️ YouTube" },
-            { value: "linkedin", label: "💼 LinkedIn" },
-            { value: "email", label: "📧 Email" },
-            { value: "otra", label: "🔗 Otra" },
-          ],
         },
       ],
     },

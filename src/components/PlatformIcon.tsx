@@ -1,0 +1,62 @@
+import type { ReactNode } from "react";
+
+const PATHS: Record<string, ReactNode> = {
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  youtube: (
+    <>
+      <rect x="2.5" y="5" width="19" height="14" rx="4" />
+      <path d="M10.5 9.5v5l4.5-2.5z" fill="currentColor" stroke="none" />
+    </>
+  ),
+  linkedin: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <circle cx="8" cy="8.5" r="1.1" fill="currentColor" stroke="none" />
+      <path d="M8 11.5v6" />
+      <path d="M12 17.5v-3.8c0-1.3 1-2.2 2.2-2.2s2 .9 2 2.2v3.8" />
+      <path d="M12 11.5v6" />
+    </>
+  ),
+  tiktok: (
+    <path d="M14.5 3v10.5a3 3 0 1 1-2.4-2.94V8a5.3 5.3 0 0 0 5.3 5.3V10.7a2.7 2.7 0 0 1-2.9-2.7V3z" />
+  ),
+  facebook: (
+    <path d="M14 21v-7h2.5l.5-3H14V9c0-.9.3-1.5 1.7-1.5H17V4.8c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4V11H8.5v3H10.8v7z" />
+  ),
+  email: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="m4 7 8 6 8-6" />
+    </>
+  ),
+  otra: (
+    <>
+      <path d="M9 12a4 4 0 0 0 4 4h2a4 4 0 0 0 0-8h-1" />
+      <path d="M15 12a4 4 0 0 0-4-4H9a4 4 0 0 0 0 8h1" />
+    </>
+  ),
+};
+
+export default function PlatformIcon({ id, className }: { id: string; className?: string }) {
+  const inner = PATHS[id];
+  if (!inner) return null;
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      {inner}
+    </svg>
+  );
+}

@@ -7,6 +7,7 @@ import { countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
 import OfferField from "@/components/OfferField";
+import PlatformIcon from "@/components/PlatformIcon";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -359,7 +360,44 @@ function FieldInput({
         </select>
       )}
 
-      {(field.type === "yesno" || (field.type === "select" && field.display !== "dropdown")) && (
+      {field.type === "select" && field.display === "icon-cards" && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {field.options?.map((opt) => {
+            const selected = value === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onChange(field.id, opt.value)}
+                className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition ${
+                  selected
+                    ? "border-fuchsia-400 bg-fuchsia-50"
+                    : "border-gray-200 bg-white hover:bg-gray-50"
+                }`}
+              >
+                <span
+                  className={`flex h-11 w-11 items-center justify-center rounded-full ${
+                    selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+                  }`}
+                >
+                  {opt.icon && <PlatformIcon id={opt.icon} className="h-6 w-6" />}
+                </span>
+                <span
+                  className={`text-xs font-bold uppercase tracking-wide ${
+                    selected ? "text-fuchsia-700" : "text-gray-400"
+                  }`}
+                >
+                  {opt.label}
+                </span>
+              </button>
+            );
+          })}
+          <input type="hidden" name={`field_${field.id}`} value={textValue} />
+        </div>
+      )}
+
+      {(field.type === "yesno" ||
+        (field.type === "select" && field.display !== "dropdown" && field.display !== "icon-cards")) && (
         <div>
           <div className="flex flex-wrap gap-2">
             {field.options?.map((opt) => {
