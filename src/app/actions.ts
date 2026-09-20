@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
+import { countRequiredFields, getMissingRequiredFieldIds, type Answers } from "@/lib/missionFields";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -108,6 +109,71 @@ export async function uncompleteDay(day: number): Promise<void> {
   revalidatePath("/dashboard");
   revalidatePath(`/dia/${day}`);
   revalidatePath("/cofre");
+}
+
+export type MissionState =
+  | { saved: true; missing: number; total: number }
+  | undefined;
+
+export async function saveMissionAnswers(
+  day: number,
+  _prevState: MissionState,
+  formData: FormData
+): Promise<MissionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: progress } = await supabase
+    .from("challenge_progress")
+    .select("day")
+    .eq("user_id", user.id);
+
+  const completedDays = new Set((progress ?? []).map((p) => p.day));
+  const unlocked = day === 1 || completedDays.has(day - 1);
+  if (!unlocked || day < 1 || day > TOTAL_DAYS) redirect("/dashboard");
+
+  const answers: Answers = {};
+  for (const [key, value] of formData.entries()) {
+    if (!key.startsWith("field_")) continue;
+    const id = key.slice("field_".length);
+    if (id in answers) {
+      const existing = answers[id];
+      answers[id] = Array.isArray(existing) ? [...existing, String(value)] : [String(existing), String(value)];
+    } else {
+      answers[id] = String(value);
+    }
+  }
+
+  await supabase
+    .from("mission_answers")
+    .upsert(
+      { user_id: user.id, day, answers, updated_at: new Date().toISOString() },
+      { onConflict: "user_id,day" }
+    );
+
+  const missingIds = getMissingRequiredFieldIds(day, answers);
+  const { total } = countRequiredFields(day, answers);
+
+  if (missingIds.length === 0 && !completedDays.has(day)) {
+    await supabase
+      .from("challenge_progress")
+      .upsert({ user_id: user.id, day }, { onConflict: "user_id,day" });
+
+    revalidatePath("/dashboard");
+    revalidatePath(`/dia/${day}`);
+    revalidatePath("/cofre");
+
+    if (day === TOTAL_DAYS) redirect("/cofre");
+    redirect("/dashboard");
+  }
+
+  revalidatePath(`/dia/${day}`);
+
+  return { saved: true, missing: missingIds.length, total };
 }
 
 export async function adminUnlockAll(): Promise<void> {

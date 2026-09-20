@@ -1,8 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import { getMission, TOTAL_DAYS } from "@/lib/challenge";
-import { completeDay, uncompleteDay } from "@/app/actions";
+import { getMissionSections, type Answers } from "@/lib/missionFields";
+import { saveMissionAnswers, uncompleteDay } from "@/app/actions";
 import { getSidebarData } from "@/lib/sidebar-data";
+import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
+import MissionForm from "@/components/MissionForm";
 
 export default async function DiaPage({
   params,
@@ -20,8 +23,19 @@ export default async function DiaPage({
   if (!unlocked) redirect("/dashboard");
 
   const done = completedDays.has(day);
-  const completeDayWithDay = completeDay.bind(null, day);
   const uncompleteDayWithDay = uncompleteDay.bind(null, day);
+  const saveAction = saveMissionAnswers.bind(null, day);
+
+  const supabase = await createClient();
+  const { data: answerRow } = await supabase
+    .from("mission_answers")
+    .select("answers")
+    .eq("user_id", user.id)
+    .eq("day", day)
+    .maybeSingle();
+
+  const initialAnswers = (answerRow?.answers ?? {}) as Answers;
+  const sections = getMissionSections(day);
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
@@ -46,60 +60,31 @@ export default async function DiaPage({
               </div>
             </div>
 
-            <section className="mt-6">
-              <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
-                Objetivo
-              </h2>
-              <p className="text-white/80">{mission.objetivo}</p>
-            </section>
+            <p className="mb-6 text-white/70">{mission.intro}</p>
 
-            <section className="mt-6">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
-                Tareas
-              </h2>
-              <ul className="space-y-2">
-                {mission.tareas.map((t, i) => (
-                  <li key={i} className="flex gap-2 text-white/80">
-                    <span className="text-fuchsia-400">•</span>
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-              <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
-                Entregable
-              </h2>
-              <p className="text-white/80">{mission.entregable}</p>
-            </section>
-
-            <div className="mt-8">
-              {done ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
-                    ✓ Misión completada
-                  </div>
-                  <form action={uncompleteDayWithDay}>
-                    <button
-                      type="submit"
-                      className="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/5 hover:text-white"
-                    >
-                      Desmarcar como completada
-                    </button>
-                  </form>
+            {done && (
+              <div className="mb-6 flex flex-col gap-3">
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
+                  ✓ Misión completada
                 </div>
-              ) : (
-                <form action={completeDayWithDay}>
+                <form action={uncompleteDayWithDay}>
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:brightness-110"
+                    className="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/5 hover:text-white"
                   >
-                    Marcar misión como completada
+                    Desmarcar como completada
                   </button>
                 </form>
-              )}
-            </div>
+              </div>
+            )}
+
+            <MissionForm
+              day={day}
+              totalDays={TOTAL_DAYS}
+              sections={sections}
+              initialAnswers={initialAnswers}
+              saveAction={saveAction}
+            />
           </div>
         </div>
       </main>

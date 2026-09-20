@@ -92,6 +92,7 @@ export default async function AdminPage({
                   <th className="px-4 py-3 font-medium">Progreso</th>
                   <th className="px-4 py-3 font-medium">Última actividad</th>
                   <th className="px-4 py-3 font-medium">Registrado</th>
+                  <th className="px-4 py-3 font-medium">Respuestas</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,11 +122,19 @@ export default async function AdminPage({
                     <td className="px-4 py-3 text-white/60">
                       {new Date(row.created_at).toLocaleDateString("es")}
                     </td>
+                    <td className="px-4 py-3">
+                      <a
+                        href={`/admin/${row.id}`}
+                        className="font-medium text-fuchsia-300 hover:underline"
+                      >
+                        Ver respuestas →
+                      </a>
+                    </td>
                   </tr>
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={6} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>
