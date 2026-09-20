@@ -1,6 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CURRENT_EPISODE_TITLE, MISSIONS, NEXT_EPISODE_TEASER, TOTAL_DAYS } from "@/lib/challenge";
+import {
+  CURRENT_EPISODE_LABEL,
+  CURRENT_EPISODE_NAME,
+  MISSIONS,
+  NEXT_EPISODE_TEASER,
+  TOTAL_DAYS,
+} from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 
 export default function ChallengePathHorizontal({
@@ -17,8 +23,9 @@ export default function ChallengePathHorizontal({
   return (
     <div className="mx-auto mb-12 hidden md:block">
       <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-6 pt-10 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-8 lg:pt-12">
-        <h2 className="mb-0 text-center text-2xl font-semibold text-white lg:text-3xl">
-          {CURRENT_EPISODE_TITLE}
+        <h2 className="mb-0 text-center text-lg lg:text-xl">
+          <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
+          <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
         <div className="flex items-center gap-6 overflow-x-auto pt-8">
