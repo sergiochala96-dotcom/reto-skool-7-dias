@@ -41,6 +41,26 @@ const PATHS: Record<string, ReactNode> = {
       <path d="M15 12a4 4 0 0 0-4-4H9a4 4 0 0 0 0 8h1" />
     </>
   ),
+  hombre: (
+    <>
+      <circle cx="10" cy="14" r="6" />
+      <path d="M14.5 9.5 20 4" />
+      <path d="M15 4h5v5" />
+    </>
+  ),
+  mujer: (
+    <>
+      <circle cx="12" cy="9" r="6" />
+      <path d="M12 15v7" />
+      <path d="M9 19h6" />
+    </>
+  ),
+  ambos: (
+    <>
+      <circle cx="9" cy="12" r="6" />
+      <circle cx="15" cy="12" r="6" />
+    </>
+  ),
 };
 
 export default function PlatformIcon({ id, className }: { id: string; className?: string }) {

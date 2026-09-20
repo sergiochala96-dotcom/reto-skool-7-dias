@@ -311,6 +311,27 @@ function FieldInput({
 
   const textValue = (value as string) ?? "";
 
+  if (field.type === "text" && field.inlineBadge) {
+    return (
+      <div>
+        <div className="flex items-center gap-3">
+          <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-3 py-1.5 text-xs font-bold text-fuchsia-700">
+            {field.badgeLabel ?? field.label}
+          </span>
+          <input
+            name={`field_${field.id}`}
+            value={textValue}
+            placeholder={field.placeholder}
+            maxLength={field.maxLength}
+            onChange={(e) => onChange(field.id, e.target.value)}
+            className={`${inputBase} flex-1`}
+          />
+        </div>
+        {field.helper && <p className="mt-1.5 text-xs text-gray-500">{field.helper}</p>}
+      </div>
+    );
+  }
+
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
@@ -376,7 +397,11 @@ function FieldInput({
       )}
 
       {field.type === "select" && field.display === "icon-cards" && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div
+          className={`grid gap-2 ${
+            (field.options?.length ?? 0) <= 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"
+          }`}
+        >
           {field.options?.map((opt) => {
             const selected = value === opt.value;
             return (

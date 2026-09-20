@@ -22,6 +22,7 @@ export type MissionField = {
   placeholder?: string;
   options?: { value: string; label: string; description?: string; icon?: string }[];
   display?: "pills" | "dropdown" | "icon-cards";
+  inlineBadge?: boolean;
   promptText?: string;
   infoText?: string;
   url?: string;
@@ -102,12 +103,21 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "text",
           label: "Tu usuario en tu canal preferido",
           placeholder: "@tu_usuario",
+          inlineBadge: true,
+          badgeLabel: "Tu Usuario:",
         },
         {
           id: "canal_seguidores",
-          type: "text",
+          type: "select",
+          display: "pills",
           label: "Seguidores o lista que tienes",
-          placeholder: "Ej: 1.200 seguidores en Instagram + 300 en mi lista de email",
+          options: [
+            { value: "0-100", label: "0-100 seguidores" },
+            { value: "100-1000", label: "100 - 1.000 seguidores" },
+            { value: "1000-10000", label: "1.000 - 10.000 seguidores" },
+            { value: "10000-100000", label: "10.000 - 100.000 seguidores" },
+            { value: "100000+", label: "Más de 100.000 seguidores" },
+          ],
         },
       ],
     },
@@ -125,18 +135,27 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "avatar_genero",
           type: "select",
-          display: "dropdown",
+          display: "icon-cards",
           label: "Identifica tu avatar",
           options: [
-            { value: "hombres", label: "Hombres" },
-            { value: "mujeres", label: "Mujeres" },
-            { value: "ambos", label: "Ambos" },
+            { value: "hombres", label: "Hombres", icon: "hombre" },
+            { value: "mujeres", label: "Mujeres", icon: "mujer" },
+            { value: "ambos", label: "Ambos", icon: "ambos" },
           ],
         },
         {
           id: "edad",
-          type: "range",
+          type: "multiselect",
           label: "Rango de edades de tu avatar",
+          helper: "Selecciona una o varias",
+          options: [
+            { value: "18-24", label: "18-24 años" },
+            { value: "25-34", label: "25-34 años" },
+            { value: "35-44", label: "35-44 años" },
+            { value: "45-54", label: "45-54 años" },
+            { value: "55-65", label: "55-65 años" },
+            { value: "65+", label: "65+ Años" },
+          ],
         },
       ],
     },
