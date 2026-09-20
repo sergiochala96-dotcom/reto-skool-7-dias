@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import confetti from "canvas-confetti";
+import TreasureChestIcon from "@/components/TreasureChestIcon";
+import TreasureChestOpenIcon from "@/components/TreasureChestOpenIcon";
 
 type Props = {
   nombre: string;
@@ -44,16 +46,17 @@ export default function TreasureChest({ nombre }: Props) {
           onClick={handleOpen}
           className="group flex flex-col items-center gap-4 focus:outline-none"
         >
-          <span className="text-[7rem] leading-none transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-            🎁
-          </span>
+          <TreasureChestIcon
+            locked={false}
+            className="h-40 w-40 drop-shadow-[0_0_25px_rgba(245,158,11,0.45)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
+          />
           <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-6 py-3 font-bold text-slate-900 shadow-lg shadow-amber-500/30 transition group-hover:brightness-110">
             Abrir el Cofre del Tesoro
           </span>
         </button>
       ) : (
         <div className="flex flex-col items-center gap-5 animate-[fadeIn_0.6s_ease]">
-          <span className="text-[7rem] leading-none">🏆</span>
+          <TreasureChestOpenIcon className="h-40 w-40 drop-shadow-[0_0_30px_rgba(245,158,11,0.55)]" />
           <h2 className="text-2xl font-bold text-amber-300">
             ¡Felicidades, {nombre}!
           </h2>
