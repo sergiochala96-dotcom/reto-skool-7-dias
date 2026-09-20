@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getMission, TOTAL_DAYS } from "@/lib/challenge";
 import { getMissionSections, type Answers } from "@/lib/missionFields";
-import { saveMissionAnswers, uncompleteDay } from "@/app/actions";
+import { saveMissionAnswers } from "@/app/actions";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
@@ -23,7 +24,6 @@ export default async function DiaPage({
   if (!unlocked) redirect("/dashboard");
 
   const done = completedDays.has(day);
-  const uncompleteDayWithDay = uncompleteDay.bind(null, day);
   const saveAction = saveMissionAnswers.bind(null, day);
 
   const supabase = await createClient();
@@ -49,6 +49,13 @@ export default async function DiaPage({
 
       <main className="flex-1 px-4 py-10">
         <div className="mx-auto max-w-2xl">
+          <Link
+            href="/dashboard"
+            className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-white/60 transition hover:text-white"
+          >
+            ← Volver al inicio
+          </Link>
+
           <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
             <div className="mb-4 flex items-center gap-4">
               <span className="text-5xl">{mission.emoji}</span>
@@ -63,18 +70,8 @@ export default async function DiaPage({
             <p className="mb-6 text-white/70">{mission.intro}</p>
 
             {done && (
-              <div className="mb-6 flex flex-col gap-3">
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
-                  ✓ Misión completada
-                </div>
-                <form action={uncompleteDayWithDay}>
-                  <button
-                    type="submit"
-                    className="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/5 hover:text-white"
-                  >
-                    Desmarcar como completada
-                  </button>
-                </form>
+              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-300">
+                ✓ Misión completada
               </div>
             )}
 

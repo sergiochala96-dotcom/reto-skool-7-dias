@@ -7,6 +7,7 @@ export type FieldType =
   | "multiselect"
   | "list"
   | "range"
+  | "slider"
   | "prompt"
   | "link"
   | "info";
@@ -31,6 +32,11 @@ export type MissionField = {
   itemPlaceholder?: string;
   itemMaxLength?: number;
   addLabel?: string;
+  badgeLabel?: string;
+  sliderMin?: number;
+  sliderMax?: number;
+  sliderStep?: number;
+  sliderUnit?: string;
   required?: boolean;
   showIf?: { field: string; equals: string };
 };
@@ -117,8 +123,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           id: "problemas_avatar",
           type: "list",
           label: "Problemas de tu avatar",
-          helper: "Escribe mínimo 5",
-          minItems: 5,
+          helper: "Escribe mínimo 3",
+          minItems: 3,
           addLabel: "+ Añadir problema",
           itemPlaceholder: "Ej: no sabe por dónde empezar",
         },
@@ -126,8 +132,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           id: "deseos_avatar",
           type: "list",
           label: "Deseos de tu avatar",
-          helper: "Escribe mínimo 5",
-          minItems: 5,
+          helper: "Escribe mínimo 3",
+          minItems: 3,
           addLabel: "+ Añadir deseo",
           itemPlaceholder: "Ej: quiere generar ingresos extra",
         },
@@ -141,8 +147,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           id: "diferenciacion",
           type: "list",
           label: "¿Qué te diferencia?",
-          helper: "Escribe mínimo 5",
-          minItems: 5,
+          helper: "Escribe mínimo 3",
+          minItems: 3,
           addLabel: "+ Añadir diferencial",
         },
         {
@@ -437,7 +443,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Intenta que sea temático y personalizado para tu comunidad",
           minItems: 9,
           maxItems: 9,
-          addLabel: "+ Añadir nivel",
+          badgeLabel: "Nivel",
         },
         {
           id: "niveles_premios",
@@ -507,6 +513,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 2,
           maxItems: 15,
           addLabel: "+ Añadir módulo/curso",
+          badgeLabel: "Curso",
         },
         {
           id: "nombres_videos",
@@ -532,9 +539,13 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       fields: [
         {
           id: "personas_invitadas",
-          type: "number",
+          type: "slider",
           label: "¿Cuántas personas has invitado?",
-          helper: "Mínimo 5 (puedes invitar gratis si es necesario)",
+          helper: "Arrastra el punto (puedes invitar gratis si es necesario)",
+          sliderMin: 1,
+          sliderMax: 20,
+          sliderStep: 1,
+          sliderUnit: "personas",
         },
         {
           id: "canales_invitacion",
@@ -610,16 +621,14 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       heading: "Ritmo de publicación",
       fields: [
         {
-          id: "frecuencia_min",
-          type: "text",
-          label: "Frecuencia mínima de publicación",
-          placeholder: "Ej: 3 veces por semana",
-        },
-        {
-          id: "frecuencia_max",
-          type: "text",
-          label: "Frecuencia máxima de publicación",
-          placeholder: "Ej: 1 vez al día",
+          id: "frecuencia",
+          type: "slider",
+          label: "Frecuencia de publicación",
+          helper: "¿Cuántas veces publicarás en tu Skool?",
+          sliderMin: 3,
+          sliderMax: 14,
+          sliderStep: 1,
+          sliderUnit: "veces",
         },
       ],
     },
@@ -629,13 +638,17 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       fields: [
         {
           id: "tematicas",
-          type: "textarea",
+          type: "list",
           label: "¿Qué temáticas publicarás?",
+          minItems: 1,
+          addLabel: "+ Añadir temática",
         },
         {
           id: "como_conversacion",
-          type: "textarea",
+          type: "list",
           label: "¿Cómo crearás conversación en tus publicaciones?",
+          minItems: 1,
+          addLabel: "+ Añadir idea",
         },
       ],
     },
@@ -651,8 +664,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "dinamicas_detalle",
-          type: "textarea",
+          type: "list",
           label: "Cuéntanos brevemente qué tipo de dinámicas o retos",
+          minItems: 1,
+          addLabel: "+ Añadir dinámica",
           showIf: { field: "dinamicas", equals: "si" },
         },
       ],

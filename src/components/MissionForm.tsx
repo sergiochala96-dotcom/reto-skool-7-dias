@@ -5,6 +5,9 @@ import type { MissionField, MissionSection, Answers } from "@/lib/missionFields"
 import { countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
 
+const inputBase =
+  "w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-fuchsia-400";
+
 function PromptField({ field }: { field: MissionField }) {
   const [copied, setCopied] = useState(false);
 
@@ -21,7 +24,7 @@ function PromptField({ field }: { field: MissionField }) {
   return (
     <div className="rounded-xl border border-dashed border-fuchsia-400/30 bg-fuchsia-500/5 p-4">
       <p className="mb-2 text-sm font-semibold text-fuchsia-200">💡 {field.label}</p>
-      <p className="whitespace-pre-wrap rounded-lg bg-black/30 p-3 font-mono text-xs leading-relaxed text-white/70">
+      <p className="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 font-mono text-xs leading-relaxed text-gray-700">
         {field.promptText}
       </p>
       <button
@@ -71,7 +74,10 @@ function ListField({
   onChange: (id: string, value: string[]) => void;
 }) {
   const minRows = field.minItems ?? 1;
-  const items = value && value.length > 0 ? value : Array(minRows).fill("");
+  // value puede venir de una respuesta antigua guardada como texto plano (antes de
+  // que este campo fuera de tipo "list"): si no es un array, se ignora y se parte
+  // de filas vacías en vez de romper el .map de abajo.
+  const items = Array.isArray(value) && value.length > 0 ? value : Array(minRows).fill("");
 
   const setItem = (index: number, text: string) => {
     const next = [...items];
@@ -91,16 +97,22 @@ function ListField({
       <div className="flex flex-col gap-2">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="text-fuchsia-400">•</span>
+            {field.badgeLabel ? (
+              <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-500/20 px-2.5 py-1 text-xs font-semibold text-fuchsia-200">
+                {field.badgeLabel} {i + 1}
+              </span>
+            ) : (
+              <span className="text-fuchsia-400">•</span>
+            )}
             <input
               name={`field_${field.id}`}
               value={item}
               maxLength={field.itemMaxLength}
               placeholder={field.itemPlaceholder}
               onChange={(e) => setItem(i, e.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400"
+              className={`${inputBase} py-2`}
             />
-            {items.length > 1 && (
+            {i >= minRows && (
               <button
                 type="button"
                 onClick={() => removeItem(i)}
@@ -135,7 +147,7 @@ function RangeField({
   value: string[] | undefined;
   onChange: (id: string, value: string[]) => void;
 }) {
-  const [min, max] = value && value.length === 2 ? value : ["", ""];
+  const [min, max] = Array.isArray(value) && value.length === 2 ? value : ["", ""];
 
   return (
     <div>
@@ -150,7 +162,7 @@ function RangeField({
             name={`field_${field.id}`}
             value={min}
             onChange={(e) => onChange(field.id, [e.target.value, max])}
-            className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-fuchsia-400"
+            className={inputBase}
           />
         </div>
         <div className="flex-1">
@@ -161,8 +173,50 @@ function RangeField({
             name={`field_${field.id}`}
             value={max}
             onChange={(e) => onChange(field.id, [min, e.target.value])}
-            className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-fuchsia-400"
+            className={inputBase}
           />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SliderField({
+  field,
+  value,
+  onChange,
+}: {
+  field: MissionField;
+  value: string | undefined;
+  onChange: (id: string, value: string) => void;
+}) {
+  const min = field.sliderMin ?? 0;
+  const max = field.sliderMax ?? 100;
+  const current = value !== undefined && value !== "" ? Number(value) : min;
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <div className="rounded-xl border border-white/15 bg-white/5 px-4 py-4">
+        <div className="mb-2 text-center">
+          <span className="rounded-full bg-fuchsia-500/20 px-3 py-1 text-sm font-bold text-fuchsia-200">
+            {current} {field.sliderUnit ?? ""}
+          </span>
+        </div>
+        <input
+          type="range"
+          name={`field_${field.id}`}
+          min={min}
+          max={max}
+          step={field.sliderStep ?? 1}
+          value={current}
+          onChange={(e) => onChange(field.id, e.target.value)}
+          className="w-full accent-fuchsia-500"
+        />
+        <div className="mt-1 flex justify-between text-[11px] text-white/40">
+          <span>{min}</span>
+          <span>{max}</span>
         </div>
       </div>
     </div>
@@ -178,9 +232,6 @@ function FieldInput({
   value: string | string[] | undefined;
   onChange: (id: string, value: string | string[]) => void;
 }) {
-  const baseInput =
-    "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400";
-
   if (field.type === "prompt") return <PromptField field={field} />;
   if (field.type === "info") return <InfoField field={field} />;
   if (field.type === "link") return <LinkField field={field} />;
@@ -188,6 +239,8 @@ function FieldInput({
     return <ListField field={field} value={value as string[]} onChange={onChange} />;
   if (field.type === "range")
     return <RangeField field={field} value={value as string[]} onChange={onChange} />;
+  if (field.type === "slider")
+    return <SliderField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 
@@ -203,7 +256,7 @@ function FieldInput({
           placeholder={field.placeholder}
           maxLength={field.maxLength}
           onChange={(e) => onChange(field.id, e.target.value)}
-          className={baseInput}
+          className={inputBase}
         />
       )}
 
@@ -215,7 +268,7 @@ function FieldInput({
           value={textValue}
           placeholder={field.placeholder}
           onChange={(e) => onChange(field.id, e.target.value)}
-          className={baseInput}
+          className={inputBase}
         />
       )}
 
@@ -227,7 +280,7 @@ function FieldInput({
           maxLength={field.maxLength}
           onChange={(e) => onChange(field.id, e.target.value)}
           rows={4}
-          className={`${baseInput} resize-y`}
+          className={`${inputBase} resize-y`}
         />
       )}
 
@@ -242,13 +295,13 @@ function FieldInput({
           name={`field_${field.id}`}
           value={textValue}
           onChange={(e) => onChange(field.id, e.target.value)}
-          className={`${baseInput} appearance-none`}
+          className={inputBase}
         >
-          <option value="" disabled className="bg-[#1a0b2e]">
+          <option value="" disabled>
             Selecciona una opción
           </option>
           {field.options?.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-[#1a0b2e]">
+            <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
@@ -385,10 +438,10 @@ export default function MissionForm({
       <button
         type="submit"
         disabled={pending}
-        className={`w-full rounded-xl px-4 py-3 font-semibold text-white shadow-lg transition disabled:opacity-60 ${
+        className={`w-full rounded-xl px-4 py-3 font-semibold shadow-lg transition disabled:opacity-60 ${
           allDone
-            ? "bg-gradient-to-r from-emerald-500 to-fuchsia-500 shadow-emerald-500/30 hover:brightness-110"
-            : "bg-gradient-to-r from-fuchsia-500 to-purple-600 shadow-fuchsia-500/30 hover:brightness-110"
+            ? "bg-amber-300 text-slate-900 shadow-amber-400/30 hover:brightness-105"
+            : "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-fuchsia-500/30 hover:brightness-110"
         }`}
       >
         {pending

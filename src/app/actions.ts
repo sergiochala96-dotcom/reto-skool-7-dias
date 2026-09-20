@@ -204,6 +204,7 @@ export async function adminUnlockAll(): Promise<void> {
   await supabase.from("challenge_progress").upsert(rows, { onConflict: "user_id,day" });
 
   revalidatePath("/", "layout");
+  redirect("/dashboard");
 }
 
 export async function adminResetProgress(): Promise<void> {
@@ -217,6 +218,7 @@ export async function adminResetProgress(): Promise<void> {
   await supabase.from("challenge_progress").delete().eq("user_id", user.id);
 
   revalidatePath("/", "layout");
+  redirect("/dashboard");
 }
 
 export async function updateProfile(
