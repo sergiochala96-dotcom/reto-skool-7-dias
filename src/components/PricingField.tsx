@@ -4,7 +4,7 @@ import type { MissionField } from "@/lib/missionFields";
 import { parsePricing, type PricingData, type PricingTier } from "@/lib/missionFields";
 
 const inputBase =
-  "rounded-lg border border-black/10 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-fuchsia-400 disabled:bg-white/50 disabled:text-slate-400";
+  "rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 outline-none focus:border-fuchsia-500 disabled:bg-gray-100 disabled:text-gray-400";
 
 const MODELOS = [
   { value: "gratis", label: "Gratis", desc: "Gratis para unirse" },
@@ -46,8 +46,8 @@ function SubscriptionEditor({
   ] as const;
 
   return (
-    <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
-      <p className="mb-2 text-xs font-medium text-white/50">¿Cómo vas a cobrar?</p>
+    <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+      <p className="mb-2 text-xs font-medium text-gray-500">¿Cómo vas a cobrar?</p>
       <div className="mb-4 flex flex-wrap gap-2">
         {periodos.map((p) => (
           <button
@@ -56,8 +56,8 @@ function SubscriptionEditor({
             onClick={() => update({ periodo: p.value })}
             className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
               data.periodo === p.value
-                ? "border-fuchsia-400 bg-fuchsia-500/20 text-white"
-                : "border-white/15 text-white/60 hover:bg-white/5"
+                ? "border-gray-900 bg-gray-900 text-white"
+                : "border-gray-300 text-gray-600 hover:bg-gray-100"
             }`}
           >
             {p.label}
@@ -67,9 +67,9 @@ function SubscriptionEditor({
       <div className="flex gap-3">
         {data.periodo !== "anual" && (
           <div className="flex-1">
-            <label className="mb-1 block text-xs text-white/40">Precio mensual</label>
+            <label className="mb-1 block text-xs text-gray-500">Precio mensual</label>
             <div className="flex items-center gap-1">
-              <span className="text-white/50">$</span>
+              <span className="text-gray-400">$</span>
               <input
                 type="number"
                 min={0}
@@ -82,9 +82,9 @@ function SubscriptionEditor({
         )}
         {data.periodo !== "mensual" && data.periodo && (
           <div className="flex-1">
-            <label className="mb-1 block text-xs text-white/40">Precio anual</label>
+            <label className="mb-1 block text-xs text-gray-500">Precio anual</label>
             <div className="flex items-center gap-1">
-              <span className="text-white/50">$</span>
+              <span className="text-gray-400">$</span>
               <input
                 type="number"
                 min={0}
@@ -121,18 +121,18 @@ function TiersEditor({
           <div
             key={i}
             className={`rounded-xl border p-5 transition ${
-              disabled ? "border-white/5 bg-white/[0.02] opacity-60" : "border-white/15 bg-white/5"
+              disabled ? "border-gray-100 bg-gray-50/60 opacity-60" : "border-gray-200 bg-gray-50"
             }`}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-semibold text-white">{tier.nombre}</span>
+              <span className="text-sm font-semibold text-gray-900">{tier.nombre}</span>
               {isOptional && (
                 <button
                   type="button"
                   onClick={() => updateTier(i, { activo: !tier.activo })}
                   aria-label="Activar nivel opcional"
                   className={`relative h-5 w-9 flex-shrink-0 rounded-full transition ${
-                    tier.activo ? "bg-emerald-400" : "bg-white/20"
+                    tier.activo ? "bg-emerald-500" : "bg-gray-300"
                   }`}
                 >
                   <span
@@ -145,10 +145,10 @@ function TiersEditor({
             </div>
 
             {isFreeFixed ? (
-              <p className="mb-3 text-sm font-bold text-emerald-300">🏷️ Gratis</p>
+              <p className="mb-3 text-sm font-bold text-emerald-600">🏷️ Gratis</p>
             ) : (
               <div className="mb-3 flex items-center gap-1.5">
-                <span className="text-white/50">$</span>
+                <span className="text-gray-400">$</span>
                 <input
                   type="number"
                   min={0}
@@ -173,7 +173,7 @@ function TiersEditor({
             <div className="flex flex-col gap-1.5">
               {tier.beneficios.map((b, bi) => (
                 <div key={bi} className="flex items-center gap-1.5">
-                  <span className="text-fuchsia-400">•</span>
+                  <span className="text-fuchsia-500">•</span>
                   <input
                     disabled={disabled}
                     value={b}
@@ -193,7 +193,7 @@ function TiersEditor({
                         updateTier(i, { beneficios: tier.beneficios.filter((_, x) => x !== bi) })
                       }
                       aria-label="Quitar"
-                      className="flex-shrink-0 text-white/30 transition hover:text-white/70 disabled:opacity-40"
+                      className="flex-shrink-0 text-gray-400 transition hover:text-gray-700 disabled:opacity-40"
                     >
                       ✕
                     </button>
@@ -205,7 +205,7 @@ function TiersEditor({
               type="button"
               disabled={disabled}
               onClick={() => updateTier(i, { beneficios: [...tier.beneficios, ""] })}
-              className="mt-2 text-xs font-medium text-fuchsia-300 transition hover:underline disabled:opacity-40"
+              className="mt-2 text-xs font-medium text-fuchsia-600 transition hover:underline disabled:opacity-40"
             >
               + Añadir beneficio
             </button>
@@ -248,7 +248,7 @@ export default function PricingField({
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-white/80">{field.label}</label>
+      <label className="mb-2 block text-sm font-medium text-gray-800">{field.label}</label>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {MODELOS.map((m) => {
@@ -260,19 +260,19 @@ export default function PricingField({
               onClick={() => selectModelo(m.value)}
               className={`rounded-xl border p-3 text-left transition ${
                 selected
-                  ? "border-fuchsia-400 bg-fuchsia-500/15"
-                  : "border-white/15 hover:bg-white/5"
+                  ? "border-fuchsia-400 bg-fuchsia-50"
+                  : "border-gray-200 bg-white hover:bg-gray-50"
               }`}
             >
               <span className="mb-1 flex items-center gap-2">
                 <span
                   className={`h-4 w-4 flex-shrink-0 rounded-full border-2 ${
-                    selected ? "border-fuchsia-400 bg-fuchsia-400" : "border-white/30"
+                    selected ? "border-fuchsia-500 bg-fuchsia-500" : "border-gray-300"
                   }`}
                 />
-                <span className="text-sm font-semibold text-white">{m.label}</span>
+                <span className="text-sm font-semibold text-gray-900">{m.label}</span>
               </span>
-              <span className="text-xs text-white/50">{m.desc}</span>
+              <span className="text-xs text-gray-500">{m.desc}</span>
             </button>
           );
         })}
@@ -290,9 +290,9 @@ export default function PricingField({
 
       {data.modelo === "pago_unico" && (
         <div className="mt-4 max-w-xs">
-          <label className="mb-1 block text-xs text-white/40">Precio</label>
+          <label className="mb-1 block text-xs text-gray-500">Precio</label>
           <div className="flex items-center gap-1.5">
-            <span className="text-white/50">$</span>
+            <span className="text-gray-400">$</span>
             <input
               type="number"
               min={0}

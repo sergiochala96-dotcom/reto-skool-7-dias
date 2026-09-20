@@ -8,7 +8,10 @@ import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
 
 const inputBase =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-fuchsia-400";
+  "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
+
+const blackButton =
+  "rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition hover:bg-black";
 
 function PromptField({ field }: { field: MissionField }) {
   const [copied, setCopied] = useState(false);
@@ -24,16 +27,12 @@ function PromptField({ field }: { field: MissionField }) {
   };
 
   return (
-    <div className="rounded-xl border border-dashed border-fuchsia-400/30 bg-fuchsia-500/5 p-4">
-      <p className="mb-2 text-sm font-semibold text-fuchsia-200">💡 {field.label}</p>
+    <div className="rounded-xl border border-dashed border-fuchsia-300 bg-fuchsia-50 p-4">
+      <p className="mb-2 text-sm font-semibold text-fuchsia-700">💡 {field.label}</p>
       <p className="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 font-mono text-xs leading-relaxed text-gray-700">
         {field.promptText}
       </p>
-      <button
-        type="button"
-        onClick={copy}
-        className="mt-3 rounded-full bg-amber-300 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition hover:brightness-105"
-      >
+      <button type="button" onClick={copy} className={`mt-3 ${blackButton}`}>
         {copied ? "Copiado ✓" : "📋 Copiar prompt"}
       </button>
     </div>
@@ -42,24 +41,19 @@ function PromptField({ field }: { field: MissionField }) {
 
 function InfoField({ field }: { field: MissionField }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-      <p className="mb-1 text-sm font-semibold text-white/70">ℹ️ {field.label}</p>
-      <p className="text-sm text-white/50">{field.infoText}</p>
+    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+      <p className="mb-1 text-sm font-semibold text-gray-800">ℹ️ {field.label}</p>
+      <p className="text-sm text-gray-500">{field.infoText}</p>
     </div>
   );
 }
 
 function LinkField({ field }: { field: MissionField }) {
   return (
-    <div className="rounded-xl border border-amber-300/30 bg-amber-400/5 p-4">
-      <p className="mb-1 text-sm font-semibold text-amber-200">{field.label}</p>
-      {field.helper && <p className="mb-3 text-xs text-white/50">{field.helper}</p>}
-      <a
-        href={field.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block rounded-full bg-amber-300 px-5 py-2 text-sm font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition hover:brightness-105"
-      >
+    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+      <p className="mb-1 text-sm font-semibold text-gray-900">{field.label}</p>
+      {field.helper && <p className="mb-3 text-xs text-gray-500">{field.helper}</p>}
+      <a href={field.url} target="_blank" rel="noopener noreferrer" className={`inline-block ${blackButton}`}>
         {field.buttonText ?? "Abrir enlace"}
       </a>
     </div>
@@ -94,17 +88,17 @@ function ListField({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
       <div className="flex flex-col gap-2">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
             {field.badgeLabel ? (
-              <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-500/20 px-2.5 py-1 text-xs font-semibold text-fuchsia-200">
+              <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">
                 {field.badgeLabel} {i + 1}
               </span>
             ) : (
-              <span className="text-fuchsia-400">•</span>
+              <span className="text-fuchsia-500">•</span>
             )}
             <input
               name={`field_${field.id}`}
@@ -119,7 +113,7 @@ function ListField({
                 type="button"
                 onClick={() => removeItem(i)}
                 aria-label="Quitar"
-                className="flex-shrink-0 rounded-lg px-2 py-1 text-white/30 transition hover:bg-white/10 hover:text-white/70"
+                className="flex-shrink-0 rounded-lg px-2 py-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
               >
                 ✕
               </button>
@@ -131,7 +125,7 @@ function ListField({
         <button
           type="button"
           onClick={addItem}
-          className="mt-2 text-sm font-medium text-fuchsia-300 hover:underline"
+          className="mt-2 text-sm font-medium text-fuchsia-600 hover:underline"
         >
           {field.addLabel ?? "+ Añadir"}
         </button>
@@ -153,11 +147,11 @@ function RangeField({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <span className="mb-1 block text-xs text-white/40">Mínimo</span>
+          <span className="mb-1 block text-xs text-gray-500">Mínimo</span>
           <input
             type="number"
             min={0}
@@ -168,7 +162,7 @@ function RangeField({
           />
         </div>
         <div className="flex-1">
-          <span className="mb-1 block text-xs text-white/40">Máximo</span>
+          <span className="mb-1 block text-xs text-gray-500">Máximo</span>
           <input
             type="number"
             min={0}
@@ -200,15 +194,15 @@ function SliderField({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
-      <div className="rounded-xl border border-black/10 bg-white px-4 pb-4 pt-12">
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+      <div className="rounded-xl border border-gray-200 bg-white px-4 pb-4 pt-12">
         <div className="relative">
           <div
             className="pointer-events-none absolute -top-11 flex -translate-x-1/2 flex-col items-center gap-1"
             style={{ left: `${percent}%` }}
           >
-            <span className="whitespace-nowrap rounded-full bg-fuchsia-600 px-3 py-1 text-sm font-bold text-white shadow-lg">
+            <span className="whitespace-nowrap rounded-full bg-gray-900 px-3 py-1 text-sm font-bold text-white shadow-lg">
               {current} {field.sliderUnit ?? ""}
             </span>
             {mood && <span className="text-2xl leading-none">{mood}</span>}
@@ -224,7 +218,7 @@ function SliderField({
             className="slider-big w-full accent-fuchsia-500"
           />
         </div>
-        <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+        <div className="mt-1 flex justify-between text-[11px] text-gray-400">
           <span>{min}</span>
           <span>{max}</span>
         </div>
@@ -283,8 +277,8 @@ function FieldInput({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
 
       {field.type === "text" && (
         <input
@@ -322,7 +316,7 @@ function FieldInput({
       )}
 
       {field.maxLength && (
-        <p className="mt-1 text-right text-[11px] text-white/30">
+        <p className="mt-1 text-right text-[11px] text-gray-400">
           {textValue.length}/{field.maxLength}
         </p>
       )}
@@ -357,8 +351,8 @@ function FieldInput({
                   onClick={() => onChange(field.id, opt.value)}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                     selected
-                      ? "border-fuchsia-400 bg-fuchsia-500/20 text-white"
-                      : "border-white/15 text-white/60 hover:bg-white/5"
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-300 text-gray-600 hover:bg-gray-100"
                   }`}
                 >
                   {opt.label}
@@ -370,7 +364,7 @@ function FieldInput({
           {(() => {
             const selectedOption = field.options?.find((opt) => opt.value === textValue);
             return selectedOption?.description ? (
-              <p className="mt-2 rounded-lg bg-fuchsia-500/10 px-3 py-2 text-xs text-fuchsia-100">
+              <p className="mt-2 rounded-lg bg-fuchsia-50 px-3 py-2 text-xs text-fuchsia-700">
                 {selectedOption.description}
               </p>
             ) : null;
@@ -393,8 +387,8 @@ function FieldInput({
                 }}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                   selected
-                    ? "border-fuchsia-400 bg-fuchsia-500/20 text-white"
-                    : "border-white/15 text-white/60 hover:bg-white/5"
+                    ? "border-gray-900 bg-gray-900 text-white"
+                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {selected ? "✓ " : ""}
@@ -440,14 +434,14 @@ export default function MissionForm({
   return (
     <form action={formAction} className="flex flex-col gap-6">
       {total > 0 && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-          <div className="mb-1.5 flex items-center justify-between text-xs font-medium text-white/50">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+          <div className="mb-1.5 flex items-center justify-between text-xs font-medium text-gray-500">
             <span>Progreso de la misión</span>
             <span>
               {done}/{total}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="h-2 overflow-hidden rounded-full bg-gray-200">
             <div
               className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 transition-all"
               style={{ width: `${total ? (done / total) * 100 : 0}%` }}
@@ -459,13 +453,13 @@ export default function MissionForm({
       {sections.map((section) => (
         <section
           key={section.id}
-          className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 lg:p-7"
+          className="rounded-2xl border border-gray-200 bg-gray-50 p-5 lg:p-7"
         >
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
             {section.heading}
           </h2>
           {section.image && (
-            <div className="relative mb-5 w-full overflow-hidden rounded-xl border border-white/10">
+            <div className="relative mb-5 w-full overflow-hidden rounded-xl border border-gray-200">
               <Image
                 src={section.image}
                 alt={section.heading}
@@ -491,7 +485,7 @@ export default function MissionForm({
       ))}
 
       {state?.saved && (
-        <p className="rounded-lg bg-emerald-500/15 px-4 py-2.5 text-sm text-emerald-200">
+        <p className="rounded-lg bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700">
           Guardado ✓ — te faltan {state.missing} de {state.total} campos para completar este día.
         </p>
       )}
@@ -499,11 +493,7 @@ export default function MissionForm({
       <button
         type="submit"
         disabled={pending}
-        className={`w-full rounded-xl px-4 py-3 font-semibold shadow-lg transition disabled:opacity-60 ${
-          allDone
-            ? "bg-amber-300 text-slate-900 shadow-amber-400/30 hover:brightness-105"
-            : "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-fuchsia-500/30 hover:brightness-110"
-        }`}
+        className="w-full rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black disabled:opacity-60"
       >
         {pending
           ? "Guardando..."
