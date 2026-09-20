@@ -61,6 +61,35 @@ const PATHS: Record<string, ReactNode> = {
       <circle cx="15" cy="12" r="6" />
     </>
   ),
+  historias: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+    </>
+  ),
+  estados: (
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  ),
+  grupos: (
+    <>
+      <circle cx="9" cy="8.5" r="3" />
+      <path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" />
+      <circle cx="17" cy="9" r="2.3" />
+      <path d="M15 13.8c2.3.3 4 2.4 4 5.2" />
+    </>
+  ),
+  carruseles: (
+    <>
+      <rect x="3" y="7" width="14" height="14" rx="2" />
+      <path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2" />
+    </>
+  ),
+  reels: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <path d="M9.5 9v6l5-3z" fill="currentColor" stroke="none" />
+    </>
+  ),
 };
 
 export default function PlatformIcon({ id, className }: { id: string; className?: string }) {

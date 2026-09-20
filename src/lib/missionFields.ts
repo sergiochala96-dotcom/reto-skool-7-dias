@@ -12,6 +12,7 @@ export type FieldType =
   | "offer"
   | "prompt"
   | "link"
+  | "check"
   | "info";
 
 export type MissionField = {
@@ -21,8 +22,9 @@ export type MissionField = {
   helper?: string;
   placeholder?: string;
   options?: { value: string; label: string; description?: string; icon?: string }[];
-  display?: "pills" | "dropdown" | "icon-cards";
+  display?: "pills" | "dropdown" | "icon-cards" | "boxes";
   inlineBadge?: boolean;
+  confirm?: { id: string; label: string };
   promptText?: string;
   infoText?: string;
   url?: string;
@@ -225,12 +227,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           buttonText: "Crear mi Skool",
           emphasis: true,
         },
-        {
-          id: "skool_creado",
-          type: "yesno",
-          label: "¿Ya creaste tu Skool?",
-          options: SI_NO,
-        },
       ],
     },
     {
@@ -259,12 +255,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Plantilla lista para editar en Canva",
           url: "https://canva.link/k5fdlq8qn7tngni",
           buttonText: "🎨 Abrir plantilla de portada",
-        },
-        {
-          id: "portada_hecha",
-          type: "yesno",
-          label: "¿Ya subiste tu portada?",
-          options: SI_NO,
+          confirm: { id: "portada_hecha", label: "Ya subí mi portada" },
         },
         {
           id: "icono_link",
@@ -273,12 +264,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Plantilla lista para editar en Canva",
           url: "https://canva.link/0pxdupydxfx101n",
           buttonText: "🎨 Abrir plantilla de icono",
-        },
-        {
-          id: "icono_hecho",
-          type: "yesno",
-          label: "¿Ya subiste tu icono?",
-          options: SI_NO,
+          confirm: { id: "icono_hecho", label: "Ya subí mi ícono" },
         },
       ],
     },
@@ -405,16 +391,21 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "post_media",
-          type: "yesno",
+          type: "select",
+          display: "boxes",
           label: "¿Agregaste una imagen, GIF o video al post?",
-          options: SI_NO,
+          options: [
+            { value: "foto", label: "Foto" },
+            { value: "video", label: "Video" },
+            { value: "gif", label: "GIF" },
+            { value: "nada", label: "Nada" },
+          ],
         },
-        { id: "post_categoria", type: "text", label: "Categoría seleccionada para el post" },
+        { id: "post_categoria", type: "text", label: "Escribe la categoría del post" },
         {
           id: "post_publicado",
-          type: "yesno",
+          type: "check",
           label: "¿Ya publicaste y fijaste el post?",
-          options: SI_NO,
         },
       ],
     },
@@ -482,6 +473,14 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       imagePosition: "above-heading",
       fields: [
         {
+          id: "portadas_modulos_link",
+          type: "link",
+          label: "Plantilla de portadas para tus módulos",
+          helper: "Plantilla lista para editar en Canva",
+          url: "https://canva.link/geob0uij4tnruda",
+          buttonText: "🎨 Abrir plantilla de portadas",
+        },
+        {
           id: "modulo1_titulo",
           type: "text",
           label: "Módulo 1 — Título",
@@ -489,24 +488,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         { id: "modulo1_descripcion", type: "textarea", label: "Módulo 1 — Descripción" },
         {
-          id: "modulo1_portada",
-          type: "yesno",
-          label: "Módulo 1 — ¿Ya tienes la portada lista?",
-          options: SI_NO,
-        },
-        {
           id: "modulo2_titulo",
           type: "text",
           label: "Módulo 2 — Título",
           helper: "Ej: Módulo de contenido",
         },
         { id: "modulo2_descripcion", type: "textarea", label: "Módulo 2 — Descripción" },
-        {
-          id: "modulo2_portada",
-          type: "yesno",
-          label: "Módulo 2 — ¿Ya tienes la portada lista?",
-          options: SI_NO,
-        },
       ],
     },
     {
@@ -568,12 +555,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "multiselect",
           label: "¿Por dónde los invitaste?",
           options: [
-            { value: "historias", label: "Historias" },
-            { value: "estados", label: "Estados" },
-            { value: "grupos", label: "Grupos" },
-            { value: "carruseles", label: "Carruseles" },
-            { value: "reels", label: "Reels" },
-            { value: "emails", label: "Emails" },
+            { value: "historias", label: "Historias", icon: "historias" },
+            { value: "estados", label: "Estados", icon: "estados" },
+            { value: "grupos", label: "Grupos", icon: "grupos" },
+            { value: "carruseles", label: "Carruseles", icon: "carruseles" },
+            { value: "reels", label: "Reels", icon: "reels" },
+            { value: "emails", label: "Emails", icon: "email" },
           ],
         },
         {
@@ -616,6 +603,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "boost_nivel",
           type: "select",
+          display: "boxes",
           label: "¿Qué nivel de comisión definirás?",
           options: [
             {
@@ -892,7 +880,7 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
     return arr.length === 2 && arr.every((x) => x.trim().length > 0);
   }
 
-  if (field.type === "select" || field.type === "yesno") {
+  if (field.type === "select" || field.type === "yesno" || field.type === "check") {
     return typeof v === "string" && v.length > 0;
   }
 
@@ -908,8 +896,21 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
   return true;
 }
 
+// Los campos "link" con confirm añaden un check virtual (ej: "ya subí mi
+// portada") que se cuenta como requerido aunque no exista como su propio
+// MissionField en la sección — se renderiza embebido dentro de LinkField.
+function expandFields(fields: MissionField[]): MissionField[] {
+  return fields.flatMap((f) => {
+    if (f.type === "link" && f.confirm) {
+      const check: MissionField = { id: f.confirm.id, type: "check", label: f.confirm.label };
+      return [f, check];
+    }
+    return [f];
+  });
+}
+
 function requiredVisibleFrom(fields: MissionField[], answers: Answers): MissionField[] {
-  return fields
+  return expandFields(fields)
     .filter((f) => !NO_INFO_TYPES.includes(f.type))
     .filter((f) => f.required !== false)
     .filter((f) => isVisible(f, answers));

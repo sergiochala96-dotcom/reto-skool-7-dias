@@ -17,6 +17,12 @@ const inputBase =
 const blackButton =
   "rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition hover:bg-black";
 
+function boxGridCols(count: number): string {
+  if (count <= 3) return "grid-cols-3";
+  if (count === 4) return "grid-cols-2 sm:grid-cols-4";
+  return "grid-cols-2 sm:grid-cols-3";
+}
+
 function PromptField({ field }: { field: MissionField }) {
   const [copied, setCopied] = useState(false);
 
@@ -52,7 +58,15 @@ function InfoField({ field }: { field: MissionField }) {
   );
 }
 
-function LinkField({ field }: { field: MissionField }) {
+function LinkField({
+  field,
+  confirmValue,
+  onChange,
+}: {
+  field: MissionField;
+  confirmValue?: string;
+  onChange: (id: string, value: string) => void;
+}) {
   if (field.emphasis) {
     return (
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">
@@ -70,13 +84,77 @@ function LinkField({ field }: { field: MissionField }) {
     );
   }
 
+  const checked = confirmValue === "si";
+
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <p className="mb-1 text-sm font-semibold text-gray-900">{field.label}</p>
       {field.helper && <p className="mb-3 text-xs text-gray-500">{field.helper}</p>}
-      <a href={field.url} target="_blank" rel="noopener noreferrer" className={`inline-block ${blackButton}`}>
-        {field.buttonText ?? "Abrir enlace"}
-      </a>
+      <div className="flex flex-wrap items-center gap-3">
+        <a href={field.url} target="_blank" rel="noopener noreferrer" className={`inline-block ${blackButton}`}>
+          {field.buttonText ?? "Abrir enlace"}
+        </a>
+        {field.confirm && (
+          <button
+            type="button"
+            onClick={() => onChange(field.confirm!.id, checked ? "" : "si")}
+            className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm font-semibold transition ${
+              checked
+                ? "border-emerald-400 bg-emerald-50 text-emerald-700"
+                : "border-gray-300 bg-white text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <span
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border-2 text-xs font-bold ${
+                checked ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-300 bg-white"
+              }`}
+            >
+              {checked ? "✓" : ""}
+            </span>
+            {field.confirm.label}
+          </button>
+        )}
+      </div>
+      {field.confirm && (
+        <input type="hidden" name={`field_${field.confirm.id}`} value={checked ? "si" : ""} />
+      )}
+    </div>
+  );
+}
+
+function CheckField({
+  field,
+  value,
+  onChange,
+}: {
+  field: MissionField;
+  value: string | undefined;
+  onChange: (id: string, value: string) => void;
+}) {
+  const checked = value === "si";
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+      <button
+        type="button"
+        onClick={() => onChange(field.id, checked ? "" : "si")}
+        className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 transition ${
+          checked ? "border-emerald-400 bg-emerald-50" : "border-gray-300 bg-white hover:bg-gray-50"
+        }`}
+      >
+        <span
+          className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border-2 text-lg font-bold ${
+            checked ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-300 bg-white text-transparent"
+          }`}
+        >
+          ✓
+        </span>
+        <span className={`text-sm font-semibold ${checked ? "text-emerald-700" : "text-gray-600"}`}>
+          {checked ? "¡Listo!" : "Marcar como hecho"}
+        </span>
+      </button>
+      <input type="hidden" name={`field_${field.id}`} value={checked ? "si" : ""} />
     </div>
   );
 }
@@ -289,15 +367,26 @@ function SliderField({
 function FieldInput({
   field,
   value,
+  answers,
   onChange,
 }: {
   field: MissionField;
   value: string | string[] | undefined;
+  answers: Answers;
   onChange: (id: string, value: string | string[]) => void;
 }) {
   if (field.type === "prompt") return <PromptField field={field} />;
   if (field.type === "info") return <InfoField field={field} />;
-  if (field.type === "link") return <LinkField field={field} />;
+  if (field.type === "link")
+    return (
+      <LinkField
+        field={field}
+        confirmValue={field.confirm ? (answers[field.confirm.id] as string) : undefined}
+        onChange={onChange}
+      />
+    );
+  if (field.type === "check")
+    return <CheckField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "list")
     return <ListField field={field} value={value as string[]} onChange={onChange} />;
   if (field.type === "range")
@@ -396,48 +485,57 @@ function FieldInput({
         </select>
       )}
 
-      {field.type === "select" && field.display === "icon-cards" && (
-        <div
-          className={`grid gap-2 ${
-            (field.options?.length ?? 0) <= 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"
-          }`}
-        >
-          {field.options?.map((opt) => {
-            const selected = value === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onChange(field.id, opt.value)}
-                className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition ${
-                  selected
-                    ? "border-fuchsia-400 bg-fuchsia-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50"
-                }`}
-              >
-                <span
-                  className={`flex h-11 w-11 items-center justify-center rounded-full ${
-                    selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+      {field.type === "select" && (field.display === "icon-cards" || field.display === "boxes") && (
+        <div>
+          <div className={`grid gap-2 ${boxGridCols(field.options?.length ?? 0)}`}>
+            {field.options?.map((opt) => {
+              const selected = value === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => onChange(field.id, opt.value)}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-3 text-center transition ${
+                    selected
+                      ? "border-fuchsia-400 bg-fuchsia-50"
+                      : "border-gray-200 bg-white hover:bg-gray-50"
                   }`}
                 >
-                  {opt.icon && <PlatformIcon id={opt.icon} className="h-6 w-6" />}
-                </span>
-                <span
-                  className={`text-xs font-bold uppercase tracking-wide ${
-                    selected ? "text-fuchsia-700" : "text-gray-400"
-                  }`}
-                >
-                  {opt.label}
-                </span>
-              </button>
-            );
-          })}
-          <input type="hidden" name={`field_${field.id}`} value={textValue} />
+                  {opt.icon && (
+                    <span
+                      className={`flex h-11 w-11 items-center justify-center rounded-full ${
+                        selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      <PlatformIcon id={opt.icon} className="h-6 w-6" />
+                    </span>
+                  )}
+                  <span
+                    className={`text-xs font-bold uppercase tracking-wide ${
+                      selected ? "text-fuchsia-700" : "text-gray-500"
+                    }`}
+                  >
+                    {opt.label}
+                  </span>
+                </button>
+              );
+            })}
+            <input type="hidden" name={`field_${field.id}`} value={textValue} />
+          </div>
+          {(() => {
+            const selectedOption = field.options?.find((opt) => opt.value === textValue);
+            return selectedOption?.description ? (
+              <div className="mt-3 rounded-xl border-2 border-violet-300 bg-violet-50 px-4 py-3">
+                <p className="text-base font-bold leading-snug text-violet-800">
+                  {selectedOption.description}
+                </p>
+              </div>
+            ) : null;
+          })()}
         </div>
       )}
 
-      {(field.type === "yesno" ||
-        (field.type === "select" && field.display !== "dropdown" && field.display !== "icon-cards")) && (
+      {field.type === "select" && field.display !== "dropdown" && field.display !== "icon-cards" && field.display !== "boxes" && (
         <div>
           <div className="flex flex-wrap gap-2">
             {field.options?.map((opt) => {
@@ -472,8 +570,31 @@ function FieldInput({
         </div>
       )}
 
+      {field.type === "yesno" && (
+        <div className="grid grid-cols-2 gap-2">
+          {field.options?.map((opt) => {
+            const selected = value === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onChange(field.id, opt.value)}
+                className={`rounded-xl border-2 px-4 py-3 text-sm font-bold transition ${
+                  selected
+                    ? "border-fuchsia-400 bg-fuchsia-50 text-fuchsia-700"
+                    : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+          <input type="hidden" name={`field_${field.id}`} value={textValue} />
+        </div>
+      )}
+
       {field.type === "multiselect" && (
-        <div className="flex flex-wrap gap-2">
+        <div className={`grid gap-2 ${boxGridCols(field.options?.length ?? 0)}`}>
           {field.options?.map((opt) => {
             const arr = Array.isArray(value) ? value : [];
             const selected = arr.includes(opt.value);
@@ -485,14 +606,33 @@ function FieldInput({
                   const next = selected ? arr.filter((v) => v !== opt.value) : [...arr, opt.value];
                   onChange(field.id, next);
                 }}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-3 text-center transition ${
                   selected
-                    ? "border-gray-900 bg-gray-900 text-white"
-                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                    ? "border-fuchsia-400 bg-fuchsia-50"
+                    : "border-gray-200 bg-white hover:bg-gray-50"
                 }`}
               >
-                {selected ? "✓ " : ""}
-                {opt.label}
+                {selected && (
+                  <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-fuchsia-500 text-[10px] font-bold text-white">
+                    ✓
+                  </span>
+                )}
+                {opt.icon && (
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-full ${
+                      selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
+                    <PlatformIcon id={opt.icon} className="h-6 w-6" />
+                  </span>
+                )}
+                <span
+                  className={`text-xs font-bold uppercase tracking-wide ${
+                    selected ? "text-fuchsia-700" : "text-gray-500"
+                  }`}
+                >
+                  {opt.label}
+                </span>
               </button>
             );
           })}
@@ -674,7 +814,13 @@ export default function MissionForm({
           </div>
         );
         const fieldsList = visibleFields.map((field) => (
-          <FieldInput key={field.id} field={field} value={answers[field.id]} onChange={handleChange} />
+          <FieldInput
+            key={field.id}
+            field={field}
+            value={answers[field.id]}
+            answers={answers}
+            onChange={handleChange}
+          />
         ));
         const isActive = showAllExpanded || index === currentStep;
         const celebrating = isActive && sectionCelebrate;
