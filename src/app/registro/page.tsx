@@ -9,9 +9,9 @@ export default function RegistroPage() {
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
           <div className="mb-2 text-4xl">🏆</div>
-          <h1 className="text-2xl font-bold text-white">Únete al Reto</h1>
+          <h1 className="text-2xl font-bold text-white">Únete a Skooly</h1>
           <p className="mt-1 text-sm text-white/60">
-            7 días, 7 misiones, 1 tesoro final
+            Reto de Skool en 7 Días · 7 misiones, 1 tesoro final
           </p>
         </div>
 

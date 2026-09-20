@@ -14,9 +14,10 @@ export default async function Home() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-16 text-white">
       <div className="mx-auto max-w-3xl text-center">
         <div className="mb-4 text-5xl">🎮</div>
-        <h1 className="text-4xl font-extrabold sm:text-5xl">
-          Reto de 7 Días
-        </h1>
+        <h1 className="text-4xl font-extrabold sm:text-5xl">Skooly</h1>
+        <p className="mt-2 text-lg font-medium text-fuchsia-300">
+          Reto de Skool en 7 Días
+        </p>
         <p className="mt-4 text-lg text-white/70">
           Completa una misión cada día, desbloquea la siguiente y llega al
           Cofre del Tesoro final.

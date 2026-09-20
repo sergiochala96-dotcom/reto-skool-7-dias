@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reto de 7 Días",
+  title: "Skooly: Reto de Skool en 7 Días",
   description: "Completa las 7 misiones diarias y desbloquea el Cofre del Tesoro.",
 };
 

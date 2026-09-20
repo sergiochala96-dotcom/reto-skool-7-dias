@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import { signOut } from "@/app/actions";
+import { isAdmin } from "@/lib/admin";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -31,16 +32,26 @@ export default async function DashboardPage() {
         <header className="mb-8 flex items-center justify-between">
           <div>
             <p className="text-sm text-white/50">Hola, {nombre} 👋</p>
-            <h1 className="text-2xl font-bold text-white">Reto de 7 Días</h1>
+            <h1 className="text-2xl font-bold text-white">Skooly</h1>
           </div>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/70 transition hover:bg-white/10"
-            >
-              Salir
-            </button>
-          </form>
+          <div className="flex items-center gap-2">
+            {isAdmin(user.email) && (
+              <Link
+                href="/admin"
+                className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-200 transition hover:bg-amber-400/20"
+              >
+                Admin
+              </Link>
+            )}
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/70 transition hover:bg-white/10"
+              >
+                Salir
+              </button>
+            </form>
+          </div>
         </header>
 
         <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-5">
