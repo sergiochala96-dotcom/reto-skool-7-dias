@@ -30,6 +30,7 @@ export type MissionField = {
   minItems?: number;
   maxItems?: number;
   itemPlaceholder?: string;
+  itemPlaceholders?: string[];
   itemMaxLength?: number;
   addLabel?: string;
   badgeLabel?: string;
@@ -45,6 +46,7 @@ export type MissionField = {
 export type MissionSection = {
   id: string;
   heading: string;
+  image?: string;
   fields: MissionField[];
 };
 
@@ -183,6 +185,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "crea-skool",
       heading: "Crea tu Skool",
+      image: "/skool-ejemplo-cta.png",
       fields: [
         {
           id: "crear_skool_link",
@@ -203,6 +206,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "identidad",
       heading: "Identidad de tu comunidad",
+      image: "/skool-ejemplo-identidad.png",
       fields: [
         {
           id: "nombre_comunidad",
@@ -258,6 +262,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 3,
           addLabel: "+ Añadir categoría",
           badgeLabel: "Categoría",
+          itemPlaceholders: ["Ejemplo: Preséntate", "Ejemplo: Victorias", "Ejemplo: Comunicados"],
         },
         {
           id: "reglas",
@@ -269,6 +274,11 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           itemMaxLength: 30,
           addLabel: "+ Añadir regla",
           badgeLabel: "Regla",
+          itemPlaceholders: [
+            "Ejemplo: Sé positivo",
+            "Ejemplo: No auto promociones / No Spam",
+            "Ejemplo: Asiste a las clases en vivo",
+          ],
         },
       ],
     },

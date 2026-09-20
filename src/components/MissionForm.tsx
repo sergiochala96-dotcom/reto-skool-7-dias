@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Image from "next/image";
 import type { MissionField, MissionSection, Answers } from "@/lib/missionFields";
 import { countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
@@ -108,7 +109,7 @@ function ListField({
               name={`field_${field.id}`}
               value={item}
               maxLength={field.itemMaxLength}
-              placeholder={field.itemPlaceholder}
+              placeholder={field.itemPlaceholders?.[i] ?? field.itemPlaceholder}
               onChange={(e) => setItem(i, e.target.value)}
               className={`${inputBase} py-2`}
             />
@@ -457,6 +458,17 @@ export default function MissionForm({
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
             {section.heading}
           </h2>
+          {section.image && (
+            <div className="relative mb-5 w-full overflow-hidden rounded-xl border border-white/10">
+              <Image
+                src={section.image}
+                alt={section.heading}
+                width={1200}
+                height={675}
+                className="h-auto w-full object-contain"
+              />
+            </div>
+          )}
           <div className="flex flex-col gap-5">
             {section.fields
               .filter((f) => !f.showIf || answers[f.showIf.field] === f.showIf.equals)
