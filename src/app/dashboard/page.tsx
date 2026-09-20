@@ -19,7 +19,7 @@ export default async function DashboardPage() {
       />
 
       <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-2xl md:max-w-5xl">
+        <div className="mx-auto max-w-2xl md:max-w-6xl">
           <div className="mb-8 text-center">
             <p className="text-sm text-white/50">Hola, {nombre} 👋</p>
             <h1 className="text-2xl font-bold text-white">

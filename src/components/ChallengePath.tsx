@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 
-const AMPLITUDE = 100;
-const SPACING = 140;
+const AMPLITUDE = 55;
+const SPACING = 160;
 const NODE = 76;
 const OFFSETS = [0, 1, 1.4, 1, 0, -1, -1.4]; // patrón zigzag por día
 
@@ -27,7 +27,7 @@ export default function ChallengePath({
     y: MISSIONS.length * SPACING + NODE / 2,
   };
 
-  const width = AMPLITUDE * 2 * 1.4 + NODE + 40;
+  const width = AMPLITUDE * 2 * 1.4 + NODE + 100;
   const height = chestPoint.y + NODE;
   const cx = width / 2;
 
@@ -52,10 +52,10 @@ export default function ChallengePath({
 
   return (
     <div className="mx-auto max-w-2xl overflow-x-auto pb-8">
-      <div className="relative mx-auto" style={{ width, height: height + 40 }}>
+      <div className="relative mx-auto" style={{ width, height: height + 90 }}>
         <svg
           width={width}
-          height={height + 40}
+          height={height + 90}
           className="absolute inset-0"
           aria-hidden
         >
@@ -85,7 +85,7 @@ export default function ChallengePath({
 
           const node = (
             <div
-              className={`group relative flex items-center justify-center rounded-full border-4 text-3xl shadow-lg transition ${
+              className={`relative flex items-center justify-center rounded-full border-4 text-3xl shadow-lg transition ${
                 isDone
                   ? "border-amber-300 bg-gradient-to-br from-fuchsia-500 to-amber-400"
                   : isCurrent
@@ -97,9 +97,6 @@ export default function ChallengePath({
               style={{ width: NODE, height: NODE }}
             >
               {isDone ? "✓" : unlocked ? p.mission.emoji : "🔒"}
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full whitespace-nowrap rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white/80 opacity-0 transition group-hover:opacity-100">
-                Día {p.mission.day}: {p.mission.title}
-              </span>
               {isCurrent && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-900 shadow">
                   EMPEZAR
@@ -108,25 +105,43 @@ export default function ChallengePath({
             </div>
           );
 
+          const label = (
+            <div className="mt-2 w-28 text-center">
+              <p
+                className={`text-[10px] font-bold uppercase tracking-wide ${
+                  isDone ? "text-amber-300" : isCurrent ? "text-fuchsia-300" : "text-white/40"
+                }`}
+              >
+                Día {p.mission.day}
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-white/60">
+                {p.mission.title}
+              </p>
+            </div>
+          );
+
           return (
             <div
               key={p.mission.day}
-              className="absolute"
+              className="absolute flex flex-col items-center"
               style={{
-                left: cx + p.x - NODE / 2,
+                left: cx + p.x - NODE / 2 - 26,
                 top: p.y - NODE / 2,
+                width: NODE + 52,
               }}
             >
               {unlocked ? <Link href={`/dia/${p.mission.day}`}>{node}</Link> : node}
+              {label}
             </div>
           );
         })}
 
         <div
-          className="absolute"
+          className="absolute flex flex-col items-center"
           style={{
-            left: cx + chestPoint.x - NODE / 2,
+            left: cx + chestPoint.x - NODE / 2 - 26,
             top: chestPoint.y - NODE / 2,
+            width: NODE + 52,
           }}
         >
           {allDone ? (
@@ -145,6 +160,18 @@ export default function ChallengePath({
               🔒
             </div>
           )}
+          <div className="mt-2 w-28 text-center">
+            <p
+              className={`text-[10px] font-bold uppercase tracking-wide ${
+                allDone ? "text-amber-300" : "text-white/40"
+              }`}
+            >
+              Cofre
+            </p>
+            <p className="mt-0.5 text-[11px] leading-tight text-white/60">
+              Premio final
+            </p>
+          </div>
         </div>
       </div>
     </div>
