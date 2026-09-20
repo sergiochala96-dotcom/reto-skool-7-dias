@@ -3,14 +3,17 @@
 import { useActionState } from "react";
 import { updateProfile } from "@/app/actions";
 import type { AuthState } from "@/app/actions";
+import Avatar from "@/components/Avatar";
 
 export default function AccountModal({
   nombre,
   email,
+  avatarUrl,
   onClose,
 }: {
   nombre: string;
   email: string;
+  avatarUrl: string | null;
   onClose: () => void;
 }) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -37,6 +40,10 @@ export default function AccountModal({
           >
             ✕
           </button>
+        </div>
+
+        <div className="mb-5 flex justify-center">
+          <Avatar avatarUrl={avatarUrl} nombre={nombre} size={80} editable />
         </div>
 
         <form action={formAction} className="flex flex-col gap-4">

@@ -16,11 +16,11 @@ export default function ChallengePathHorizontal({
 
   return (
     <div className="mx-auto mb-12 hidden md:block">
-      <h2 className="mb-6 text-center text-3xl font-extrabold text-white lg:text-4xl">
-        {CURRENT_EPISODE_TITLE}
-      </h2>
+      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-6 pt-6 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-8">
+        <h2 className="mb-2 text-center text-3xl font-extrabold text-white lg:text-4xl">
+          {CURRENT_EPISODE_TITLE}
+        </h2>
 
-      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-6 pt-3 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-8 lg:pt-5">
         <div className="flex items-center gap-6 overflow-x-auto pt-8">
           <Image
             src="/mascota-skooly.png"
@@ -125,9 +125,9 @@ export default function ChallengePathHorizontal({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-4 text-white/40">
-        <span className="text-2xl grayscale">🔒</span>
-        <span className="font-semibold">{NEXT_EPISODE_TEASER}</span>
+      <div className="mt-5 flex flex-col items-center justify-center gap-2 rounded-3xl border border-white/10 bg-white/[0.03] px-6 py-10 text-white/40">
+        <span className="text-4xl grayscale">🔒</span>
+        <span className="text-lg font-semibold lg:text-xl">{NEXT_EPISODE_TEASER}</span>
       </div>
     </div>
   );

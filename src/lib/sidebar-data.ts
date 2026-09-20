@@ -6,6 +6,7 @@ import type { User } from "@supabase/supabase-js";
 export type SidebarData = {
   user: User;
   nombre: string;
+  avatarUrl: string | null;
   completedDays: Set<number>;
   admin: boolean;
 };
@@ -27,10 +28,12 @@ export async function getSidebarData(): Promise<SidebarData> {
     (user.user_metadata?.display_name as string | undefined) ||
     user.email?.split("@")[0] ||
     "Retador";
+  const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) || null;
 
   return {
     user,
     nombre,
+    avatarUrl,
     completedDays: new Set((progress ?? []).map((p) => p.day)),
     admin: isAdmin(user.email),
   };

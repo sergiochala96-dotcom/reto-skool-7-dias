@@ -14,7 +14,7 @@ export default async function DiaPage({
   const mission = getMission(day);
   if (!mission) notFound();
 
-  const { nombre, user, admin, completedDays } = await getSidebarData();
+  const { nombre, user, avatarUrl, admin, completedDays } = await getSidebarData();
 
   const unlocked = day === 1 || completedDays.has(day - 1);
   if (!unlocked) redirect("/dashboard");
@@ -28,6 +28,7 @@ export default async function DiaPage({
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
+        avatarUrl={avatarUrl}
         admin={admin}
         completedDays={Array.from(completedDays)}
       />

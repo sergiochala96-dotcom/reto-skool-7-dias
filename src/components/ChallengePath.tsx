@@ -55,11 +55,11 @@ export default function ChallengePath({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h2 className="mb-4 px-4 text-center text-xl font-extrabold text-white">
-        {CURRENT_EPISODE_TITLE}
-      </h2>
-
       <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-5 shadow-2xl shadow-fuchsia-900/40">
+        <h2 className="mb-3 px-4 text-center text-xl font-extrabold text-white">
+          {CURRENT_EPISODE_TITLE}
+        </h2>
+
         <Image
           src="/mascota-skooly.png"
           alt="Mascota Skooly"
@@ -194,9 +194,9 @@ export default function ChallengePath({
         </div>
       </div>
 
-      <div className="mx-4 mt-4 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/40">
-        <span className="text-xl grayscale">🔒</span>
-        <span className="text-sm font-semibold">{NEXT_EPISODE_TEASER}</span>
+      <div className="mx-4 mt-5 flex flex-col items-center justify-center gap-2 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-8 text-white/40">
+        <span className="text-3xl grayscale">🔒</span>
+        <span className="text-base font-semibold">{NEXT_EPISODE_TEASER}</span>
       </div>
     </div>
   );

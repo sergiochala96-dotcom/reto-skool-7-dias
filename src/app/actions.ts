@@ -168,6 +168,57 @@ export async function updateProfile(
   return { error: undefined };
 }
 
+const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
+
+export async function updateAvatar(
+  _prevState: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Selecciona una imagen." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { error: "El archivo debe ser una imagen." };
+  }
+  if (file.size > MAX_AVATAR_BYTES) {
+    return { error: "La imagen no puede pesar más de 3MB." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${user.id}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (uploadError) return { error: uploadError.message };
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(path);
+  const avatarUrl = `${publicUrl}?v=${Date.now()}`;
+
+  const { error: authError } = await supabase.auth.updateUser({
+    data: { avatar_url: avatarUrl },
+  });
+  if (authError) return { error: authError.message };
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl })
+    .eq("id", user.id);
+  if (profileError) return { error: profileError.message };
+
+  revalidatePath("/", "layout");
+  return { error: undefined };
+}
+
 function traducirError(message: string): string {
   if (message.includes("Invalid login credentials"))
     return "Email o contraseña incorrectos.";
