@@ -55,8 +55,8 @@ export default function ChallengePath({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-5 shadow-2xl shadow-fuchsia-900/40">
-        <h2 className="mb-3 px-4 text-center text-xl font-extrabold text-white">
+      <div className="mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-8 shadow-2xl shadow-fuchsia-900/40">
+        <h2 className="mb-1 px-4 text-center text-lg font-semibold text-white">
           {CURRENT_EPISODE_TITLE}
         </h2>
 

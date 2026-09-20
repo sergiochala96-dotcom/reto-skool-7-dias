@@ -33,6 +33,20 @@ export default async function DashboardPage() {
             <p className="mt-1 text-sm text-white/60 md:mt-3 md:text-xl">
               {completedCount}/{TOTAL_DAYS} días completados
             </p>
+
+            <div className="mt-5 flex flex-col items-center gap-3 md:mt-6">
+              <p className="text-sm text-white/60 md:text-base">
+                Si aún no has creado tu Skool, hazlo con este botón:
+              </p>
+              <a
+                href="https://www.skool.com/signup?ref=182fe0d3c1db4272a1f3e479073168be"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-amber-300 px-6 py-3 font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+              >
+                Crear mi Skool
+              </a>
+            </div>
           </div>
 
           <ChallengePathHorizontal completedDays={completedList} />
