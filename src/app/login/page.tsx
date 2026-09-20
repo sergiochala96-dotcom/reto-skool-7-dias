@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import AuthForm from "@/components/AuthForm";
 import GoogleButton from "@/components/GoogleButton";
@@ -8,7 +9,14 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
-          <div className="mb-2 text-4xl">🎮</div>
+          <Image
+            src="/mascota-skooly.png"
+            alt="Skooly"
+            width={96}
+            height={96}
+            className="mx-auto mb-2 h-24 w-24 object-contain"
+            priority
+          />
           <h1 className="text-2xl font-bold text-white">Skooly</h1>
           <p className="mt-1 text-sm text-white/60">
             Inicia sesión para continuar tu misión

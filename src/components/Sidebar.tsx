@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
@@ -40,8 +41,15 @@ export default function Sidebar({
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="text-lg font-extrabold text-white"
+          className="flex items-center gap-2 text-lg font-extrabold text-white"
         >
+          <Image
+            src="/mascota-skooly.png"
+            alt="Skooly"
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain"
+          />
           Skooly
         </Link>
       </div>
@@ -63,7 +71,13 @@ export default function Sidebar({
           onClick={() => setMobileOpen(false)}
           className="flex items-center gap-2 px-5 py-6"
         >
-          <span className="text-2xl">🎮</span>
+          <Image
+            src="/mascota-skooly.png"
+            alt="Skooly"
+            width={40}
+            height={40}
+            className="h-10 w-10 object-contain"
+          />
           <span className="text-xl font-extrabold text-white">Skooly</span>
         </Link>
 

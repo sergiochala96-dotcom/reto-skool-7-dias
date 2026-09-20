@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -13,7 +14,14 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-16 text-white">
       <div className="mx-auto max-w-3xl text-center">
-        <div className="mb-4 text-5xl">🎮</div>
+        <Image
+          src="/mascota-skooly.png"
+          alt="Skooly"
+          width={128}
+          height={128}
+          className="mx-auto mb-4 h-32 w-32 object-contain"
+          priority
+        />
         <h1 className="text-4xl font-extrabold sm:text-5xl">Skooly</h1>
         <p className="mt-2 text-lg font-medium text-fuchsia-300">
           Reto de Skool en 7 Días
