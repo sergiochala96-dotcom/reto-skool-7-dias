@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import {
   getMissionSections,
+  parseOffer,
   parsePricing,
   type Answers,
   type MissionField,
@@ -18,6 +19,50 @@ const MODELO_LABELS: Record<string, string> = {
   niveles: "Niveles",
   pago_unico: "1 pago único",
 };
+
+const GARANTIA_LABELS: Record<string, string> = {
+  incondicional: "Incondicional",
+  condicional: "Condicional",
+  resultado: "Basada en resultado",
+  sin_garantia: "Sin garantía",
+};
+
+const ESCASEZ_LABELS: Record<string, string> = {
+  cupos: "Cupos limitados",
+  primeros_n: "Solo para primeros N miembros",
+  sin_escasez: "Sin escasez",
+};
+
+const URGENCIA_LABELS: Record<string, string> = {
+  precio_sube: "Precio sube después de la fecha límite",
+  bono_se_pierde: "Bono se pierde después de la fecha límite",
+  sin_urgencia: "Sin urgencia",
+};
+
+function formatOffer(value: string | undefined): string {
+  const data = parseOffer(value);
+  const parts: string[] = [];
+
+  const bonos = (data.bonos ?? []).filter((b) => b.nombre.trim());
+  bonos.forEach((b, i) => {
+    parts.push(`Bono ${i + 1}: ${b.nombre} — ${b.incluye} (${b.valor})`);
+  });
+
+  if (data.garantiaTipo) {
+    const label = GARANTIA_LABELS[data.garantiaTipo] ?? data.garantiaTipo;
+    parts.push(`Garantía: ${label}${data.garantiaTexto ? ` — ${data.garantiaTexto}` : ""}`);
+  }
+  if (data.escasezTipo) {
+    const label = ESCASEZ_LABELS[data.escasezTipo] ?? data.escasezTipo;
+    parts.push(`Escasez: ${label}${data.escasezNumero ? ` (${data.escasezNumero} cupos)` : ""}`);
+  }
+  if (data.urgenciaTipo) {
+    const label = URGENCIA_LABELS[data.urgenciaTipo] ?? data.urgenciaTipo;
+    parts.push(`Urgencia: ${label}${data.urgenciaFecha ? ` — ${data.urgenciaFecha}` : ""}`);
+  }
+
+  return parts.join("\n");
+}
 
 function formatTier(t: PricingTier): string {
   const precio =
@@ -49,6 +94,7 @@ function formatPricing(value: string | undefined): string {
 function formatAnswer(field: MissionField, value: string | string[]): string {
   const labelFor = (v: string) => field.options?.find((o) => o.value === v)?.label ?? v;
   if (field.type === "pricing") return formatPricing(value as string);
+  if (field.type === "offer") return formatOffer(value as string);
   if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
   if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
@@ -122,6 +168,7 @@ export default async function AdminUserPage({
               const answeredFields = fields.filter((f) => {
                 const v = answers[f.id];
                 if (f.type === "pricing") return formatPricing(v as string) !== "";
+                if (f.type === "offer") return formatOffer(v as string) !== "";
                 if (Array.isArray(v)) return v.some((x) => x !== "");
                 return v !== undefined && v !== "";
               });

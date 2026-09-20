@@ -6,6 +6,7 @@ import type { MissionField, MissionSection, Answers } from "@/lib/missionFields"
 import { countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
+import OfferField from "@/components/OfferField";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -49,6 +50,23 @@ function InfoField({ field }: { field: MissionField }) {
 }
 
 function LinkField({ field }: { field: MissionField }) {
+  if (field.emphasis) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">
+        <p className="mb-1 text-base font-semibold text-gray-900">{field.label}</p>
+        {field.helper && <p className="mb-4 text-sm text-gray-500">{field.helper}</p>}
+        <a
+          href={field.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block w-full max-w-md rounded-full bg-amber-400 px-8 py-4 text-base font-extrabold text-black shadow-lg shadow-amber-400/40 transition hover:brightness-105"
+        >
+          {field.buttonText ?? "Abrir enlace"}
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <p className="mb-1 text-sm font-semibold text-gray-900">{field.label}</p>
@@ -272,6 +290,8 @@ function FieldInput({
     return <SliderField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "pricing")
     return <PricingField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "offer")
+    return <OfferField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

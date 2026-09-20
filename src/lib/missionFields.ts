@@ -9,6 +9,7 @@ export type FieldType =
   | "range"
   | "slider"
   | "pricing"
+  | "offer"
   | "prompt"
   | "link"
   | "info";
@@ -25,6 +26,7 @@ export type MissionField = {
   infoText?: string;
   url?: string;
   buttonText?: string;
+  emphasis?: boolean;
   maxLength?: number;
   minLines?: number;
   minSelect?: number;
@@ -174,7 +176,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "oferta_grand_slam",
-          type: "textarea",
+          type: "offer",
           label: "Tu Oferta Grand Slam",
           helper: "Describe la oferta irresistible de tu comunidad",
         },
@@ -195,6 +197,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           helper: "Regístrate gratis con este enlace",
           url: "https://www.skool.com/signup?ref=182fe0d3c1db4272a1f3e479073168be",
           buttonText: "Crear mi Skool",
+          emphasis: true,
         },
         {
           id: "skool_creado",
@@ -767,6 +770,55 @@ function isPricingAnswered(data: PricingData): boolean {
   return false;
 }
 
+export type Bono = {
+  nombre: string;
+  incluye: string;
+  valor: string;
+};
+
+export type OfferData = {
+  bonos?: Bono[];
+  garantiaTipo?: "incondicional" | "condicional" | "resultado" | "sin_garantia";
+  garantiaTexto?: string;
+  escasezTipo?: "cupos" | "primeros_n" | "sin_escasez";
+  escasezNumero?: string;
+  urgenciaTipo?: "precio_sube" | "bono_se_pierde" | "sin_urgencia";
+  urgenciaFecha?: string;
+};
+
+export function parseOffer(value: string | undefined): OfferData {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as OfferData) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isOfferAnswered(data: OfferData): boolean {
+  const bonos = data.bonos ?? [];
+  const bonosOk =
+    bonos.filter((b) => b.nombre.trim() && b.incluye.trim() && b.valor.trim()).length >= 2;
+  if (!bonosOk) return false;
+
+  if (!data.garantiaTipo) return false;
+  if (data.garantiaTipo !== "sin_garantia" && !data.garantiaTexto?.trim()) return false;
+
+  if (!data.escasezTipo) return false;
+  if ((data.escasezTipo === "cupos" || data.escasezTipo === "primeros_n") && !data.escasezNumero?.trim())
+    return false;
+
+  if (!data.urgenciaTipo) return false;
+  if (
+    (data.urgenciaTipo === "precio_sube" || data.urgenciaTipo === "bono_se_pierde") &&
+    !data.urgenciaFecha?.trim()
+  )
+    return false;
+
+  return true;
+}
+
 function isVisible(field: MissionField, answers: Answers): boolean {
   if (!field.showIf) return true;
   return answers[field.showIf.field] === field.showIf.equals;
@@ -777,6 +829,10 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
 
   if (field.type === "pricing") {
     return isPricingAnswered(parsePricing(typeof v === "string" ? v : undefined));
+  }
+
+  if (field.type === "offer") {
+    return isOfferAnswered(parseOffer(typeof v === "string" ? v : undefined));
   }
 
   if (field.type === "multiselect") {
