@@ -5,7 +5,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
-import { countRequiredFields, getMissingRequiredFieldIds, type Answers } from "@/lib/missionFields";
+import {
+  countRequiredFields,
+  getFlatFields,
+  getMissingRequiredFieldIds,
+  isMultiValueField,
+  type Answers,
+} from "@/lib/missionFields";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -136,15 +142,22 @@ export async function saveMissionAnswers(
   const unlocked = day === 1 || completedDays.has(day - 1);
   if (!unlocked || day < 1 || day > TOTAL_DAYS) redirect("/dashboard");
 
+  const multiValueIds = new Set(
+    getFlatFields(day)
+      .filter(isMultiValueField)
+      .map((f) => f.id)
+  );
+
   const answers: Answers = {};
   for (const [key, value] of formData.entries()) {
     if (!key.startsWith("field_")) continue;
     const id = key.slice("field_".length);
-    if (id in answers) {
+    const str = String(value);
+    if (multiValueIds.has(id)) {
       const existing = answers[id];
-      answers[id] = Array.isArray(existing) ? [...existing, String(value)] : [String(existing), String(value)];
+      answers[id] = Array.isArray(existing) ? [...existing, str] : [str];
     } else {
-      answers[id] = String(value);
+      answers[id] = str;
     }
   }
 

@@ -5,7 +5,10 @@ export type FieldType =
   | "select"
   | "yesno"
   | "multiselect"
+  | "list"
+  | "range"
   | "prompt"
+  | "link"
   | "info";
 
 export type MissionField = {
@@ -15,10 +18,19 @@ export type MissionField = {
   helper?: string;
   placeholder?: string;
   options?: { value: string; label: string }[];
+  display?: "pills" | "dropdown";
   promptText?: string;
   infoText?: string;
+  url?: string;
+  buttonText?: string;
+  maxLength?: number;
   minLines?: number;
   minSelect?: number;
+  minItems?: number;
+  maxItems?: number;
+  itemPlaceholder?: string;
+  itemMaxLength?: number;
+  addLabel?: string;
   required?: boolean;
   showIf?: { field: string; equals: string };
 };
@@ -34,29 +46,110 @@ const SI_NO = [
   { value: "no", label: "No" },
 ];
 
+const NICHOS = [
+  { value: "aficiones", label: "🎨 Aficiones" },
+  { value: "musica", label: "🎸 Música" },
+  { value: "dinero", label: "💰 Dinero" },
+  { value: "espiritualidad", label: "🕉️ Espiritualidad" },
+  { value: "tecnologia", label: "💻 Tecnología" },
+  { value: "salud", label: "🥕 Salud" },
+  { value: "deportes", label: "🌐 Deportes" },
+  { value: "superacion", label: "📊 Superación personal" },
+  { value: "relaciones", label: "❤️ Relaciones" },
+];
+
+const NO_INFO_TYPES: FieldType[] = ["info", "prompt", "link"];
+
 export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
   1: [
     {
-      id: "primeros-pasos",
-      heading: "Primeros pasos",
+      id: "canal-audiencia",
+      heading: "Tu canal y tu audiencia",
       fields: [
         {
-          id: "perfil_completo",
-          type: "yesno",
-          label: "¿Completaste tu perfil de Skool con foto y una frase que te represente?",
-          options: SI_NO,
+          id: "canal_usuario",
+          type: "text",
+          label: "Tu usuario en tu canal preferido",
+          placeholder: "@tu_usuario",
         },
         {
-          id: "presentacion_hecha",
-          type: "yesno",
-          label: "¿Ya te presentaste en la comunidad contando qué quieres lograr en estos 7 días?",
-          options: SI_NO,
+          id: "canal_seguidores",
+          type: "text",
+          label: "Seguidores o lista que tienes",
+          placeholder: "Ej: 1.200 seguidores en Instagram + 300 en mi lista de email",
+        },
+      ],
+    },
+    {
+      id: "nicho-avatar",
+      heading: "Tu nicho y tu avatar",
+      fields: [
+        {
+          id: "nicho",
+          type: "select",
+          display: "dropdown",
+          label: "Escoge tu nicho",
+          options: NICHOS,
         },
         {
-          id: "meta_personal",
+          id: "avatar_genero",
+          type: "select",
+          display: "dropdown",
+          label: "Identifica tu avatar",
+          options: [
+            { value: "hombres", label: "Hombres" },
+            { value: "mujeres", label: "Mujeres" },
+            { value: "ambos", label: "Ambos" },
+          ],
+        },
+        {
+          id: "edad",
+          type: "range",
+          label: "Rango de edades de tu avatar",
+        },
+      ],
+    },
+    {
+      id: "problemas-deseos",
+      heading: "Problemas y deseos de tu avatar",
+      fields: [
+        {
+          id: "problemas_avatar",
+          type: "list",
+          label: "Problemas de tu avatar",
+          helper: "Escribe mínimo 5",
+          minItems: 5,
+          addLabel: "+ Añadir problema",
+          itemPlaceholder: "Ej: no sabe por dónde empezar",
+        },
+        {
+          id: "deseos_avatar",
+          type: "list",
+          label: "Deseos de tu avatar",
+          helper: "Escribe mínimo 5",
+          minItems: 5,
+          addLabel: "+ Añadir deseo",
+          itemPlaceholder: "Ej: quiere generar ingresos extra",
+        },
+      ],
+    },
+    {
+      id: "diferenciacion-oferta",
+      heading: "Tu diferenciación y tu oferta",
+      fields: [
+        {
+          id: "diferenciacion",
+          type: "list",
+          label: "¿Qué te diferencia?",
+          helper: "Escribe mínimo 5",
+          minItems: 5,
+          addLabel: "+ Añadir diferencial",
+        },
+        {
+          id: "oferta_grand_slam",
           type: "textarea",
-          label: "Tu meta personal para el final del reto",
-          helper: "¿Qué quieres haber logrado al terminar estos 7 días?",
+          label: "Tu Oferta Grand Slam",
+          helper: "Describe la oferta irresistible de tu comunidad",
         },
       ],
     },
@@ -64,22 +157,92 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
 
   2: [
     {
+      id: "crea-skool",
+      heading: "Crea tu Skool",
+      fields: [
+        {
+          id: "crear_skool_link",
+          type: "link",
+          label: "Crea tu Skool",
+          helper: "Regístrate gratis con este enlace",
+          url: "https://www.skool.com/signup?ref=182fe0d3c1db4272a1f3e479073168be",
+          buttonText: "Crear mi Skool",
+        },
+        {
+          id: "skool_creado",
+          type: "yesno",
+          label: "¿Ya creaste tu Skool?",
+          options: SI_NO,
+        },
+      ],
+    },
+    {
+      id: "identidad",
+      heading: "Identidad de tu comunidad",
+      fields: [
+        {
+          id: "nombre_comunidad",
+          type: "text",
+          label: "Nombre de la Comunidad",
+          maxLength: 30,
+        },
+        {
+          id: "descripcion_comunidad",
+          type: "textarea",
+          label: "Descripción de la Comunidad",
+          maxLength: 150,
+        },
+        {
+          id: "portada_link",
+          type: "link",
+          label: "Portada de la Comunidad",
+          helper: "Plantilla lista para editar en Canva",
+          url: "https://canva.link/k5fdlq8qn7tngni",
+          buttonText: "🎨 Abrir plantilla de portada",
+        },
+        {
+          id: "portada_hecha",
+          type: "yesno",
+          label: "¿Ya subiste tu portada?",
+          options: SI_NO,
+        },
+        {
+          id: "icono_link",
+          type: "link",
+          label: "Icono de la Comunidad",
+          helper: "Plantilla lista para editar en Canva",
+          url: "https://canva.link/0pxdupydxfx101n",
+          buttonText: "🎨 Abrir plantilla de icono",
+        },
+        {
+          id: "icono_hecho",
+          type: "yesno",
+          label: "¿Ya subiste tu icono?",
+          options: SI_NO,
+        },
+      ],
+    },
+    {
       id: "categorias-reglas",
       heading: "Categorías y reglas",
       fields: [
         {
           id: "categorias",
-          type: "textarea",
-          label: "Categorías de tu comunidad",
-          helper: "Escribe mínimo 3, una por línea",
-          minLines: 3,
+          type: "list",
+          label: "Planifica y configura las categorías",
+          helper: "Escribe mínimo 3",
+          minItems: 3,
+          addLabel: "+ Añadir categoría",
         },
         {
           id: "reglas",
-          type: "textarea",
-          label: "Reglas de tu comunidad",
-          helper: "Escribe exactamente 3 reglas, máximo 30 caracteres cada una, una por línea",
-          minLines: 3,
+          type: "list",
+          label: "Configura las reglas de tu comunidad",
+          helper: "En total son 3, máximo 30 caracteres cada una",
+          minItems: 3,
+          maxItems: 3,
+          itemMaxLength: 30,
+          addLabel: "+ Añadir regla",
         },
       ],
     },
@@ -117,10 +280,11 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "contenido_planes",
-          type: "textarea",
+          type: "list",
           label: "¿Qué incluye cada plan?",
-          helper: "Mínimo 5 cosas por plan, una por línea",
-          minLines: 5,
+          helper: "Mínimo 5 cosas",
+          minItems: 5,
+          addLabel: "+ Añadir beneficio",
           showIf: { field: "modelo", equals: "freemium" },
         },
         {
@@ -138,10 +302,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "beneficios_niveles",
-          type: "textarea",
+          type: "list",
           label: "3 a 5 cosas que ofreces por cada nivel",
-          helper: "Una por línea",
-          minLines: 3,
+          minItems: 3,
+          addLabel: "+ Añadir beneficio",
           showIf: { field: "tipo_cobro", equals: "niveles" },
         },
         {
@@ -192,7 +356,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           id: "descripcion_texto",
           type: "textarea",
           label: "Pega aquí tu descripción final",
-          helper: "Máximo 1.000 caracteres",
+          maxLength: 1000,
         },
       ],
     },
@@ -268,10 +432,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       fields: [
         {
           id: "niveles_nombres",
-          type: "textarea",
+          type: "list",
           label: "Nombre de tus 9 niveles",
-          helper: "Escribe uno por línea. Intenta que sea temático y personalizado para tu comunidad",
-          minLines: 9,
+          helper: "Intenta que sea temático y personalizado para tu comunidad",
+          minItems: 9,
+          maxItems: 9,
+          addLabel: "+ Añadir nivel",
         },
         {
           id: "niveles_premios",
@@ -335,16 +501,19 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
         {
           id: "temario_lista",
-          type: "textarea",
+          type: "list",
           label: "Escribe tu temario",
-          helper: "Mínimo 2, máximo 15 módulos/cursos, uno por línea",
-          minLines: 2,
+          helper: "Mínimo 2, máximo 15 módulos/cursos",
+          minItems: 2,
+          maxItems: 15,
+          addLabel: "+ Añadir módulo/curso",
         },
         {
           id: "nombres_videos",
-          type: "textarea",
+          type: "list",
           label: "Nombres de los videos dentro de cada módulo/curso",
-          helper: "Uno por línea",
+          minItems: 1,
+          addLabel: "+ Añadir video",
         },
         {
           id: "modulos_subidos",
@@ -462,7 +631,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           id: "tematicas",
           type: "textarea",
           label: "¿Qué temáticas publicarás?",
-          helper: "Una por línea",
         },
         {
           id: "como_conversacion",
@@ -500,6 +668,16 @@ function flatFields(day: number): MissionField[] {
   return getMissionSections(day).flatMap((s) => s.fields);
 }
 
+export function getFlatFields(day: number): MissionField[] {
+  return flatFields(day);
+}
+
+const MULTI_VALUE_TYPES: FieldType[] = ["list", "multiselect", "range"];
+
+export function isMultiValueField(field: MissionField): boolean {
+  return MULTI_VALUE_TYPES.includes(field.type);
+}
+
 export type AnswerValue = string | string[];
 export type Answers = Record<string, AnswerValue>;
 
@@ -510,13 +688,27 @@ function isVisible(field: MissionField, answers: Answers): boolean {
 
 function isAnswered(field: MissionField, answers: Answers): boolean {
   const v = answers[field.id];
+
   if (field.type === "multiselect") {
     const arr = Array.isArray(v) ? v : [];
     return arr.length >= (field.minSelect ?? 1);
   }
+
+  if (field.type === "list") {
+    const arr = Array.isArray(v) ? v : [];
+    const filled = arr.filter((x) => x.trim().length > 0).length;
+    return filled >= (field.minItems ?? 1);
+  }
+
+  if (field.type === "range") {
+    const arr = Array.isArray(v) ? v : [];
+    return arr.length === 2 && arr.every((x) => x.trim().length > 0);
+  }
+
   if (field.type === "select" || field.type === "yesno") {
     return typeof v === "string" && v.length > 0;
   }
+
   const s = typeof v === "string" ? v.trim() : "";
   if (!s) return false;
   if (field.minLines) {
@@ -531,7 +723,7 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
 
 function requiredVisibleFields(day: number, answers: Answers): MissionField[] {
   return flatFields(day)
-    .filter((f) => f.type !== "info" && f.type !== "prompt")
+    .filter((f) => !NO_INFO_TYPES.includes(f.type))
     .filter((f) => f.required !== false)
     .filter((f) => isVisible(f, answers));
 }

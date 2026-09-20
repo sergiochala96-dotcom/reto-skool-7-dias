@@ -7,7 +7,8 @@ import { getMissionSections, type Answers, type MissionField } from "@/lib/missi
 
 function formatAnswer(field: MissionField, value: string | string[]): string {
   const labelFor = (v: string) => field.options?.find((o) => o.value === v)?.label ?? v;
-  if (Array.isArray(value)) return value.map(labelFor).join(", ");
+  if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
+  if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
 }
 
@@ -75,10 +76,11 @@ export default async function AdminUserPage({
               const isDone = doneDays.has(m.day);
               const fields = sections
                 .flatMap((s) => s.fields)
-                .filter((f) => f.type !== "info" && f.type !== "prompt");
+                .filter((f) => f.type !== "info" && f.type !== "prompt" && f.type !== "link");
               const answeredFields = fields.filter((f) => {
                 const v = answers[f.id];
-                return v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0);
+                if (Array.isArray(v)) return v.some((x) => x !== "");
+                return v !== undefined && v !== "";
               });
 
               return (

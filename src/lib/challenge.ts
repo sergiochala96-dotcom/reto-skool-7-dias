@@ -8,15 +8,15 @@ export type Mission = {
 export const MISSIONS: Mission[] = [
   {
     day: 1,
-    title: "¡Inicia los Skool Games!",
+    title: "Inicia el Reto",
     emoji: "🚀",
-    intro: "Prepara tu mentalidad de jugador y da tus primeros pasos dentro de la comunidad.",
+    intro: "Define tu audiencia y tu avatar ideal: la base de todo lo que construirás en este reto.",
   },
   {
     day: 2,
-    title: "Nicho y Modelo de Negocio",
-    emoji: "🎯",
-    intro: "Define el corazón de tu comunidad: cómo se va a organizar y cómo vas a monetizarla.",
+    title: "Identidad de tu Skool",
+    emoji: "🪪",
+    intro: "Crea tu Skool y dale identidad: nombre, portada, icono y tu modelo de monetización.",
   },
   {
     day: 3,

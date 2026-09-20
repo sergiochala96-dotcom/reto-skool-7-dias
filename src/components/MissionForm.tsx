@@ -44,6 +44,131 @@ function InfoField({ field }: { field: MissionField }) {
   );
 }
 
+function LinkField({ field }: { field: MissionField }) {
+  return (
+    <div className="rounded-xl border border-amber-300/30 bg-amber-400/5 p-4">
+      <p className="mb-1 text-sm font-semibold text-amber-200">{field.label}</p>
+      {field.helper && <p className="mb-3 text-xs text-white/50">{field.helper}</p>}
+      <a
+        href={field.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block rounded-full bg-amber-300 px-5 py-2 text-sm font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+      >
+        {field.buttonText ?? "Abrir enlace"}
+      </a>
+    </div>
+  );
+}
+
+function ListField({
+  field,
+  value,
+  onChange,
+}: {
+  field: MissionField;
+  value: string[] | undefined;
+  onChange: (id: string, value: string[]) => void;
+}) {
+  const minRows = field.minItems ?? 1;
+  const items = value && value.length > 0 ? value : Array(minRows).fill("");
+
+  const setItem = (index: number, text: string) => {
+    const next = [...items];
+    next[index] = text;
+    onChange(field.id, next);
+  };
+
+  const addItem = () => onChange(field.id, [...items, ""]);
+  const removeItem = (index: number) => onChange(field.id, items.filter((_, i) => i !== index));
+
+  const canAddMore = !field.maxItems || items.length < field.maxItems;
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <div className="flex flex-col gap-2">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="text-fuchsia-400">•</span>
+            <input
+              name={`field_${field.id}`}
+              value={item}
+              maxLength={field.itemMaxLength}
+              placeholder={field.itemPlaceholder}
+              onChange={(e) => setItem(i, e.target.value)}
+              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400"
+            />
+            {items.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                aria-label="Quitar"
+                className="flex-shrink-0 rounded-lg px-2 py-1 text-white/30 transition hover:bg-white/10 hover:text-white/70"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {canAddMore && (
+        <button
+          type="button"
+          onClick={addItem}
+          className="mt-2 text-sm font-medium text-fuchsia-300 hover:underline"
+        >
+          {field.addLabel ?? "+ Añadir"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function RangeField({
+  field,
+  value,
+  onChange,
+}: {
+  field: MissionField;
+  value: string[] | undefined;
+  onChange: (id: string, value: string[]) => void;
+}) {
+  const [min, max] = value && value.length === 2 ? value : ["", ""];
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-white/80">{field.label}</label>
+      {field.helper && <p className="mb-2 text-xs text-white/40">{field.helper}</p>}
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <span className="mb-1 block text-xs text-white/40">Mínimo</span>
+          <input
+            type="number"
+            min={0}
+            name={`field_${field.id}`}
+            value={min}
+            onChange={(e) => onChange(field.id, [e.target.value, max])}
+            className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-fuchsia-400"
+          />
+        </div>
+        <div className="flex-1">
+          <span className="mb-1 block text-xs text-white/40">Máximo</span>
+          <input
+            type="number"
+            min={0}
+            name={`field_${field.id}`}
+            value={max}
+            onChange={(e) => onChange(field.id, [min, e.target.value])}
+            className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-fuchsia-400"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FieldInput({
   field,
   value,
@@ -58,6 +183,13 @@ function FieldInput({
 
   if (field.type === "prompt") return <PromptField field={field} />;
   if (field.type === "info") return <InfoField field={field} />;
+  if (field.type === "link") return <LinkField field={field} />;
+  if (field.type === "list")
+    return <ListField field={field} value={value as string[]} onChange={onChange} />;
+  if (field.type === "range")
+    return <RangeField field={field} value={value as string[]} onChange={onChange} />;
+
+  const textValue = (value as string) ?? "";
 
   return (
     <div>
@@ -67,8 +199,9 @@ function FieldInput({
       {field.type === "text" && (
         <input
           name={`field_${field.id}`}
-          value={(value as string) ?? ""}
+          value={textValue}
           placeholder={field.placeholder}
+          maxLength={field.maxLength}
           onChange={(e) => onChange(field.id, e.target.value)}
           className={baseInput}
         />
@@ -79,7 +212,7 @@ function FieldInput({
           type="number"
           min={0}
           name={`field_${field.id}`}
-          value={(value as string) ?? ""}
+          value={textValue}
           placeholder={field.placeholder}
           onChange={(e) => onChange(field.id, e.target.value)}
           className={baseInput}
@@ -89,15 +222,40 @@ function FieldInput({
       {field.type === "textarea" && (
         <textarea
           name={`field_${field.id}`}
-          value={(value as string) ?? ""}
+          value={textValue}
           placeholder={field.placeholder}
+          maxLength={field.maxLength}
           onChange={(e) => onChange(field.id, e.target.value)}
           rows={4}
           className={`${baseInput} resize-y`}
         />
       )}
 
-      {(field.type === "select" || field.type === "yesno") && (
+      {field.maxLength && (
+        <p className="mt-1 text-right text-[11px] text-white/30">
+          {textValue.length}/{field.maxLength}
+        </p>
+      )}
+
+      {field.type === "select" && field.display === "dropdown" && (
+        <select
+          name={`field_${field.id}`}
+          value={textValue}
+          onChange={(e) => onChange(field.id, e.target.value)}
+          className={`${baseInput} appearance-none`}
+        >
+          <option value="" disabled className="bg-[#1a0b2e]">
+            Selecciona una opción
+          </option>
+          {field.options?.map((opt) => (
+            <option key={opt.value} value={opt.value} className="bg-[#1a0b2e]">
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {(field.type === "yesno" || (field.type === "select" && field.display !== "dropdown")) && (
         <div className="flex flex-wrap gap-2">
           {field.options?.map((opt) => {
             const selected = value === opt.value;
@@ -116,7 +274,7 @@ function FieldInput({
               </button>
             );
           })}
-          <input type="hidden" name={`field_${field.id}`} value={(value as string) ?? ""} />
+          <input type="hidden" name={`field_${field.id}`} value={textValue} />
         </div>
       )}
 
