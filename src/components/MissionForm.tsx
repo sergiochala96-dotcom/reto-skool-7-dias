@@ -457,7 +457,10 @@ export default function MissionForm({
       )}
 
       {sections.map((section) => (
-        <section key={section.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <section
+          key={section.id}
+          className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 lg:p-7"
+        >
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-300">
             {section.heading}
           </h2>

@@ -47,8 +47,8 @@ export default async function DiaPage({
         completedDays={Array.from(completedDays)}
       />
 
-      <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-2xl">
+      <main className="flex-1 px-4 py-10 lg:px-10">
+        <div className="mx-auto max-w-2xl lg:max-w-4xl">
           <Link
             href="/dashboard"
             aria-label="Volver al inicio"
@@ -57,7 +57,7 @@ export default async function DiaPage({
             ←
           </Link>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl lg:p-10">
             <div className="mb-4 flex items-center gap-4">
               <span className="text-5xl">{mission.emoji}</span>
               <div>

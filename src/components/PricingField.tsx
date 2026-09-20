@@ -110,7 +110,7 @@ function TiersEditor({
   updateTier: (index: number, patch: Partial<PricingTier>) => void;
 }) {
   return (
-    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+    <div className="mt-4 grid gap-4 sm:grid-cols-3">
       {[0, 1, 2].map((i) => {
         const tier = tiers[i] ?? emptyTier(`Nivel ${i + 1}`);
         const isFreeFixed = modelo === "freemium" && i === 0;
@@ -120,7 +120,7 @@ function TiersEditor({
         return (
           <div
             key={i}
-            className={`rounded-xl border p-4 transition ${
+            className={`rounded-xl border p-5 transition ${
               disabled ? "border-white/5 bg-white/[0.02] opacity-60" : "border-white/15 bg-white/5"
             }`}
           >
