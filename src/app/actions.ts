@@ -213,6 +213,7 @@ export async function adminResetProgress(): Promise<void> {
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
   await supabase.from("challenge_progress").delete().eq("user_id", user.id);
+  await supabase.from("mission_answers").delete().eq("user_id", user.id);
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
