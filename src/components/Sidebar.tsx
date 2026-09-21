@@ -121,8 +121,11 @@ export default function Sidebar({
                   }`}
                 >
                   <span className="text-lg">{mission.emoji}</span>
-                  <span className="min-w-0 flex-1 truncate rounded-md bg-white/5 px-2 py-1 text-xs font-bold">
-                    Día {mission.day}: {mission.title}
+                  <span className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className="flex-shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/60">
+                      Día {mission.day}
+                    </span>
+                    <span className="truncate">{mission.title}</span>
                   </span>
                   {isDone ? (
                     <span className="text-emerald-400">✓</span>

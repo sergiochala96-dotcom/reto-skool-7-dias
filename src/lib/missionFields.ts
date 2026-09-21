@@ -111,7 +111,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "canal_seguidores",
           type: "select",
-          display: "pills",
+          display: "boxes",
           label: "Seguidores o lista que tienes",
           options: [
             { value: "0-100", label: "0-100 seguidores" },

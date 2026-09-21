@@ -719,6 +719,7 @@ export default function MissionForm({
   }, [currentStep, currentStat?.done, currentStat?.total]);
 
   const isLastStep = currentStep === sections.length - 1;
+  const currentStepIncomplete = !!currentStat && currentStat.total > 0 && currentStat.done < currentStat.total;
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, sections.length - 1));
   const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
@@ -746,25 +747,23 @@ export default function MissionForm({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex max-w-[75%] items-center truncate rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-fuchsia-700">
-            Día {day}: {title}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex-shrink-0 text-4xl sm:text-5xl">{emoji}</span>
+          <span className="flex-shrink-0 rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-fuchsia-700">
+            Día {day}
           </span>
-          {allDone && (
-            <button
-              type="button"
-              onClick={toggleExpanded}
-              className="rounded-lg border-2 border-fuchsia-300 bg-white px-3 py-1.5 text-xs font-bold text-fuchsia-700 shadow-sm transition hover:bg-fuchsia-50"
-            >
-              {showAllExpanded ? `Ocultar Respuestas Día ${day}` : `Todas Respuestas Día ${day}`}
-            </button>
-          )}
+          <h1 className="truncate text-xl font-bold text-gray-900 sm:text-2xl">{title}</h1>
         </div>
-        <div className="mt-1 flex items-center gap-4">
-          <span className="text-5xl">{emoji}</span>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        </div>
+        {allDone && (
+          <button
+            type="button"
+            onClick={toggleExpanded}
+            className="flex-shrink-0 rounded-lg border-2 border-fuchsia-300 bg-white px-3 py-1.5 text-xs font-bold text-fuchsia-700 shadow-sm transition hover:bg-fuchsia-50"
+          >
+            {showAllExpanded ? `Ocultar Respuestas Día ${day}` : `Todas Respuestas Día ${day}`}
+          </button>
+        )}
       </div>
 
       <p className="text-gray-600">{intro}</p>
@@ -880,7 +879,12 @@ export default function MissionForm({
               <button
                 type="button"
                 onClick={goNext}
-                className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-black"
+                disabled={currentStepIncomplete}
+                className={`flex-1 rounded-xl px-4 py-3 font-semibold shadow-lg transition ${
+                  currentStepIncomplete
+                    ? "cursor-not-allowed bg-gray-200 text-gray-400 shadow-none"
+                    : "bg-gray-900 text-white shadow-black/20 hover:bg-black"
+                }`}
               >
                 Siguiente →
               </button>
