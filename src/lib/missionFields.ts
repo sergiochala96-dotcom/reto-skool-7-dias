@@ -389,6 +389,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       id: "presentacion",
       heading: "Presentación",
       mascot: "/mascota-presentacion.png",
+      mascotAfterField: "video_prompt",
       image: "/skool-ejemplo-about.png",
       imageWidth: 1080,
       imageHeight: 1080,
@@ -551,10 +552,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       id: "modulos",
       heading: "Módulos",
       mascot: "/mascota-modulos.png",
-      image: "/skool-ejemplo-cursos.webp",
-      imageWidth: 1223,
-      imageHeight: 916,
-      imagePosition: "above-heading",
       fields: [
         {
           id: "portadas_modulos_link",
