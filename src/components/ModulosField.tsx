@@ -30,8 +30,8 @@ export default function ModulosField({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-3 text-xs text-gray-500">{field.helper}</p>}
+      <h2 className="mb-2 text-2xl font-extrabold text-gray-900 sm:text-3xl">{field.label}</h2>
+      {field.helper && <p className="mb-3 text-sm text-gray-500">{field.helper}</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {items.map((modulo, i) => (

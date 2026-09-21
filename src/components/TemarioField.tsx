@@ -1,7 +1,7 @@
 "use client";
 
-import type { MissionField } from "@/lib/missionFields";
-import { parseTemario, type CursoItem, type TemarioData } from "@/lib/missionFields";
+import type { Answers, MissionField } from "@/lib/missionFields";
+import { parseModulos, parseTemario, type CursoItem, type TemarioData } from "@/lib/missionFields";
 import CourseCardMockup from "@/components/CourseCardMockup";
 
 const MAX_CURSOS = 15;
@@ -84,18 +84,41 @@ function VideoListEditor({
 export default function TemarioField({
   field,
   value,
+  answers,
   onChange,
 }: {
   field: MissionField;
   value: string | undefined;
+  answers: Answers;
   onChange: (id: string, value: string) => void;
 }) {
+  // Los primeros cursos heredan título y descripción de "Tus primeros 2
+  // módulos" (Día 5, sección Módulos): aquí quedan bloqueados y el usuario
+  // solo se enfoca en cargar los videos de cada uno.
+  const syncedModulos = field.syncTitlesFrom
+    ? parseModulos(answers[field.syncTitlesFrom] as string | undefined).modulos ?? []
+    : [];
+  const lockedCount = syncedModulos.length;
+
   const data = parseTemario(value);
   const cursos = data.cursos ?? [];
-  const items = cursos.length >= 1 ? cursos : [emptyCurso()];
+  const baseLen = Math.max(1, lockedCount);
+  const padded =
+    cursos.length >= baseLen
+      ? cursos
+      : [...cursos, ...Array.from({ length: baseLen - cursos.length }, () => emptyCurso())];
+
+  // Aplica el título/descripción sincronizados a los cursos bloqueados,
+  // tanto para mostrarlos como para lo que se termina guardando.
+  const items = padded.map((c, i) =>
+    i < lockedCount ? { ...c, titulo: syncedModulos[i].titulo, descripcion: syncedModulos[i].descripcion } : c
+  );
 
   const commit = (next: CursoItem[]) => {
-    const payload: TemarioData = { cursos: next };
+    const synced = next.map((c, i) =>
+      i < lockedCount ? { ...c, titulo: syncedModulos[i].titulo, descripcion: syncedModulos[i].descripcion } : c
+    );
+    const payload: TemarioData = { cursos: synced };
     onChange(field.id, JSON.stringify(payload));
   };
 
@@ -118,38 +141,42 @@ export default function TemarioField({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-3 text-xs text-gray-500">{field.helper}</p>}
+      <h2 className="mb-2 text-2xl font-extrabold text-gray-900 sm:text-3xl">{field.label}</h2>
+      {field.helper && <p className="mb-3 text-sm text-gray-500">{field.helper}</p>}
 
       <div className="flex flex-col gap-5">
-        {items.map((curso, i) => (
-          <div key={i} className="relative">
-            {i > 0 && (
-              <button
-                type="button"
-                onClick={() => removeCurso(i)}
-                className="absolute -top-2 right-0 z-10 rounded-full bg-white px-2 py-1 text-xs font-semibold text-gray-400 shadow transition hover:text-red-600"
-              >
-                ✕ Quitar curso
-              </button>
-            )}
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-fuchsia-600">
-              Curso {i + 1}
-            </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <CourseCardMockup
-                titulo={curso.titulo}
-                descripcion={curso.descripcion}
-                onTituloChange={(v) => updateCurso(i, { titulo: v })}
-                onDescripcionChange={(v) => updateCurso(i, { descripcion: v })}
-              />
-              <VideoListEditor
-                videos={curso.videos}
-                onChange={(videos) => updateCurso(i, { videos })}
-              />
+        {items.map((curso, i) => {
+          const locked = i < lockedCount;
+          return (
+            <div key={i} className="relative">
+              {!locked && i > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeCurso(i)}
+                  className="absolute -top-2 right-0 z-10 rounded-full bg-white px-2 py-1 text-xs font-semibold text-gray-400 shadow transition hover:text-red-600"
+                >
+                  ✕ Quitar curso
+                </button>
+              )}
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-fuchsia-600">
+                Curso {i + 1}
+              </p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <CourseCardMockup
+                  titulo={curso.titulo}
+                  descripcion={curso.descripcion}
+                  locked={locked}
+                  onTituloChange={(v) => updateCurso(i, { titulo: v })}
+                  onDescripcionChange={(v) => updateCurso(i, { descripcion: v })}
+                />
+                <VideoListEditor
+                  videos={curso.videos}
+                  onChange={(videos) => updateCurso(i, { videos })}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {items.length < MAX_CURSOS && (

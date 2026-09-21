@@ -5,11 +5,13 @@ export default function CourseCardMockup({
   descripcion,
   onTituloChange,
   onDescripcionChange,
+  locked = false,
 }: {
   titulo: string;
   descripcion: string;
-  onTituloChange: (value: string) => void;
-  onDescripcionChange: (value: string) => void;
+  onTituloChange?: (value: string) => void;
+  onDescripcionChange?: (value: string) => void;
+  locked?: boolean;
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -37,24 +39,40 @@ export default function CourseCardMockup({
 
       {/* Contenido editable */}
       <div className="p-6">
-        <input
-          value={titulo}
-          maxLength={50}
-          placeholder="Edita el Título"
-          onChange={(e) => onTituloChange(e.target.value)}
-          className="w-full border-none bg-transparent text-xl font-bold text-gray-900 outline-none placeholder:text-gray-400"
-        />
-        <textarea
-          value={descripcion}
-          maxLength={200}
-          placeholder="Edita la descripción"
-          onChange={(e) => onDescripcionChange(e.target.value)}
-          rows={3}
-          className="mt-2 w-full resize-none border-none bg-transparent text-base font-light text-gray-500 outline-none placeholder:text-gray-400"
-        />
-        <p className="mt-2 text-right text-xs text-gray-400">
-          {titulo.length}/50 · {descripcion.length}/200
-        </p>
+        {locked ? (
+          <>
+            <p className="text-xl font-bold text-gray-900">
+              {titulo || "Sin título todavía"}
+            </p>
+            <p className="mt-2 text-base font-light text-gray-500">
+              {descripcion || "Complétalo en la sección Módulos"}
+            </p>
+            <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-gray-400">
+              🔒 Sincronizado con Módulos
+            </p>
+          </>
+        ) : (
+          <>
+            <input
+              value={titulo}
+              maxLength={50}
+              placeholder="Edita el Título"
+              onChange={(e) => onTituloChange?.(e.target.value)}
+              className="w-full border-none bg-transparent text-xl font-bold text-gray-900 outline-none placeholder:text-gray-400"
+            />
+            <textarea
+              value={descripcion}
+              maxLength={200}
+              placeholder="Edita la descripción"
+              onChange={(e) => onDescripcionChange?.(e.target.value)}
+              rows={3}
+              className="mt-2 w-full resize-none border-none bg-transparent text-base font-light text-gray-500 outline-none placeholder:text-gray-400"
+            />
+            <p className="mt-2 text-right text-xs text-gray-400">
+              {titulo.length}/50 · {descripcion.length}/200
+            </p>
+          </>
+        )}
         <div className="mt-3 rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-500">
           0%
         </div>

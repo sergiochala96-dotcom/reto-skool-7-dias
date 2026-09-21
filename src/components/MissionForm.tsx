@@ -515,7 +515,7 @@ function FieldInput({
   if (field.type === "modulos")
     return <ModulosField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "temario")
-    return <TemarioField field={field} value={value as string} onChange={onChange} />;
+    return <TemarioField field={field} value={value as string} answers={answers} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

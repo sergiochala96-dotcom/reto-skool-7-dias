@@ -50,6 +50,7 @@ export type MissionField = {
   moodMap?: { max: number; emoji: string; text: string; color: "red" | "orange" | "green" }[];
   required?: boolean;
   showIf?: { field: string; equals: string };
+  syncTitlesFrom?: string;
 };
 
 export type MissionSection = {
@@ -561,6 +562,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "temario",
           label: "Escribe tu temario",
           helper: "Mínimo 2, máximo 15 módulos/cursos. Cada uno con su lista de videos.",
+          syncTitlesFrom: "modulos_preview",
         },
         {
           id: "modulos_subidos",
