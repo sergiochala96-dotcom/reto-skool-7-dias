@@ -8,6 +8,7 @@ import {
   parseBonos,
   parseTerminos,
   parseModulos,
+  parseTemario,
   parsePricing,
   type Answers,
   type MissionField,
@@ -73,6 +74,18 @@ function formatModulos(value: string | undefined): string {
   return modulos.map((m, i) => `Módulo ${i + 1}: ${m.titulo} — ${m.descripcion}`).join("\n");
 }
 
+function formatTemario(value: string | undefined): string {
+  const data = parseTemario(value);
+  const cursos = (data.cursos ?? []).filter((c) => c.titulo.trim());
+  return cursos
+    .map((c, i) => {
+      const videos = (c.videos ?? []).filter((v) => v.trim());
+      const videosText = videos.length ? ` [videos: ${videos.join(", ")}]` : "";
+      return `Curso ${i + 1}: ${c.titulo} — ${c.descripcion}${videosText}`;
+    })
+    .join("\n");
+}
+
 function formatTier(t: PricingTier): string {
   const precio =
     t.precio && t.precio !== "0"
@@ -106,6 +119,7 @@ function formatAnswer(field: MissionField, value: string | string[]): string {
   if (field.type === "bonos") return formatBonos(value as string);
   if (field.type === "terminos") return formatTerminos(value as string);
   if (field.type === "modulos") return formatModulos(value as string);
+  if (field.type === "temario") return formatTemario(value as string);
   if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
   if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
@@ -182,6 +196,7 @@ export default async function AdminUserPage({
                 if (f.type === "bonos") return formatBonos(v as string) !== "";
                 if (f.type === "terminos") return formatTerminos(v as string) !== "";
                 if (f.type === "modulos") return formatModulos(v as string) !== "";
+                if (f.type === "temario") return formatTemario(v as string) !== "";
                 if (Array.isArray(v)) return v.some((x) => x !== "");
                 return v !== undefined && v !== "";
               });

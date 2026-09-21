@@ -10,6 +10,7 @@ import PricingField from "@/components/PricingField";
 import BonosField from "@/components/BonosField";
 import TerminosField from "@/components/TerminosField";
 import ModulosField from "@/components/ModulosField";
+import TemarioField from "@/components/TemarioField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
 import { playSuccessDing } from "@/lib/successSound";
@@ -513,6 +514,8 @@ function FieldInput({
     return <TerminosField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "modulos")
     return <ModulosField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "temario")
+    return <TemarioField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

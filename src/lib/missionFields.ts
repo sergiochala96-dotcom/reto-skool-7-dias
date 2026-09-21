@@ -12,6 +12,7 @@ export type FieldType =
   | "bonos"
   | "terminos"
   | "modulos"
+  | "temario"
   | "prompt"
   | "link"
   | "check"
@@ -556,22 +557,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             "Ayúdame a estructurar el temario de mi curso/comunidad. Mi método de enseñanza consiste en: [describe tu método]. Dime cuántos módulos o cursos debería tener (entre 2 y 15) y qué debería enseñar en cada uno, ordenado de lo más básico a lo más avanzado.",
         },
         {
-          id: "temario_lista",
-          type: "list",
+          id: "temario_cursos",
+          type: "temario",
           label: "Escribe tu temario",
-          helper: "Mínimo 2, máximo 15 módulos/cursos",
-          minItems: 2,
-          maxItems: 15,
-          addLabel: "+ Añadir módulo/curso",
-          badgeLabel: "Curso",
-        },
-        {
-          id: "nombres_videos",
-          type: "list",
-          label: "Nombres de los videos dentro de cada módulo/curso",
-          minItems: 1,
-          addLabel: "+ Añadir video",
-          badgeLabel: "Video",
+          helper: "Mínimo 2, máximo 15 módulos/cursos. Cada uno con su lista de videos.",
         },
         {
           id: "modulos_subidos",
@@ -941,6 +930,38 @@ function isModulosAnswered(data: ModulosData): boolean {
   return modulos.slice(0, 2).every((m) => m.titulo.trim() && m.descripcion.trim());
 }
 
+export type CursoItem = {
+  titulo: string;
+  descripcion: string;
+  videos: string[];
+};
+
+export type TemarioData = {
+  cursos?: CursoItem[];
+};
+
+export function parseTemario(value: string | undefined): TemarioData {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as TemarioData) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isTemarioAnswered(data: TemarioData): boolean {
+  const cursos = data.cursos ?? [];
+  if (cursos.length < 2) return false;
+  const titlesOk = cursos.slice(0, 2).every((c) => c.titulo.trim());
+  if (!titlesOk) return false;
+  const totalVideos = cursos.reduce(
+    (n, c) => n + (c.videos ?? []).filter((v) => v.trim()).length,
+    0
+  );
+  return totalVideos >= 1;
+}
+
 function isVisible(field: MissionField, answers: Answers): boolean {
   if (!field.showIf) return true;
   return answers[field.showIf.field] === field.showIf.equals;
@@ -963,6 +984,10 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
 
   if (field.type === "modulos") {
     return isModulosAnswered(parseModulos(typeof v === "string" ? v : undefined));
+  }
+
+  if (field.type === "temario") {
+    return isTemarioAnswered(parseTemario(typeof v === "string" ? v : undefined));
   }
 
   if (field.type === "multiselect") {
