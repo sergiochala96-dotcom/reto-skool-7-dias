@@ -9,6 +9,7 @@ import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
 import BonosField from "@/components/BonosField";
 import TerminosField from "@/components/TerminosField";
+import ModulosField from "@/components/ModulosField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
 import { playSuccessDing } from "@/lib/successSound";
@@ -510,6 +511,8 @@ function FieldInput({
     return <BonosField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "terminos")
     return <TerminosField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "modulos")
+    return <ModulosField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

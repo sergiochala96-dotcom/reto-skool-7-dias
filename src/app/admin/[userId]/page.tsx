@@ -7,6 +7,7 @@ import {
   getMissionSections,
   parseBonos,
   parseTerminos,
+  parseModulos,
   parsePricing,
   type Answers,
   type MissionField,
@@ -66,6 +67,12 @@ function formatTerminos(value: string | undefined): string {
   return parts.join("\n");
 }
 
+function formatModulos(value: string | undefined): string {
+  const data = parseModulos(value);
+  const modulos = (data.modulos ?? []).filter((m) => m.titulo.trim());
+  return modulos.map((m, i) => `Módulo ${i + 1}: ${m.titulo} — ${m.descripcion}`).join("\n");
+}
+
 function formatTier(t: PricingTier): string {
   const precio =
     t.precio && t.precio !== "0"
@@ -98,6 +105,7 @@ function formatAnswer(field: MissionField, value: string | string[]): string {
   if (field.type === "pricing") return formatPricing(value as string);
   if (field.type === "bonos") return formatBonos(value as string);
   if (field.type === "terminos") return formatTerminos(value as string);
+  if (field.type === "modulos") return formatModulos(value as string);
   if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
   if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
@@ -173,6 +181,7 @@ export default async function AdminUserPage({
                 if (f.type === "pricing") return formatPricing(v as string) !== "";
                 if (f.type === "bonos") return formatBonos(v as string) !== "";
                 if (f.type === "terminos") return formatTerminos(v as string) !== "";
+                if (f.type === "modulos") return formatModulos(v as string) !== "";
                 if (Array.isArray(v)) return v.some((x) => x !== "");
                 return v !== undefined && v !== "";
               });

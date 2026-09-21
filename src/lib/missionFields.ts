@@ -11,6 +11,7 @@ export type FieldType =
   | "pricing"
   | "bonos"
   | "terminos"
+  | "modulos"
   | "prompt"
   | "link"
   | "check"
@@ -536,19 +537,11 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           buttonText: "🎨 Abrir plantilla de portadas",
         },
         {
-          id: "modulo1_titulo",
-          type: "text",
-          label: "Módulo 1 — Título",
-          helper: "Ej: Módulo de bienvenida",
+          id: "modulos_preview",
+          type: "modulos",
+          label: "Tus primeros 2 módulos",
+          helper: "Así se verían dentro de tu Skool. Edita el título (máx. 50) y la descripción (máx. 200) de cada uno.",
         },
-        { id: "modulo1_descripcion", type: "textarea", label: "Módulo 1 — Descripción" },
-        {
-          id: "modulo2_titulo",
-          type: "text",
-          label: "Módulo 2 — Título",
-          helper: "Ej: Módulo de contenido",
-        },
-        { id: "modulo2_descripcion", type: "textarea", label: "Módulo 2 — Descripción" },
       ],
     },
     {
@@ -923,6 +916,31 @@ function isTerminosAnswered(data: TerminosData): boolean {
   return true;
 }
 
+export type ModuloCard = {
+  titulo: string;
+  descripcion: string;
+};
+
+export type ModulosData = {
+  modulos?: ModuloCard[];
+};
+
+export function parseModulos(value: string | undefined): ModulosData {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as ModulosData) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isModulosAnswered(data: ModulosData): boolean {
+  const modulos = data.modulos ?? [];
+  if (modulos.length < 2) return false;
+  return modulos.slice(0, 2).every((m) => m.titulo.trim() && m.descripcion.trim());
+}
+
 function isVisible(field: MissionField, answers: Answers): boolean {
   if (!field.showIf) return true;
   return answers[field.showIf.field] === field.showIf.equals;
@@ -941,6 +959,10 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
 
   if (field.type === "terminos") {
     return isTerminosAnswered(parseTerminos(typeof v === "string" ? v : undefined));
+  }
+
+  if (field.type === "modulos") {
+    return isModulosAnswered(parseModulos(typeof v === "string" ? v : undefined));
   }
 
   if (field.type === "multiselect") {
