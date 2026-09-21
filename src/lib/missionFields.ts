@@ -9,7 +9,8 @@ export type FieldType =
   | "range"
   | "slider"
   | "pricing"
-  | "offer"
+  | "bonos"
+  | "terminos"
   | "prompt"
   | "link"
   | "check"
@@ -82,7 +83,7 @@ const NO_INFO_TYPES: FieldType[] = ["info", "prompt", "link"];
 export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
   1: [
     {
-      id: "canal-audiencia",
+      id: "canal",
       heading: "Tu canal y tu audiencia",
       fields: [
         {
@@ -100,6 +101,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             { value: "otra", label: "Otra", icon: "otra" },
           ],
         },
+      ],
+    },
+    {
+      id: "usuario",
+      heading: "Tu usuario",
+      fields: [
         {
           id: "canal_usuario",
           type: "text",
@@ -108,6 +115,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           inlineBadge: true,
           badgeLabel: "Tu Usuario:",
         },
+      ],
+    },
+    {
+      id: "seguidores",
+      heading: "Tus seguidores",
+      fields: [
         {
           id: "canal_seguidores",
           type: "select",
@@ -124,8 +137,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "nicho-avatar",
-      heading: "Tu nicho y tu avatar",
+      id: "nicho",
+      heading: "Tu nicho",
       fields: [
         {
           id: "nicho",
@@ -134,6 +147,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "Escoge tu nicho",
           options: NICHOS,
         },
+      ],
+    },
+    {
+      id: "avatar",
+      heading: "Tu avatar",
+      fields: [
         {
           id: "avatar_genero",
           type: "select",
@@ -162,8 +181,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "problemas-deseos",
-      heading: "Problemas y deseos de tu avatar",
+      id: "problemas",
+      heading: "Problemas de tu avatar",
       fields: [
         {
           id: "problemas_avatar",
@@ -175,6 +194,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           itemPlaceholder: "Ej: no sabe por dónde empezar",
           badgeLabel: "Problema",
         },
+      ],
+    },
+    {
+      id: "deseos",
+      heading: "Deseos de tu avatar",
+      fields: [
         {
           id: "deseos_avatar",
           type: "list",
@@ -188,8 +213,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "diferenciacion-oferta",
-      heading: "Tu diferenciación y tu oferta",
+      id: "diferenciacion-bonos",
+      heading: "Diferenciación y Bonos",
       fields: [
         {
           id: "diferenciacion",
@@ -201,10 +226,22 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           badgeLabel: "Diferencia",
         },
         {
-          id: "oferta_grand_slam",
-          type: "offer",
-          label: "Tu Oferta Grand Slam",
+          id: "oferta_bonos",
+          type: "bonos",
+          label: "Bonos de tu Oferta Grand Slam",
           helper: "Describe la oferta irresistible de tu comunidad",
+        },
+      ],
+    },
+    {
+      id: "garantia-escasez-urgencia",
+      heading: "Garantía, Escasez y Urgencia",
+      fields: [
+        {
+          id: "oferta_terminos",
+          type: "terminos",
+          label: "Garantía, escasez y urgencia de tu oferta",
+          helper: "Termina de armar tu Oferta Grand Slam",
         },
       ],
     },
@@ -275,8 +312,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "categorias-reglas",
-      heading: "Categorías y reglas",
+      id: "categorias",
+      heading: "Categorías",
       fields: [
         {
           id: "categorias",
@@ -288,6 +325,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           badgeLabel: "Categoría",
           itemPlaceholders: ["Ejemplo: Preséntate", "Ejemplo: Victorias", "Ejemplo: Comunicados"],
         },
+      ],
+    },
+    {
+      id: "reglas",
+      heading: "Reglas",
+      fields: [
         {
           id: "reglas",
           type: "list",
@@ -620,8 +663,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           options: [
             {
               value: "off",
-              label: "OFF",
-              description: "No vas a recibir tráfico de Skool, no vas a tener descubrimiento.",
+              label: "Apagada",
+              description:
+                "No vas a recibir tráfico de Skool. Te llevas el 100% del ingreso pero debes promocionar por tus propios medios.",
             },
             {
               value: "30",
@@ -688,8 +732,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "contenido",
-      heading: "Contenido y conversación",
+      id: "tematicas",
+      heading: "Temáticas",
       fields: [
         {
           id: "tematicas",
@@ -699,6 +743,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           addLabel: "+ Añadir temática",
           badgeLabel: "Temática",
         },
+      ],
+    },
+    {
+      id: "conversacion",
+      heading: "Ideas para crear conversación",
+      fields: [
         {
           id: "como_conversacion",
           type: "list",
@@ -817,8 +867,26 @@ export type Bono = {
   valor: string;
 };
 
-export type OfferData = {
+export type BonosData = {
   bonos?: Bono[];
+};
+
+export function parseBonos(value: string | undefined): BonosData {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null ? (parsed as BonosData) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isBonosAnswered(data: BonosData): boolean {
+  const bonos = data.bonos ?? [];
+  return bonos.filter((b) => b.nombre.trim() && b.incluye.trim() && b.valor.trim()).length >= 1;
+}
+
+export type TerminosData = {
   garantiaTipo?: "incondicional" | "condicional" | "resultado" | "sin_garantia";
   garantiaTexto?: string;
   escasezTipo?: "cupos" | "primeros_n" | "sin_escasez";
@@ -827,22 +895,17 @@ export type OfferData = {
   urgenciaFecha?: string;
 };
 
-export function parseOffer(value: string | undefined): OfferData {
+export function parseTerminos(value: string | undefined): TerminosData {
   if (!value) return {};
   try {
     const parsed = JSON.parse(value);
-    return typeof parsed === "object" && parsed !== null ? (parsed as OfferData) : {};
+    return typeof parsed === "object" && parsed !== null ? (parsed as TerminosData) : {};
   } catch {
     return {};
   }
 }
 
-function isOfferAnswered(data: OfferData): boolean {
-  const bonos = data.bonos ?? [];
-  const bonosOk =
-    bonos.filter((b) => b.nombre.trim() && b.incluye.trim() && b.valor.trim()).length >= 1;
-  if (!bonosOk) return false;
-
+function isTerminosAnswered(data: TerminosData): boolean {
   if (!data.garantiaTipo) return false;
   if (data.garantiaTipo !== "sin_garantia" && !data.garantiaTexto?.trim()) return false;
 
@@ -872,8 +935,12 @@ function isAnswered(field: MissionField, answers: Answers): boolean {
     return isPricingAnswered(parsePricing(typeof v === "string" ? v : undefined));
   }
 
-  if (field.type === "offer") {
-    return isOfferAnswered(parseOffer(typeof v === "string" ? v : undefined));
+  if (field.type === "bonos") {
+    return isBonosAnswered(parseBonos(typeof v === "string" ? v : undefined));
+  }
+
+  if (field.type === "terminos") {
+    return isTerminosAnswered(parseTerminos(typeof v === "string" ? v : undefined));
   }
 
   if (field.type === "multiselect") {

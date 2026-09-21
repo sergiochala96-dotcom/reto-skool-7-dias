@@ -7,7 +7,8 @@ import type { MissionField, MissionSection, Answers } from "@/lib/missionFields"
 import { countFieldsAnswered, countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
 import PricingField from "@/components/PricingField";
-import OfferField from "@/components/OfferField";
+import BonosField from "@/components/BonosField";
+import TerminosField from "@/components/TerminosField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
 import { playSuccessDing } from "@/lib/successSound";
@@ -505,8 +506,10 @@ function FieldInput({
     return <SliderField field={field} value={value as string} onChange={onChange} />;
   if (field.type === "pricing")
     return <PricingField field={field} value={value as string} onChange={onChange} />;
-  if (field.type === "offer")
-    return <OfferField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "bonos")
+    return <BonosField field={field} value={value as string} onChange={onChange} />;
+  if (field.type === "terminos")
+    return <TerminosField field={field} value={value as string} onChange={onChange} />;
 
   const textValue = (value as string) ?? "";
 

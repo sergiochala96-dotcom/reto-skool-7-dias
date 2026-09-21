@@ -5,7 +5,8 @@ import Sidebar from "@/components/Sidebar";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import {
   getMissionSections,
-  parseOffer,
+  parseBonos,
+  parseTerminos,
   parsePricing,
   type Answers,
   type MissionField,
@@ -39,14 +40,15 @@ const URGENCIA_LABELS: Record<string, string> = {
   sin_urgencia: "Sin urgencia",
 };
 
-function formatOffer(value: string | undefined): string {
-  const data = parseOffer(value);
-  const parts: string[] = [];
-
+function formatBonos(value: string | undefined): string {
+  const data = parseBonos(value);
   const bonos = (data.bonos ?? []).filter((b) => b.nombre.trim());
-  bonos.forEach((b, i) => {
-    parts.push(`Bono ${i + 1}: ${b.nombre} — ${b.incluye} (${b.valor})`);
-  });
+  return bonos.map((b, i) => `Bono ${i + 1}: ${b.nombre} — ${b.incluye} (${b.valor})`).join("\n");
+}
+
+function formatTerminos(value: string | undefined): string {
+  const data = parseTerminos(value);
+  const parts: string[] = [];
 
   if (data.garantiaTipo) {
     const label = GARANTIA_LABELS[data.garantiaTipo] ?? data.garantiaTipo;
@@ -94,7 +96,8 @@ function formatPricing(value: string | undefined): string {
 function formatAnswer(field: MissionField, value: string | string[]): string {
   const labelFor = (v: string) => field.options?.find((o) => o.value === v)?.label ?? v;
   if (field.type === "pricing") return formatPricing(value as string);
-  if (field.type === "offer") return formatOffer(value as string);
+  if (field.type === "bonos") return formatBonos(value as string);
+  if (field.type === "terminos") return formatTerminos(value as string);
   if (field.type === "range" && Array.isArray(value)) return value.join(" - ");
   if (Array.isArray(value)) return value.filter(Boolean).map(labelFor).join(", ");
   return labelFor(value);
@@ -168,7 +171,8 @@ export default async function AdminUserPage({
               const answeredFields = fields.filter((f) => {
                 const v = answers[f.id];
                 if (f.type === "pricing") return formatPricing(v as string) !== "";
-                if (f.type === "offer") return formatOffer(v as string) !== "";
+                if (f.type === "bonos") return formatBonos(v as string) !== "";
+                if (f.type === "terminos") return formatTerminos(v as string) !== "";
                 if (Array.isArray(v)) return v.some((x) => x !== "");
                 return v !== undefined && v !== "";
               });
