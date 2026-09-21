@@ -118,7 +118,7 @@ export async function uncompleteDay(day: number): Promise<void> {
 }
 
 export type MissionState =
-  | { saved: true; missing: number; total: number }
+  | { saved: true; missing: number; total: number; justCompleted: boolean }
   | undefined;
 
 export async function saveMissionAnswers(
@@ -170,8 +170,9 @@ export async function saveMissionAnswers(
 
   const missingIds = getMissingRequiredFieldIds(day, answers);
   const { total } = countRequiredFields(day, answers);
+  const justCompleted = missingIds.length === 0 && !completedDays.has(day);
 
-  if (missingIds.length === 0 && !completedDays.has(day)) {
+  if (justCompleted) {
     await supabase
       .from("challenge_progress")
       .upsert({ user_id: user.id, day }, { onConflict: "user_id,day" });
@@ -182,7 +183,7 @@ export async function saveMissionAnswers(
 
   revalidatePath(`/dia/${day}`);
 
-  return { saved: true, missing: missingIds.length, total };
+  return { saved: true, missing: missingIds.length, total, justCompleted };
 }
 
 export async function adminUnlockAll(): Promise<void> {

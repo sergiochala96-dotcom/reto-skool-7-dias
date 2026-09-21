@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { MissionField, MissionSection, Answers } from "@/lib/missionFields";
 import { countFieldsAnswered, countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
@@ -364,6 +365,84 @@ function SliderField({
   );
 }
 
+function CelebrationModal({
+  day,
+  totalDays,
+  totalXp,
+  onClose,
+}: {
+  day: number;
+  totalDays: number;
+  totalXp: number;
+  onClose: () => void;
+}) {
+  const isLastDay = day >= totalDays;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex w-full max-w-lg flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-6 text-center shadow-2xl sm:p-8"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+        >
+          ✕
+        </button>
+
+        <Image
+          src="/celebracion-dia.png"
+          alt="¡Felicidades!"
+          width={1254}
+          height={1254}
+          className="h-36 w-36 object-contain sm:h-48 sm:w-48"
+        />
+
+        <h2 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+          ¡Completaste el Día {day}!
+        </h2>
+
+        <div className="mt-6 flex w-full gap-3">
+          <div className="flex-1 rounded-2xl border-2 border-amber-400 bg-amber-400/10 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Exp total</p>
+            <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-extrabold text-amber-300">
+              ⚡ {totalXp}
+            </p>
+          </div>
+          <div className="flex-1 rounded-2xl border-2 border-emerald-400 bg-emerald-400/10 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Increíble</p>
+            <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-extrabold text-emerald-300">
+              🎯 100%
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-xl border-2 border-white/20 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
+          >
+            Volver al Día {day}
+          </button>
+          <Link
+            href={isLastDay ? "/cofre" : `/dia/${day + 1}`}
+            className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+          >
+            {isLastDay ? "Ir al Cofre del Tesoro" : `Continuar al Día ${day + 1}`}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FieldInput({
   field,
   value,
@@ -675,6 +754,7 @@ export default function MissionForm({
   const [xpPop, setXpPop] = useState(false);
   const [sectionCelebrate, setSectionCelebrate] = useState(false);
   const [showAllExpanded, setShowAllExpanded] = useState(false);
+  const [celebration, setCelebration] = useState<{ total: number } | null>(null);
 
   const { total, done } = countRequiredFields(day, answers);
   const allDone = total > 0 && done >= total;
@@ -695,6 +775,13 @@ export default function MissionForm({
     }
     prevDoneRef.current = done;
   }, [done]);
+
+  // Popup de celebración cuando el día se completa por primera vez.
+  useEffect(() => {
+    if (state?.justCompleted) {
+      setCelebration({ total: state.total });
+    }
+  }, [state]);
 
   const sectionStats = sections.map((s) => countFieldsAnswered(s.fields, answers));
   const currentSection = sections[currentStep];
@@ -923,6 +1010,15 @@ export default function MissionForm({
         </>
       )}
     </form>
+
+    {celebration && (
+      <CelebrationModal
+        day={day}
+        totalDays={totalDays}
+        totalXp={celebration.total}
+        onClose={() => setCelebration(null)}
+      />
+    )}
     </div>
   );
 }
