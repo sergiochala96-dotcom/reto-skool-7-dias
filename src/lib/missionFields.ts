@@ -375,6 +375,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           infoText:
             "Solo las personas que lleven mínimo 1 mes dentro y sean usuarios pagados podrán dejarte una reseña pública en tu Skool.",
         },
+        {
+          id: "resenas_entendido",
+          type: "yesno",
+          label: "¿Entendiste cómo funcionan las reseñas?",
+          options: SI_NO,
+        },
       ],
     },
   ],

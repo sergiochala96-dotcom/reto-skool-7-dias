@@ -783,7 +783,7 @@ export default function MissionForm({
   );
   const [currentStep, setCurrentStep] = useState(0);
   const [xpPop, setXpPop] = useState(false);
-  const [sectionCelebrate, setSectionCelebrate] = useState(false);
+  const [sectionCelebrate, setSectionCelebrate] = useState<string | null>(null);
   const [showAllExpanded, setShowAllExpanded] = useState(false);
   const [celebration, setCelebration] = useState<{ total: number } | null>(null);
 
@@ -829,8 +829,11 @@ export default function MissionForm({
       !celebratedRef.current.has(currentSection.id)
     ) {
       celebratedRef.current.add(currentSection.id);
-      setSectionCelebrate(true);
-      const t = setTimeout(() => setSectionCelebrate(false), 1300);
+      const sectionId = currentSection.id;
+      setSectionCelebrate(sectionId);
+      const t = setTimeout(() => {
+        setSectionCelebrate((prev) => (prev === sectionId ? null : prev));
+      }, 1300);
       return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -940,7 +943,7 @@ export default function MissionForm({
           />
         ));
         const isActive = showAllExpanded || index === currentStep;
-        const celebrating = isActive && sectionCelebrate;
+        const celebrating = isActive && sectionCelebrate === section.id;
 
         return (
           <section
