@@ -380,18 +380,18 @@ function CelebrationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      className="celebration-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex w-full max-w-lg flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-6 text-center shadow-2xl sm:p-8"
+        className="celebration-card relative flex w-full max-w-2xl flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl sm:p-12"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+          className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
         >
           ✕
         </button>
@@ -401,44 +401,75 @@ function CelebrationModal({
           alt="¡Felicidades!"
           width={1254}
           height={1254}
-          className="h-36 w-36 object-contain sm:h-48 sm:w-48"
+          className="h-48 w-48 object-contain sm:h-64 sm:w-64"
         />
 
-        <h2 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+        <h2 className="mt-3 text-3xl font-extrabold text-white sm:text-4xl">
           ¡Completaste el Día {day}!
         </h2>
 
-        <div className="mt-6 flex w-full gap-3">
-          <div className="flex-1 rounded-2xl border-2 border-amber-400 bg-amber-400/10 px-4 py-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Exp total</p>
-            <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-extrabold text-amber-300">
+        <div className="mt-8 flex w-full gap-4">
+          <div className="flex-1 rounded-2xl border-2 border-amber-400 bg-amber-400/10 px-4 py-4 sm:py-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-amber-300 sm:text-sm">
+              Exp total
+            </p>
+            <p className="mt-1 flex items-center justify-center gap-1.5 text-3xl font-extrabold text-amber-300 sm:text-4xl">
               ⚡ {totalXp}
             </p>
           </div>
-          <div className="flex-1 rounded-2xl border-2 border-emerald-400 bg-emerald-400/10 px-4 py-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Increíble</p>
-            <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-extrabold text-emerald-300">
+          <div className="flex-1 rounded-2xl border-2 border-emerald-400 bg-emerald-400/10 px-4 py-4 sm:py-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-emerald-300 sm:text-sm">
+              Increíble
+            </p>
+            <p className="mt-1 flex items-center justify-center gap-1.5 text-3xl font-extrabold text-emerald-300 sm:text-4xl">
               🎯 100%
             </p>
           </div>
         </div>
 
-        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
+        <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl border-2 border-white/20 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
+            className="flex-1 rounded-xl border-2 border-white/20 px-4 py-4 text-base font-bold text-white/80 transition hover:bg-white/10"
           >
             Volver al Día {day}
           </button>
           <Link
             href={isLastDay ? "/cofre" : `/dia/${day + 1}`}
-            className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+            className="flex-1 rounded-xl bg-amber-400 px-4 py-4 text-center text-base font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
           >
             {isLastDay ? "Ir al Cofre del Tesoro" : `Continuar al Día ${day + 1}`}
           </Link>
         </div>
       </div>
+
+      <style jsx>{`
+        .celebration-backdrop {
+          animation: celebration-fade 0.2s ease-out both;
+        }
+        .celebration-card {
+          animation: celebration-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes celebration-fade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes celebration-pop {
+          0% {
+            opacity: 0;
+            transform: scale(0.75) translateY(24px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
