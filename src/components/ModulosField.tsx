@@ -19,7 +19,7 @@ function ModuloCardEditor({
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Portada: placeholder decorativo lila, no editable */}
-      <div className="relative h-28 w-full overflow-hidden bg-violet-100">
+      <div className="relative h-44 w-full overflow-hidden bg-violet-100">
         <svg
           viewBox="0 0 400 160"
           preserveAspectRatio="none"
@@ -32,35 +32,35 @@ function ModuloCardEditor({
             fill="#DDD6FE"
           />
         </svg>
-        <span className="absolute left-2.5 top-2.5 rounded-full bg-gray-700/80 px-2.5 py-1 text-[10px] font-bold text-white">
+        <span className="absolute left-3 top-3 rounded-full bg-gray-700/80 px-3 py-1.5 text-xs font-bold text-white">
           Borrador
         </span>
-        <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-gray-500">
+        <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-gray-500">
           ⋯
         </span>
       </div>
 
       {/* Contenido editable */}
-      <div className="p-3.5">
+      <div className="p-6">
         <input
           value={modulo.titulo}
           maxLength={50}
           placeholder="Edita el Título"
           onChange={(e) => onChange({ titulo: e.target.value })}
-          className="w-full border-none bg-transparent text-base font-bold text-gray-900 outline-none placeholder:text-gray-400"
+          className="w-full border-none bg-transparent text-xl font-bold text-gray-900 outline-none placeholder:text-gray-400"
         />
         <textarea
           value={modulo.descripcion}
           maxLength={200}
           placeholder="Edita la descripción"
           onChange={(e) => onChange({ descripcion: e.target.value })}
-          rows={2}
-          className="mt-1 w-full resize-none border-none bg-transparent text-sm font-light text-gray-500 outline-none placeholder:text-gray-400"
+          rows={3}
+          className="mt-2 w-full resize-none border-none bg-transparent text-base font-light text-gray-500 outline-none placeholder:text-gray-400"
         />
-        <p className="mt-1 text-right text-[10px] text-gray-400">
+        <p className="mt-2 text-right text-xs text-gray-400">
           {modulo.titulo.length}/50 · {modulo.descripcion.length}/200
         </p>
-        <div className="mt-2 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-500">
+        <div className="mt-3 rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-500">
           0%
         </div>
       </div>
