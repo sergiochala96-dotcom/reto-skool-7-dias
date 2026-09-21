@@ -1013,13 +1013,13 @@ export default function MissionForm({
 
           {sections.length > 1 && (
             <div>
-              <div className="mb-2 flex items-center justify-between text-xs font-medium text-gray-500">
-                <span>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-base font-bold text-gray-700">
                   Paso {currentStep + 1} de {sections.length}
                 </span>
-                <span className="truncate pl-3 text-gray-400">{currentSection?.heading}</span>
+                <span className="truncate pl-3 text-xs text-gray-400">{currentSection?.heading}</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 {sections.map((s, i) => {
                   const stat = sectionStats[i];
                   const complete = stat.total > 0 && stat.done >= stat.total;
@@ -1029,8 +1029,8 @@ export default function MissionForm({
                       type="button"
                       onClick={() => setCurrentStep(i)}
                       aria-label={`Ir a ${s.heading}`}
-                      className={`h-2 flex-1 rounded-full transition ${
-                        complete ? "bg-emerald-400" : i === currentStep ? "bg-fuchsia-400" : "bg-gray-200"
+                      className={`h-2.5 flex-1 rounded-full transition ${
+                        complete ? "bg-emerald-400" : "bg-gray-700"
                       }`}
                     />
                   );
