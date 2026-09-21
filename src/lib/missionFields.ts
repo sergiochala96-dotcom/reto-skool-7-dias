@@ -431,6 +431,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "resenas",
       heading: "Reseñas",
+      mascot: "/mascota-resenas.png",
       fields: [
         {
           id: "resenas_info",
@@ -515,6 +516,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "niveles",
       heading: "Clasificación (niveles)",
+      mascot: "/mascota-niveles.png",
       fields: [
         {
           id: "niveles_nombres",
@@ -545,6 +547,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "modulos",
       heading: "Módulos",
+      mascot: "/mascota-modulos.png",
       image: "/skool-ejemplo-cursos.webp",
       imageWidth: 1223,
       imageHeight: 916,
@@ -569,6 +572,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "temario",
       heading: "Temario",
+      mascot: "/mascota-temario.png",
       fields: [
         {
           id: "temario_prompt",
@@ -598,6 +602,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "invitaciones",
       heading: "Invitaciones",
+      mascot: "/mascota-invitaciones.png",
       fields: [
         {
           id: "personas_invitadas",
@@ -633,6 +638,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "email",
       heading: "Email",
+      mascot: "/mascota-email.png",
       fields: [
         {
           id: "email_prompt",
@@ -652,6 +658,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "boost",
       heading: "Skool Boost",
+      mascot: "/mascota-boost.png",
       fields: [
         {
           id: "boost_activado",
@@ -717,6 +724,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "ritmo",
       heading: "Ritmo de publicación",
+      mascot: "/mascota-ritmo.png",
       fields: [
         {
           id: "frecuencia",
@@ -738,6 +746,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "tematicas",
       heading: "Temáticas",
+      mascot: "/mascota-tematicas.png",
       fields: [
         {
           id: "tematicas",
@@ -752,6 +761,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "conversacion",
       heading: "Ideas para crear conversación",
+      mascot: "/mascota-conversacion.png",
       fields: [
         {
           id: "como_conversacion",
@@ -766,6 +776,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "dinamicas",
       heading: "Dinámicas y retos",
+      mascot: "/mascota-dinamicas.png",
       fields: [
         {
           id: "dinamicas",
