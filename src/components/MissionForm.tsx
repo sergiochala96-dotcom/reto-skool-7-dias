@@ -809,7 +809,7 @@ export default function MissionForm({
 
   // Popup de celebración cuando el día se completa por primera vez.
   useEffect(() => {
-    if (state?.justCompleted) {
+    if (state?.dayComplete) {
       setCelebration({ total: state.total });
     }
   }, [state]);
