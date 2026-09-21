@@ -785,6 +785,8 @@ export default function MissionForm({
     undefined
   );
   const [currentStep, setCurrentStep] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<1 | -1>(1);
+  const [isSliding, setIsSliding] = useState(false);
   const [xpPop, setXpPop] = useState(false);
   const [sectionCelebrate, setSectionCelebrate] = useState<string | null>(null);
   const [showAllExpanded, setShowAllExpanded] = useState(false);
@@ -844,8 +846,18 @@ export default function MissionForm({
 
   const isLastStep = currentStep === sections.length - 1;
   const currentStepIncomplete = !!currentStat && currentStat.total > 0 && currentStat.done < currentStat.total;
-  const goNext = () => setCurrentStep((s) => Math.min(s + 1, sections.length - 1));
-  const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
+
+  const goToStep = (target: number) => {
+    if (isSliding || target === currentStep || target < 0 || target >= sections.length) return;
+    setSlideDirection(target > currentStep ? 1 : -1);
+    setIsSliding(true);
+    setTimeout(() => {
+      setCurrentStep(target);
+      setIsSliding(false);
+    }, 220);
+  };
+  const goNext = () => goToStep(currentStep + 1);
+  const goPrev = () => goToStep(currentStep - 1);
 
   const toggleExpanded = () => {
     setShowAllExpanded((prev) => {
@@ -947,13 +959,23 @@ export default function MissionForm({
         ));
         const isActive = showAllExpanded || index === currentStep;
         const celebrating = isActive && sectionCelebrate === section.id;
+        const slideAnimClass =
+          !showAllExpanded && isActive
+            ? isSliding
+              ? slideDirection === 1
+                ? "slide-out-left"
+                : "slide-out-right"
+              : slideDirection === 1
+              ? "slide-in-right"
+              : "slide-in-left"
+            : "";
 
         return (
           <section
             key={section.id}
             className={`relative rounded-2xl border p-5 transition lg:p-7 ${
               isActive ? "" : "hidden"
-            } ${celebrating ? "border-emerald-400 bg-emerald-50/60" : "border-gray-200 bg-gray-50"}`}
+            } ${slideAnimClass} ${celebrating ? "border-emerald-400 bg-emerald-50/60" : "border-gray-200 bg-gray-50"}`}
           >
             {celebrating && (
               <span className="absolute -top-3 right-4 animate-bounce rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-lg">
@@ -994,7 +1016,8 @@ export default function MissionForm({
               <button
                 type="button"
                 onClick={goPrev}
-                className="rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+                disabled={isSliding}
+                className="rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 ← Anterior
               </button>
@@ -1003,7 +1026,7 @@ export default function MissionForm({
               <button
                 type="button"
                 onClick={goNext}
-                disabled={currentStepIncomplete}
+                disabled={currentStepIncomplete || isSliding}
                 className={`flex-1 rounded-xl px-4 py-3 font-semibold shadow-lg transition ${
                   currentStepIncomplete
                     ? "cursor-not-allowed bg-gray-200 text-gray-400 shadow-none"
@@ -1033,9 +1056,10 @@ export default function MissionForm({
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => setCurrentStep(i)}
+                      onClick={() => goToStep(i)}
+                      disabled={isSliding}
                       aria-label={`Ir a ${s.heading}`}
-                      className={`h-2.5 flex-1 rounded-full transition ${
+                      className={`h-2.5 flex-1 rounded-full transition disabled:cursor-not-allowed ${
                         complete ? "bg-emerald-400" : "bg-gray-700"
                       }`}
                     />
@@ -1056,6 +1080,61 @@ export default function MissionForm({
         onClose={() => setCelebration(null)}
       />
     )}
+
+    <style jsx>{`
+      @keyframes slide-in-right {
+        from {
+          opacity: 0;
+          transform: translateX(32px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slide-in-left {
+        from {
+          opacity: 0;
+          transform: translateX(-32px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slide-out-left {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-32px);
+        }
+      }
+      @keyframes slide-out-right {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(32px);
+        }
+      }
+      :global(.slide-in-right) {
+        animation: slide-in-right 0.22s ease-out;
+      }
+      :global(.slide-in-left) {
+        animation: slide-in-left 0.22s ease-out;
+      }
+      :global(.slide-out-left) {
+        animation: slide-out-left 0.22s ease-in forwards;
+      }
+      :global(.slide-out-right) {
+        animation: slide-out-right 0.22s ease-in forwards;
+      }
+    `}</style>
     </div>
   );
 }
