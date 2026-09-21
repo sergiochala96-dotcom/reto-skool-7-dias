@@ -883,7 +883,7 @@ export default function MissionForm({
           <button
             type="button"
             onClick={toggleExpanded}
-            className="flex-shrink-0 rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-bold text-black shadow-sm transition hover:brightness-105"
+            className="flex-shrink-0 rounded-xl bg-amber-400 px-5 py-3 text-sm font-extrabold uppercase tracking-wide text-black shadow-md transition hover:brightness-105"
           >
             {showAllExpanded ? "Ocultar todas las respuestas" : "Ver todas las respuestas"}
           </button>
