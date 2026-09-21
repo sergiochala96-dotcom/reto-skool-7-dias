@@ -954,15 +954,31 @@ export default function MissionForm({
             />
           </div>
         );
-        const fieldsList = visibleFields.map((field) => (
-          <FieldInput
-            key={field.id}
-            field={field}
-            value={answers[field.id]}
-            answers={answers}
-            onChange={handleChange}
+        const mascotElement = !showAllExpanded && section.mascot && (
+          <Image
+            key="mascot"
+            src={section.mascot}
+            alt=""
+            width={1484}
+            height={1060}
+            className="mx-auto h-auto w-full max-w-xs object-contain sm:max-w-sm"
           />
-        ));
+        );
+        const fieldsList = visibleFields.flatMap((field) => {
+          const fieldEl = (
+            <FieldInput
+              key={field.id}
+              field={field}
+              value={answers[field.id]}
+              answers={answers}
+              onChange={handleChange}
+            />
+          );
+          if (section.mascotAfterField === field.id && mascotElement) {
+            return [fieldEl, mascotElement];
+          }
+          return [fieldEl];
+        });
         const isActive = showAllExpanded || index === currentStep;
         const celebrating = isActive && sectionCelebrate === section.id;
         const slideAnimClass =
@@ -988,14 +1004,8 @@ export default function MissionForm({
                 ✓ ¡Sección completa!
               </span>
             )}
-            {!showAllExpanded && section.mascot && (
-              <Image
-                src={section.mascot}
-                alt=""
-                width={1484}
-                height={1060}
-                className="mx-auto mb-4 h-auto w-full max-w-xs object-contain sm:max-w-sm"
-              />
+            {!section.mascotAfterField && mascotElement && (
+              <div className="mb-4">{mascotElement}</div>
             )}
             {section.imagePosition === "above-heading" && sectionImage}
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">

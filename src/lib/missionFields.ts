@@ -64,6 +64,8 @@ export type MissionSection = {
   fields: MissionField[];
   /** Skooly + globo de texto diciendo qué hacer en este paso (solo en modo paso a paso). */
   mascot?: string;
+  /** Si se define, la mascota se muestra justo después de este campo en vez de arriba de la sección. */
+  mascotAfterField?: string;
 };
 
 const SI_NO = [
@@ -266,6 +268,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       id: "crea-skool",
       heading: "Crea tu Skool",
       mascot: "/mascota-crea-skool.png",
+      mascotAfterField: "crear_skool_link",
       image: "/skool-ejemplo-cta.png",
       imageWidth: 1369,
       imageHeight: 825,
