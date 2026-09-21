@@ -62,6 +62,8 @@ export type MissionSection = {
   imagePosition?: "above-heading" | "below-heading";
   layout?: "default" | "split-calendar";
   fields: MissionField[];
+  /** Skooly + globo de texto diciendo qué hacer en este paso (solo en modo paso a paso). */
+  mascot?: string;
 };
 
 const SI_NO = [
@@ -88,6 +90,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "canal",
       heading: "Tu canal y tu audiencia",
+      mascot: "/mascota-canal.png",
       fields: [
         {
           id: "red_favorita",
@@ -109,6 +112,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "usuario",
       heading: "Tu usuario",
+      mascot: "/mascota-usuario.png",
       fields: [
         {
           id: "canal_usuario",
@@ -123,6 +127,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "seguidores",
       heading: "Tus seguidores",
+      mascot: "/mascota-seguidores.png",
       fields: [
         {
           id: "canal_seguidores",
@@ -142,6 +147,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "nicho",
       heading: "Tu nicho",
+      mascot: "/mascota-nicho.png",
       fields: [
         {
           id: "nicho",
@@ -155,6 +161,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "avatar",
       heading: "Tu avatar",
+      mascot: "/mascota-avatar.png",
       fields: [
         {
           id: "avatar_genero",
@@ -186,6 +193,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "problemas",
       heading: "Problemas de tu avatar",
+      mascot: "/mascota-problemas.png",
       fields: [
         {
           id: "problemas_avatar",
@@ -202,6 +210,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "deseos",
       heading: "Deseos de tu avatar",
+      mascot: "/mascota-deseos.png",
       fields: [
         {
           id: "deseos_avatar",
@@ -218,6 +227,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "diferenciacion-bonos",
       heading: "Diferenciación y Bonos",
+      mascot: "/mascota-diferenciacion-bonos.png",
       fields: [
         {
           id: "diferenciacion",
@@ -239,6 +249,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "garantia-escasez-urgencia",
       heading: "Garantía, Escasez y Urgencia",
+      mascot: "/mascota-garantia-escasez-urgencia.png",
       fields: [
         {
           id: "oferta_terminos",
@@ -254,6 +265,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "crea-skool",
       heading: "Crea tu Skool",
+      mascot: "/mascota-crea-skool.png",
       image: "/skool-ejemplo-cta.png",
       imageWidth: 1369,
       imageHeight: 825,
@@ -278,6 +290,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "identidad",
       heading: "Identidad de tu comunidad",
+      mascot: "/mascota-identidad.png",
       image: "/skool-ejemplo-identidad.png",
       imageWidth: 1091,
       imageHeight: 280,
@@ -317,6 +330,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "categorias",
       heading: "Categorías",
+      mascot: "/mascota-categorias.png",
       fields: [
         {
           id: "categorias",
@@ -333,6 +347,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "reglas",
       heading: "Reglas",
+      mascot: "/mascota-reglas.png",
       fields: [
         {
           id: "reglas",
@@ -355,6 +370,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "monetizacion",
       heading: "Modelo de monetización",
+      mascot: "/mascota-monetizacion.png",
       fields: [
         {
           id: "monetizacion_modelo",
@@ -369,6 +385,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "presentacion",
       heading: "Presentación",
+      mascot: "/mascota-presentacion.png",
       image: "/skool-ejemplo-about.png",
       imageWidth: 1080,
       imageHeight: 1080,
@@ -394,6 +411,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "descripcion",
       heading: "Descripción",
+      mascot: "/mascota-descripcion.png",
       fields: [
         {
           id: "descripcion_prompt",
@@ -435,6 +453,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "post-bienvenida",
       heading: "Post fijado de bienvenida",
+      mascot: "/mascota-post-bienvenida.png",
       image: "/skool-ejemplo-post.png",
       imageWidth: 993,
       imageHeight: 621,
@@ -470,6 +489,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     {
       id: "calendario",
       heading: "Calendario",
+      mascot: "/mascota-calendario.png",
       layout: "split-calendar",
       fields: [
         {

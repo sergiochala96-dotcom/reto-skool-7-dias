@@ -988,6 +988,15 @@ export default function MissionForm({
                 ✓ ¡Sección completa!
               </span>
             )}
+            {!showAllExpanded && section.mascot && (
+              <Image
+                src={section.mascot}
+                alt=""
+                width={1484}
+                height={1060}
+                className="mx-auto mb-4 h-auto w-full max-w-xs object-contain sm:max-w-sm"
+              />
+            )}
             {section.imagePosition === "above-heading" && sectionImage}
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
               {section.heading}
