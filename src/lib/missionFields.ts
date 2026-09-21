@@ -227,6 +227,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           buttonText: "Crear mi Skool",
           emphasis: true,
         },
+        {
+          id: "skool_creado",
+          type: "yesno",
+          label: "¿Ya creaste tu Skool?",
+          options: SI_NO,
+        },
       ],
     },
     {
@@ -828,7 +834,7 @@ export function parseOffer(value: string | undefined): OfferData {
 function isOfferAnswered(data: OfferData): boolean {
   const bonos = data.bonos ?? [];
   const bonosOk =
-    bonos.filter((b) => b.nombre.trim() && b.incluye.trim() && b.valor.trim()).length >= 2;
+    bonos.filter((b) => b.nombre.trim() && b.incluye.trim() && b.valor.trim()).length >= 1;
   if (!bonosOk) return false;
 
   if (!data.garantiaTipo) return false;

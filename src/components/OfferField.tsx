@@ -20,7 +20,7 @@ function BonosEditor({
   bonos: Bono[];
   update: (bonos: Bono[]) => void;
 }) {
-  const items = bonos.length >= 2 ? bonos : [emptyBono(), emptyBono()];
+  const items = bonos.length >= 1 ? bonos : [emptyBono()];
 
   const updateBono = (index: number, patch: Partial<Bono>) => {
     const next = [...items];
@@ -34,7 +34,7 @@ function BonosEditor({
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <p className="mb-1 text-sm font-semibold text-gray-900">Bonos</p>
-      <p className="mb-3 text-xs text-gray-500">Escribe mínimo 2 bonos que hagan tu oferta irresistible</p>
+      <p className="mb-3 text-xs text-gray-500">Escribe al menos 1 bono que haga tu oferta irresistible</p>
       <div className="flex flex-col gap-3">
         {items.map((bono, i) => (
           <div key={i} className="rounded-lg border border-gray-200 bg-white p-3">
@@ -42,7 +42,7 @@ function BonosEditor({
               <span className="whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">
                 Bono {i + 1}
               </span>
-              {i >= 2 && (
+              {i >= 1 && (
                 <button
                   type="button"
                   onClick={() => removeBono(i)}
