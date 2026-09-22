@@ -398,9 +398,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "video_prompt",
           type: "prompt",
-          label: "Prompt para crear tu video VSL (3 min)",
+          label: "Prompt para crear tu video VSL (2 a 5 min)",
           promptText:
-            "Actúa como guionista experto en video sales letters (VSL). Escribe el guion de un video de presentación de 3 minutos para mi comunidad de Skool, con esta estructura: 1) Intro que capte la atención, 2) Muestra la comunidad por dentro paso a paso (cursos, calendario, clases en vivo, comunidad), 3) Genera autoridad, 4) Crea urgencia/escasez, 5) Cierra con un llamado a la acción claro. Mi comunidad es sobre: [describe tu nicho aquí].",
+            "Actúa como guionista experto en video sales letters (VSL) para comunidades online. Escribe el guion completo de un video de presentación de entre 2 y 5 minutos para mi comunidad de Skool. El objetivo del video es enseñar la comunidad por dentro para reducir el sentimiento de riesgo de quien está dudando en unirse. Usa esta estructura:\n\n1) Introducción breve: da contexto de lo que van a ver y recuerda la promesa principal de mi comunidad.\n2) Destripe de la comunidad paso a paso: muestra TODA la comunidad por dentro — la interacción y preguntas de los miembros, todos los cursos que hay, el calendario de clases en vivo, y los recursos/herramientas disponibles. Esta es la parte más importante del video: la objeción #1 de quien duda es no saber qué se va a encontrar adentro.\n3) Autoridad: habla de los resultados o testimonios que respaldan que el método funciona y que puedo llevarlos de A a B.\n4) Urgencia y escasez: explica por qué deberían entrar ahora y no la próxima semana (ej: el precio va a subir pronto, los cupos son limitados, o es por tiempo limitado). Aclara que quien entra ahora mantiene ese precio de por vida mientras siga dentro.\n5) Llamado a la acción final: explica el paso a paso exacto para unirse (dónde dar clic, cómo crear la cuenta, cómo pagar), recordando la promesa y qué van a lograr si entran. Deja claro que no tienen nada que perder porque siempre pueden cancelar y no se les vuelve a cobrar.\n\nMi comunidad es sobre: [describe tu nicho aquí].",
         },
         {
           id: "video_imagenes_hecho",
@@ -420,9 +420,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "descripcion_prompt",
           type: "prompt",
-          label: "Prompt para tu descripción (máx. 1.000 caracteres)",
+          label: "Prompt para tu descripción (500 a 1.000 caracteres)",
           promptText:
-            "Escribe la descripción de mi comunidad de Skool en máximo 1000 caracteres. Debe incluir: a quién ayudo, qué problema resuelvo, qué encontrarán dentro (cursos, comunidad, calendario, niveles) y por qué deberían unirse ahora. Mi nicho es: [describe tu nicho aquí]. Tono: cercano y motivador.",
+            "Actúa como copywriter experto en descripciones de comunidades de Skool que convierten. Escribe la descripción de mi comunidad en español, de entre 500 y 1000 caracteres en total, como un texto fluido (sin poner números ni títulos de cada parte), siguiendo esta estructura de 8 partes:\n\n1) Título llamativo: una frase poderosa que capture atención al toque, con emojis o símbolos (✅🚀🔥), prometiendo un beneficio claro o una transformación. Ej: '🛡️ La Comunidad #1 para [Avatar/Nicho] que quiere [Gran Beneficio Prometido]'.\n2) Oferta especial limitada (urgencia + escasez): usa frases como 'solo hasta [fecha]' o 'solo X plazas', y menciona que el precio actual será de por vida si entran ahora. Esto genera FOMO.\n3) Beneficio principal: en 1 o 2 líneas, lo más potente que van a lograr, enfocado en el resultado deseado, no en el proceso.\n4) Lista detallada de lo que incluye: 5 a 7 beneficios concretos con bullets, cada uno con un emoji y su valor aproximado si se puede, para aumentar el valor percibido.\n5) Valor total percibido vs. precio actual: muestra cuánto valdría todo junto comparado con lo que cuesta entrar (idealmente un precio ridículamente bajo frente al valor).\n6) Llamada a la acción clara: di exactamente qué hacer y cómo, paso a paso simple.\n7) Garantía o cancelación simple: remarca que no hay riesgo, frases como 'cancelá cuando quieras' funcionan muy bien.\n8) Cierre emocional y cercano: termina con una frase amistosa que invite a unirse.\n\nMi nicho es: [describe tu nicho aquí]. Tono: cercano y motivador.",
         },
         {
           id: "descripcion_texto",
