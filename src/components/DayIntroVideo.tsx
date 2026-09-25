@@ -2,7 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function DayIntroVideo({ src }: { src: string }) {
+type Props = {
+  src: string;
+  /** Si es false, no se puede cerrar hasta que el video termine (sin X, sin cerrar al hacer clic afuera). */
+  closable?: boolean;
+  /** Si es true, el modal ocupa mucha más pantalla. */
+  large?: boolean;
+};
+
+export default function DayIntroVideo({ src, closable = true, large = false }: Props) {
   const [open, setOpen] = useState(true);
   const [needsTap, setNeedsTap] = useState(false);
   const [ended, setEnded] = useState(false);
@@ -36,20 +44,24 @@ export default function DayIntroVideo({ src }: { src: string }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
-      onClick={() => setOpen(false)}
+      onClick={() => closable && setOpen(false)}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-black shadow-2xl"
+        className={`relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl ${
+          large ? "max-w-6xl" : "max-w-2xl"
+        }`}
       >
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          aria-label="Cerrar video"
-          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg font-bold text-white transition hover:bg-black/80"
-        >
-          ✕
-        </button>
+        {closable && (
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Cerrar video"
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg font-bold text-white transition hover:bg-black/80"
+          >
+            ✕
+          </button>
+        )}
 
         <video
           ref={videoRef}
