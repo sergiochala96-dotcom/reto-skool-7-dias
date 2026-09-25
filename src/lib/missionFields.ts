@@ -41,6 +41,8 @@ export type MissionField = {
   itemPlaceholder?: string;
   itemPlaceholders?: string[];
   itemMaxLength?: number;
+  /** Para campos "list": chips de ejemplo no clicables que se muestran arriba de las cajas de texto, para inspirar. */
+  examples?: string[];
   addLabel?: string;
   badgeLabel?: string;
   sliderMin?: number;
@@ -208,6 +210,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           addLabel: "+ Añadir problema",
           itemPlaceholder: "Ej: no sabe por dónde empezar",
           badgeLabel: "Problema",
+          examples: [
+            "No sabe por dónde empezar",
+            "Se siente abrumado con tanta información gratis y contradictoria",
+          ],
         },
       ],
     },
@@ -225,6 +231,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           addLabel: "+ Añadir deseo",
           itemPlaceholder: "Ej: quiere generar ingresos extra",
           badgeLabel: "Deseo",
+          examples: [
+            "Quiere generar ingresos extra sin renunciar a su trabajo actual",
+            "Quiere sentirse parte de una comunidad que lo entienda",
+          ],
         },
       ],
     },
@@ -241,6 +251,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 3,
           addLabel: "+ Añadir diferencial",
           badgeLabel: "Diferencia",
+          examples: [
+            "Acompañamiento personalizado, no solo contenido grabado",
+            "Resultados comprobados con casos reales de otros alumnos",
+          ],
         },
         {
           id: "oferta_bonos",

@@ -193,6 +193,18 @@ function ListField({
     <div>
       <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
       {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+      {field.examples && field.examples.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-2">
+          {field.examples.map((ex, i) => (
+            <span
+              key={i}
+              className="rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
+            >
+              Ej: {ex}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
