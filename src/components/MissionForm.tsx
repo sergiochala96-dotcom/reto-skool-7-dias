@@ -724,24 +724,33 @@ function FieldInput({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl"
+            className="relative w-full max-w-lg rounded-3xl bg-white p-8 text-center shadow-2xl sm:p-10"
           >
             <button
               type="button"
               onClick={() => setShowNoPopup(false)}
               aria-label="Cerrar"
-              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
             >
               ✕
             </button>
-            <p className="mb-5 mt-2 text-sm text-gray-700">{field.noPopup.message}</p>
+            <Image
+              src="/mascota-no-skool.png"
+              alt="Skooly"
+              width={1254}
+              height={1254}
+              className="mx-auto h-48 w-48 object-contain sm:h-56 sm:w-56"
+            />
+            <p className="mb-6 mt-4 text-base leading-relaxed text-gray-700 sm:text-lg">
+              {field.noPopup.message}
+            </p>
             <a
               href={field.noPopup.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:brightness-105"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:brightness-105"
             >
-              <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5">
+              <svg viewBox="0 0 32 32" fill="currentColor" className="h-6 w-6">
                 <path d="M16.001 3C9.373 3 4 8.373 4 15.001c0 2.386.638 4.622 1.751 6.552L4 29l7.633-1.719A11.94 11.94 0 0 0 16.001 27C22.629 27 28 21.629 28 15.001 28 8.373 22.629 3 16.001 3zm6.995 17.06c-.297.836-1.476 1.532-2.415 1.732-.643.137-1.482.246-4.306-.925-3.615-1.497-5.938-5.163-6.119-5.404-.176-.242-1.464-1.949-1.464-3.716s.925-2.634 1.253-2.997c.297-.33.65-.412.867-.412.217 0 .434.002.624.011.2.009.469-.076.734.559.271.65.921 2.243.999 2.406.078.163.13.354.026.57-.104.217-.156.352-.309.541-.153.19-.322.423-.46.568-.156.163-.318.34-.137.667.182.326.808 1.334 1.734 2.161 1.191 1.063 2.196 1.392 2.522 1.549.326.156.517.13.708-.078.19-.208.816-.951 1.034-1.278.217-.326.434-.271.734-.163.3.109 1.9.897 2.226 1.06.326.163.543.244.624.38.081.136.081.786-.216 1.622z" />
               </svg>
               {field.noPopup.buttonLabel}
