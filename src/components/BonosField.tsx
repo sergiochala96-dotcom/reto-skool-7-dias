@@ -38,9 +38,22 @@ export default function BonosField({
   const removeBono = (index: number) => update(items.filter((_, i) => i !== index));
 
   return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-3 text-xs text-gray-500">{field.helper}</p>}
+    <div className={field.emphasis ? "rounded-xl bg-[#2a1150] p-4" : undefined}>
+      {field.emphasis ? (
+        <>
+          <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
+          <p className="mb-3 mt-0.5 text-xs font-semibold text-white/60">
+            Escríbelo a continuación
+          </p>
+        </>
+      ) : (
+        <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      )}
+      {field.helper && (
+        <p className={`mb-3 text-xs ${field.emphasis ? "text-white/70" : "text-gray-500"}`}>
+          {field.helper}
+        </p>
+      )}
 
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
         <p className="mb-1 text-sm font-semibold text-gray-900">Bonos</p>

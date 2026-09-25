@@ -303,9 +303,22 @@ function ListField({
   const canAddMore = !field.maxItems || items.length < field.maxItems;
 
   return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+    <div className={field.emphasis ? "rounded-xl bg-[#2a1150] p-4" : undefined}>
+      {field.emphasis ? (
+        <>
+          <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
+          <p className="mb-3 mt-0.5 text-xs font-semibold text-white/60">
+            Escríbelo a continuación
+          </p>
+        </>
+      ) : (
+        <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      )}
+      {field.helper && (
+        <p className={`mb-2 text-xs ${field.emphasis ? "text-white/70" : "text-gray-500"}`}>
+          {field.helper}
+        </p>
+      )}
       {field.examples && field.examples.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {field.examples.map((ex, i) => (
@@ -353,7 +366,9 @@ function ListField({
         <button
           type="button"
           onClick={addItem}
-          className="mt-2 text-sm font-medium text-fuchsia-600 hover:underline"
+          className={`mt-2 text-sm font-medium hover:underline ${
+            field.emphasis ? "text-fuchsia-300" : "text-fuchsia-600"
+          }`}
         >
           {field.addLabel ?? "+ Añadir"}
         </button>

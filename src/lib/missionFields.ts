@@ -233,6 +233,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           addLabel: "+ Añadir problema",
           itemPlaceholder: "Ej: no sabe por dónde empezar",
           badgeLabel: "Problema",
+          emphasis: true,
           examples: [
             "No sabe por dónde empezar",
             "Se siente abrumado con tanta información gratis y contradictoria",
@@ -264,6 +265,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           addLabel: "+ Añadir deseo",
           itemPlaceholder: "Ej: quiere generar ingresos extra",
           badgeLabel: "Deseo",
+          emphasis: true,
           examples: [
             "Quiere generar ingresos extra sin renunciar a su trabajo actual",
             "Quiere sentirse parte de una comunidad que lo entienda",
@@ -272,8 +274,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       ],
     },
     {
-      id: "diferenciacion-bonos",
-      heading: "Diferenciación y Bonos",
+      id: "diferenciacion",
+      heading: "Diferenciación",
       mascot: "/mascota-diferenciacion-bonos.png",
       fields: [
         {
@@ -284,16 +286,25 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 3,
           addLabel: "+ Añadir diferencial",
           badgeLabel: "Diferencia",
+          emphasis: true,
           examples: [
             "Acompañamiento personalizado, no solo contenido grabado",
             "Resultados comprobados con casos reales de otros alumnos",
           ],
         },
+      ],
+    },
+    {
+      id: "bonos",
+      heading: "Bonos",
+      mascot: "/mascota-diferenciacion-bonos.png",
+      fields: [
         {
           id: "oferta_bonos",
           type: "bonos",
           label: "Bonos de tu Oferta Grand Slam",
           helper: "Describe la oferta irresistible de tu comunidad",
+          emphasis: true,
         },
       ],
     },
