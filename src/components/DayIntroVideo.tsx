@@ -57,6 +57,7 @@ export default function DayIntroVideo({ src }: { src: string }) {
           autoPlay
           playsInline
           controls
+          controlsList="nodownload"
           onEnded={() => setEnded(true)}
           className="aspect-video w-full"
         />

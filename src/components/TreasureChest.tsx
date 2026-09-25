@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import confetti from "canvas-confetti";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 import TreasureChestOpenIcon from "@/components/TreasureChestOpenIcon";
@@ -11,6 +12,7 @@ type Props = {
 
 export default function TreasureChest({ nombre }: Props) {
   const [open, setOpen] = useState(false);
+  const [showNivel2, setShowNivel2] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -63,14 +65,69 @@ export default function TreasureChest({ nombre }: Props) {
           <p className="max-w-md text-white/80">
             Completaste el Reto de 7 Días. Este es tu premio final:
           </p>
-          <div className="w-full max-w-md rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-fuchsia-500/10 p-6">
-            <p className="text-lg font-semibold text-amber-200">
-              🎁 Premio sorpresa (placeholder)
-            </p>
-            <p className="mt-2 text-sm text-white/70">
-              Aquí va tu premio real: un enlace de descuento, un bono, una
-              sesión en vivo o el contenido que definas para tus miembros
-              fundadores.
+          <div className="w-full max-w-2xl rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-fuchsia-500/10 p-6">
+            <div className="overflow-hidden rounded-xl">
+              <iframe
+                className="aspect-video w-full"
+                src="https://www.youtube.com/embed/YzMBgs4k5yc"
+                title="Video final del reto"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <a
+                href="https://cal.com/sergiochala/auditoria-de-skool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center rounded-xl bg-amber-300 px-4 py-3 text-center text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+              >
+                Quiero que revises mi Skool
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowNivel2(true)}
+                className="rounded-xl border-2 border-white/20 px-4 py-3 text-sm font-bold text-white/90 transition hover:bg-white/10"
+              >
+                Desbloquear nivel 2
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNivel2 && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setShowNivel2(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex w-full max-w-md flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl"
+          >
+            <button
+              type="button"
+              onClick={() => setShowNivel2(false)}
+              aria-label="Cerrar"
+              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+            >
+              ✕
+            </button>
+
+            <Image
+              src="/celebracion-dia.png"
+              alt="¡Muy pronto!"
+              width={1254}
+              height={1254}
+              className="h-40 w-40 object-contain"
+            />
+
+            <h3 className="mt-4 text-2xl font-extrabold text-white">
+              ¡Muy pronto!
+            </h3>
+            <p className="mt-2 text-white/80">
+              Estamos trabajando en el Nivel 2.
             </p>
           </div>
         </div>
