@@ -28,11 +28,58 @@ function boxGridCols(count: number): string {
   return "grid-cols-2 sm:grid-cols-3";
 }
 
+const PROMPT_VAR_STORAGE_PREFIX = "skooly_promptvar_";
+const PROMPT_VAR_CHANGE_EVENT = "skooly-promptvar-change";
+
 function PromptField({ field }: { field: MissionField }) {
   const [copied, setCopied] = useState(false);
   const [vars, setVars] = useState<Record<string, string>>(() =>
     Object.fromEntries((field.promptVars ?? []).map((v) => [v.id, ""]))
   );
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+
+  // Al montar, recupera valores compartidos (ej. el nicho) que se hayan guardado
+  // desde CUALQUIER otro prompt de la app, para no tener que volver a escribirlos.
+  useEffect(() => {
+    setVars((prev) => {
+      const next = { ...prev };
+      for (const v of field.promptVars ?? []) {
+        try {
+          const stored = localStorage.getItem(`${PROMPT_VAR_STORAGE_PREFIX}${v.id}`);
+          if (stored) next[v.id] = stored;
+        } catch {
+          // localStorage no disponible: se queda vacío y el usuario lo escribe a mano
+        }
+      }
+      return next;
+    });
+  }, [field.promptVars]);
+
+  // Si otro prompt visible en la misma página (ej. en "Ver todas las respuestas")
+  // actualiza una variable compartida, se refleja aquí también en vivo.
+  useEffect(() => {
+    const ids = new Set((field.promptVars ?? []).map((v) => v.id));
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ id: string; value: string }>).detail;
+      if (detail && ids.has(detail.id)) {
+        setVars((prev) => ({ ...prev, [detail.id]: detail.value }));
+      }
+    };
+    window.addEventListener(PROMPT_VAR_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(PROMPT_VAR_CHANGE_EVENT, handler);
+  }, [field.promptVars]);
+
+  const setVar = (id: string, value: string) => {
+    setVars((prev) => ({ ...prev, [id]: value }));
+    try {
+      localStorage.setItem(`${PROMPT_VAR_STORAGE_PREFIX}${id}`, value);
+    } catch {
+      // localStorage no disponible: el valor solo vive en este prompt
+    }
+    window.dispatchEvent(
+      new CustomEvent(PROMPT_VAR_CHANGE_EVENT, { detail: { id, value } })
+    );
+  };
 
   const resolvedText = (field.promptText ?? "").replace(/\{\{(\w+)\}\}/g, (_, id: string) => {
     const value = vars[id]?.trim();
@@ -57,19 +104,44 @@ function PromptField({ field }: { field: MissionField }) {
 
       {field.promptVars && field.promptVars.length > 0 && (
         <div className="mb-3 flex flex-col gap-2">
-          {field.promptVars.map((v) => (
-            <div key={v.id}>
-              <label className="mb-1 block text-xs font-medium text-fuchsia-700">
-                {v.label}
-              </label>
-              <input
-                value={vars[v.id] ?? ""}
-                placeholder={v.placeholder}
-                onChange={(e) => setVars((prev) => ({ ...prev, [v.id]: e.target.value }))}
-                className={`${inputBase} bg-white`}
-              />
-            </div>
-          ))}
+          {field.promptVars.map((v) => {
+            const value = vars[v.id] ?? "";
+            const isLocked = value.trim().length > 0 && !editing[v.id];
+            return (
+              <div key={v.id}>
+                <label className="mb-1 block text-xs font-medium text-fuchsia-700">
+                  {v.label}
+                </label>
+                {isLocked ? (
+                  <div className="flex items-center justify-between rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+                    <span className="text-sm text-gray-800">{value}</span>
+                    <button
+                      type="button"
+                      onClick={() => setEditing((prev) => ({ ...prev, [v.id]: true }))}
+                      aria-label={`Editar ${v.label}`}
+                      title={`Editar ${v.label}`}
+                      className="ml-2 flex-shrink-0 text-gray-400 transition hover:text-fuchsia-600"
+                    >
+                      ✏️
+                    </button>
+                  </div>
+                ) : (
+                  <input
+                    value={value}
+                    placeholder={v.placeholder}
+                    autoFocus={!!editing[v.id]}
+                    onChange={(e) => setVar(v.id, e.target.value)}
+                    onBlur={() => {
+                      if (value.trim()) {
+                        setEditing((prev) => ({ ...prev, [v.id]: false }));
+                      }
+                    }}
+                    className={`${inputBase} bg-white`}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
