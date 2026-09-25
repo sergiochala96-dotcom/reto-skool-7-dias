@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from "react";
 export default function DayIntroVideo({ src }: { src: string }) {
   const [open, setOpen] = useState(true);
   const [needsTap, setNeedsTap] = useState(false);
+  const [ended, setEnded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Cada vez que cambia el video (nuevo día), lo abrimos de nuevo.
   useEffect(() => {
     setOpen(true);
     setNeedsTap(false);
+    setEnded(false);
   }, [src]);
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function DayIntroVideo({ src }: { src: string }) {
           autoPlay
           playsInline
           controls
-          onEnded={() => setOpen(false)}
+          onEnded={() => setEnded(true)}
           className="aspect-video w-full"
         />
 
@@ -69,6 +71,18 @@ export default function DayIntroVideo({ src }: { src: string }) {
               ▶ Toca para reproducir
             </span>
           </button>
+        )}
+
+        {ended && (
+          <div className="flex justify-center bg-black p-4">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-full bg-amber-300 px-8 py-3 text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+            >
+              Continuar
+            </button>
+          </div>
         )}
       </div>
     </div>
