@@ -51,6 +51,10 @@ export type MissionField = {
   itemMaxLength?: number;
   /** Para campos "list": chips de ejemplo no clicables que se muestran arriba de las cajas de texto, para inspirar. */
   examples?: string[];
+  /** Para campos "list": valores con los que se prellenan las cajas cuando no hay respuesta guardada todavía. */
+  defaultItems?: string[];
+  /** Para campos "list": si es 2, reparte las filas en dos columnas (primera mitad a la izquierda, segunda a la derecha) en pantallas de escritorio. */
+  columns?: 2;
   addLabel?: string;
   badgeLabel?: string;
   sliderMin?: number;
@@ -615,6 +619,16 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       mascot: "/mascota-niveles.png",
       fields: [
         {
+          id: "niveles_prompt",
+          type: "prompt",
+          label: "Prompt para pensar los nombres de tus niveles",
+          promptText:
+            "Actúa como un experto en gamificación de comunidades.\n\nMi nicho es: {{nicho}}\n\nAyúdame a crear un sistema de 9 niveles temáticos para mi comunidad, desde el nivel más básico (recién llegado) hasta el más avanzado (referente de la comunidad).\n\nPara cada uno de los 9 niveles dame:\n- Un nombre corto y llamativo, relacionado con mi nicho.\n- Una frase de una línea que describa qué representa ese nivel.\n\nPresenta la respuesta en una lista numerada del 1 (más bajo) al 9 (más alto).",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
+        },
+        {
           id: "niveles_nombres",
           type: "list",
           label: "Nombre de tus 9 niveles",
@@ -622,6 +636,18 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           minItems: 9,
           maxItems: 9,
           badgeLabel: "Nivel",
+          columns: 2,
+          defaultItems: [
+            "Novato",
+            "Aprendiz",
+            "Practicante",
+            "Constante",
+            "Comprometido",
+            "Avanzado",
+            "Experto",
+            "Mentor",
+            "Leyenda",
+          ],
         },
         {
           id: "niveles_premios",

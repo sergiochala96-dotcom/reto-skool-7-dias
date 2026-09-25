@@ -298,8 +298,23 @@ function ListField({
   const minRows = field.minItems ?? 1;
   // value puede venir de una respuesta antigua guardada como texto plano (antes de
   // que este campo fuera de tipo "list"): si no es un array, se ignora y se parte
-  // de filas vacías en vez de romper el .map de abajo.
-  const items = Array.isArray(value) && value.length > 0 ? value : Array(minRows).fill("");
+  // de filas prellenadas (si hay defaultItems) o vacías en vez de romper el .map de abajo.
+  const hasSavedValue = Array.isArray(value) && value.length > 0;
+  const items = hasSavedValue
+    ? value
+    : field.defaultItems && field.defaultItems.length > 0
+    ? field.defaultItems
+    : Array(minRows).fill("");
+
+  // Si se muestran valores prellenados que todavía no están guardados en las
+  // respuestas, se guardan apenas se monta el campo para que cuenten de una
+  // vez en el progreso, sin que el usuario tenga que tocar nada.
+  useEffect(() => {
+    if (!hasSavedValue && field.defaultItems && field.defaultItems.length > 0) {
+      onChange(field.id, field.defaultItems);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setItem = (index: number, text: string) => {
     const next = [...items];
@@ -311,6 +326,36 @@ function ListField({
   const removeItem = (index: number) => onChange(field.id, items.filter((_, i) => i !== index));
 
   const canAddMore = !field.maxItems || items.length < field.maxItems;
+
+  const row = (item: string, i: number) => (
+    <div key={i} className="flex items-center gap-2">
+      {field.badgeLabel ? (
+        <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">
+          {field.badgeLabel} {i + 1}
+        </span>
+      ) : (
+        <span className="text-fuchsia-500">•</span>
+      )}
+      <input
+        name={`field_${field.id}`}
+        value={item}
+        maxLength={field.itemMaxLength}
+        placeholder={field.itemPlaceholders?.[i] ?? field.itemPlaceholder}
+        onChange={(e) => setItem(i, e.target.value)}
+        className={`${inputBase} py-2`}
+      />
+      {i >= minRows && (
+        <button
+          type="button"
+          onClick={() => removeItem(i)}
+          aria-label="Quitar"
+          className="flex-shrink-0 rounded-lg px-2 py-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className={field.emphasis ? "rounded-xl bg-[#2a1150] p-4" : undefined}>
@@ -341,37 +386,20 @@ function ListField({
           ))}
         </div>
       )}
-      <div className="flex flex-col gap-2">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-2">
-            {field.badgeLabel ? (
-              <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">
-                {field.badgeLabel} {i + 1}
-              </span>
-            ) : (
-              <span className="text-fuchsia-500">•</span>
-            )}
-            <input
-              name={`field_${field.id}`}
-              value={item}
-              maxLength={field.itemMaxLength}
-              placeholder={field.itemPlaceholders?.[i] ?? field.itemPlaceholder}
-              onChange={(e) => setItem(i, e.target.value)}
-              className={`${inputBase} py-2`}
-            />
-            {i >= minRows && (
-              <button
-                type="button"
-                onClick={() => removeItem(i)}
-                aria-label="Quitar"
-                className="flex-shrink-0 rounded-lg px-2 py-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            )}
+      {field.columns === 2 ? (
+        <div className="grid gap-x-4 gap-y-2 md:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            {items.slice(0, Math.ceil(items.length / 2)).map((item, i) => row(item, i))}
           </div>
-        ))}
-      </div>
+          <div className="flex flex-col gap-2">
+            {items
+              .slice(Math.ceil(items.length / 2))
+              .map((item, i) => row(item, i + Math.ceil(items.length / 2)))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">{items.map((item, i) => row(item, i))}</div>
+      )}
       {canAddMore && (
         <button
           type="button"
