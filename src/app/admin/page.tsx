@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
+import ResetUserButton from "@/components/ResetUserButton";
 
 const PAGE_SIZES = [15, 50, 100] as const;
 
@@ -93,6 +94,7 @@ export default async function AdminPage({
                   <th className="px-4 py-3 font-medium">Última actividad</th>
                   <th className="px-4 py-3 font-medium">Registrado</th>
                   <th className="px-4 py-3 font-medium">Respuestas</th>
+                  <th className="px-4 py-3 font-medium">Reiniciar usuario</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,11 +132,17 @@ export default async function AdminPage({
                         Ver respuestas →
                       </a>
                     </td>
+                    <td className="px-4 py-3">
+                      <ResetUserButton
+                        userId={row.id}
+                        label={row.display_name ?? row.email}
+                      />
+                    </td>
                   </tr>
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={7} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>

@@ -219,6 +219,27 @@ export async function adminResetProgress(): Promise<void> {
   redirect("/dashboard");
 }
 
+// Resetea la cuenta de OTRO usuario desde el panel de admin: la deja como
+// si fuera nueva (sin progreso ni respuestas), para pruebas o a pedido del
+// propio usuario.
+export async function adminResetUserProgress(targetUserId: string): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  await supabase.from("challenge_progress").delete().eq("user_id", targetUserId);
+  await supabase.from("mission_answers").delete().eq("user_id", targetUserId);
+  await supabase
+    .from("profiles")
+    .update({ welcome_video_seen: false, episode2_locked_override: null })
+    .eq("id", targetUserId);
+
+  revalidatePath("/admin");
+}
+
 // Solo para pruebas del propio admin: fuerza el Episodio 2 bloqueado o
 // desbloqueado en SU PROPIA cuenta, sin afectar a los demás usuarios (para
 // quienes el Episodio 2 se desbloquea automáticamente al completar los 7 días).
