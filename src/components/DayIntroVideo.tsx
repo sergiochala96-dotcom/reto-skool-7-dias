@@ -8,13 +8,25 @@ type Props = {
   closable?: boolean;
   /** Si es true, el modal ocupa mucha más pantalla. */
   large?: boolean;
+  /** Se llama cuando el video se cierra (por X, clic afuera o el botón Continuar). */
+  onClose?: () => void;
 };
 
-export default function DayIntroVideo({ src, closable = true, large = false }: Props) {
+export default function DayIntroVideo({
+  src,
+  closable = true,
+  large = false,
+  onClose,
+}: Props) {
   const [open, setOpen] = useState(true);
   const [needsTap, setNeedsTap] = useState(false);
   const [ended, setEnded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const close = () => {
+    setOpen(false);
+    onClose?.();
+  };
 
   // Cada vez que cambia el video (nuevo día), lo abrimos de nuevo.
   useEffect(() => {
@@ -44,7 +56,7 @@ export default function DayIntroVideo({ src, closable = true, large = false }: P
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
-      onClick={() => closable && setOpen(false)}
+      onClick={() => closable && close()}
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -55,7 +67,7 @@ export default function DayIntroVideo({ src, closable = true, large = false }: P
         {closable && (
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={close}
             aria-label="Cerrar video"
             className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg font-bold text-white transition hover:bg-black/80"
           >
@@ -90,7 +102,7 @@ export default function DayIntroVideo({ src, closable = true, large = false }: P
           <div className="flex justify-center bg-black p-4">
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={close}
               className="rounded-full bg-amber-300 px-8 py-3 text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
             >
               Continuar
