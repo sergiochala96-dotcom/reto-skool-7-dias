@@ -670,9 +670,9 @@ function FieldInput({
   return (
     <div>
       {field.emphasis ? (
-        <div className="mb-3 rounded-xl bg-fuchsia-600 px-4 py-3">
+        <div className="mb-3 rounded-xl bg-[#2a1150] px-4 py-3">
           <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
-          <p className="mt-0.5 text-xs font-semibold text-fuchsia-100">
+          <p className="mt-0.5 text-xs font-semibold text-white/60">
             Escríbelo a continuación
           </p>
         </div>
