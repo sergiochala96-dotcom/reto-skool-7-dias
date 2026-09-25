@@ -61,3 +61,17 @@ export const NEXT_EPISODE_TEASER = "Episodio 2: Próximamente";
 export function getMission(day: number): Mission | undefined {
   return MISSIONS.find((m) => m.day === day);
 }
+
+// Video corto de Skooly que se reproduce al entrar a cada día (mientras se
+// vaya subiendo uno por día). Alojado en Supabase Storage (bucket público
+// "day-videos").
+const SUPABASE_STORAGE_BASE =
+  "https://umvvcfjhlkvfpnpvbfkv.supabase.co/storage/v1/object/public/day-videos";
+
+export const DAY_INTRO_VIDEOS: Record<number, string> = {
+  1: `${SUPABASE_STORAGE_BASE}/dia-1-intro.mp4`,
+};
+
+export function getDayIntroVideo(day: number): string | undefined {
+  return DAY_INTRO_VIDEOS[day];
+}

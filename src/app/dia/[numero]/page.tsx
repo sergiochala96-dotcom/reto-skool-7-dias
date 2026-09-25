@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getMission, TOTAL_DAYS } from "@/lib/challenge";
+import { getDayIntroVideo, getMission, TOTAL_DAYS } from "@/lib/challenge";
 import { getMissionSections, type Answers } from "@/lib/missionFields";
 import { saveMissionAnswers } from "@/app/actions";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import MissionForm from "@/components/MissionForm";
+import DayIntroVideo from "@/components/DayIntroVideo";
 
 export default async function DiaPage({
   params,
@@ -36,9 +37,11 @@ export default async function DiaPage({
 
   const initialAnswers = (answerRow?.answers ?? {}) as Answers;
   const sections = getMissionSections(day);
+  const introVideo = getDayIntroVideo(day);
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+      {introVideo && <DayIntroVideo key={day} src={introVideo} />}
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
