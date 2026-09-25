@@ -204,6 +204,16 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       mascot: "/mascota-problemas.png",
       fields: [
         {
+          id: "problemas_prompt",
+          type: "prompt",
+          label: "Prompt para encontrar los problemas de tu avatar",
+          promptText:
+            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 problemas, frustraciones y dolores más comunes que enfrenta mi avatar ideal dentro de este nicho, antes de encontrar una solución.\n\nPara cada problema:\n- Descríbelo en una frase clara y directa.\n- Explica brevemente por qué le duele.\n- Explica qué consecuencia le genera en su día a día si no lo resuelve.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje sencillo, como si se lo estuvieras explicando a la propia persona.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
+        },
+        {
           id: "problemas_avatar",
           type: "list",
           label: "Problemas de tu avatar",
@@ -217,16 +227,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             "Se siente abrumado con tanta información gratis y contradictoria",
           ],
         },
-        {
-          id: "problemas_prompt",
-          type: "prompt",
-          label: "Prompt para encontrar los problemas de tu avatar",
-          promptText:
-            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 problemas, frustraciones y dolores más comunes que enfrenta mi avatar ideal dentro de este nicho, antes de encontrar una solución.\n\nPara cada problema:\n- Descríbelo en una frase clara y directa.\n- Explica brevemente por qué le duele.\n- Explica qué consecuencia le genera en su día a día si no lo resuelve.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje sencillo, como si se lo estuvieras explicando a la propia persona.",
-          promptVars: [
-            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
-          ],
-        },
       ],
     },
     {
@@ -234,6 +234,16 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       heading: "Deseos de tu avatar",
       mascot: "/mascota-deseos.png",
       fields: [
+        {
+          id: "deseos_prompt",
+          type: "prompt",
+          label: "Prompt para encontrar los deseos de tu avatar",
+          promptText:
+            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 deseos, sueños y resultados que más anhela mi avatar ideal dentro de este nicho, es decir, en qué le gustaría convertirse o qué le gustaría lograr en su vida o negocio.\n\nPara cada deseo:\n- Descríbelo en una frase clara y directa.\n- Explica por qué es importante para esa persona.\n- Explica cómo se sentiría al lograrlo.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje claro y motivador.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
+        },
         {
           id: "deseos_avatar",
           type: "list",
@@ -246,16 +256,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           examples: [
             "Quiere generar ingresos extra sin renunciar a su trabajo actual",
             "Quiere sentirse parte de una comunidad que lo entienda",
-          ],
-        },
-        {
-          id: "deseos_prompt",
-          type: "prompt",
-          label: "Prompt para encontrar los deseos de tu avatar",
-          promptText:
-            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 deseos, sueños y resultados que más anhela mi avatar ideal dentro de este nicho, es decir, en qué le gustaría convertirse o qué le gustaría lograr en su vida o negocio.\n\nPara cada deseo:\n- Descríbelo en una frase clara y directa.\n- Explica por qué es importante para esa persona.\n- Explica cómo se sentiría al lograrlo.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje claro y motivador.",
-          promptVars: [
-            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
           ],
         },
       ],
@@ -344,12 +344,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       imageHeight: 280,
       fields: [
         {
-          id: "nombre_comunidad",
-          type: "text",
-          label: "Nombre de la Comunidad",
-          maxLength: 30,
-        },
-        {
           id: "nombre_comunidad_prompt",
           type: "prompt",
           label: "Prompt para inspirarte con el nombre",
@@ -360,10 +354,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           ],
         },
         {
-          id: "descripcion_comunidad",
-          type: "textarea",
-          label: "Descripción de la Comunidad",
-          maxLength: 150,
+          id: "nombre_comunidad",
+          type: "text",
+          label: "Nombre de la Comunidad",
+          maxLength: 30,
         },
         {
           id: "descripcion_comunidad_prompt",
@@ -374,6 +368,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           promptVars: [
             { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
           ],
+        },
+        {
+          id: "descripcion_comunidad",
+          type: "textarea",
+          label: "Descripción de la Comunidad",
+          maxLength: 150,
         },
         {
           id: "portada_link",
