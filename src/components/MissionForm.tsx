@@ -667,18 +667,46 @@ function FieldInput({
     );
   }
 
+  if (field.emphasis && (field.type === "text" || field.type === "textarea")) {
+    return (
+      <div className="rounded-xl bg-[#2a1150] p-4">
+        <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
+        <p className="mb-3 mt-0.5 text-xs font-semibold text-white/60">
+          Escríbelo a continuación
+        </p>
+        {field.helper && <p className="mb-2 text-xs text-white/70">{field.helper}</p>}
+        {field.type === "textarea" ? (
+          <textarea
+            name={`field_${field.id}`}
+            value={textValue}
+            placeholder={field.placeholder}
+            maxLength={field.maxLength}
+            onChange={(e) => onChange(field.id, e.target.value)}
+            rows={4}
+            className={`${inputBase} resize-y`}
+          />
+        ) : (
+          <input
+            name={`field_${field.id}`}
+            value={textValue}
+            placeholder={field.placeholder}
+            maxLength={field.maxLength}
+            onChange={(e) => onChange(field.id, e.target.value)}
+            className={inputBase}
+          />
+        )}
+        {field.maxLength && (
+          <p className="mt-1 text-right text-[11px] text-white/50">
+            {textValue.length}/{field.maxLength}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
-      {field.emphasis ? (
-        <div className="mb-3 rounded-xl bg-[#2a1150] px-4 py-3">
-          <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
-          <p className="mt-0.5 text-xs font-semibold text-white/60">
-            Escríbelo a continuación
-          </p>
-        </div>
-      ) : (
-        <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      )}
+      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
       {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
 
       {field.type === "text" && (
