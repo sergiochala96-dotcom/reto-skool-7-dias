@@ -161,22 +161,29 @@ export async function saveMissionAnswers(
     }
   }
 
-  await supabase
-    .from("mission_answers")
-    .upsert(
-      { user_id: user.id, day, answers, updated_at: new Date().toISOString() },
-      { onConflict: "user_id,day" }
-    );
-
   const missingIds = getMissingRequiredFieldIds(day, answers);
   const { total } = countRequiredFields(day, answers);
   const dayComplete = missingIds.length === 0;
+  const newlyCompleted = dayComplete && !completedDays.has(day);
 
-  if (dayComplete && !completedDays.has(day)) {
-    await supabase
-      .from("challenge_progress")
-      .upsert({ user_id: user.id, day }, { onConflict: "user_id,day" });
+  // Las respuestas y el progreso no dependen entre sí, así que se guardan en
+  // paralelo en vez de uno tras otro (esto era lo que hacía tardar el popup
+  // de celebración: dos round-trips secuenciales a Supabase en vez de uno).
+  await Promise.all([
+    supabase
+      .from("mission_answers")
+      .upsert(
+        { user_id: user.id, day, answers, updated_at: new Date().toISOString() },
+        { onConflict: "user_id,day" }
+      ),
+    newlyCompleted
+      ? supabase
+          .from("challenge_progress")
+          .upsert({ user_id: user.id, day }, { onConflict: "user_id,day" })
+      : Promise.resolve(),
+  ]);
 
+  if (newlyCompleted) {
     revalidatePath("/dashboard");
     revalidatePath("/cofre");
   }
