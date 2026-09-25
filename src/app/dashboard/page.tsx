@@ -24,13 +24,16 @@ export default async function DashboardPage() {
       .eq("id", user.id);
   }
 
-  const { data: episodeLockRows } = await supabase
-    .from("episode_locks")
-    .select("episode, locked");
-  const episode1Locked =
-    episodeLockRows?.find((r) => r.episode === 1)?.locked ?? false;
-  const episode2Locked =
-    episodeLockRows?.find((r) => r.episode === 2)?.locked ?? true;
+  // El Episodio 2 se desbloquea automáticamente por usuario al completar
+  // los 7 días. El admin puede forzar el estado en SU PROPIA cuenta para
+  // probar la vista bloqueada/desbloqueada (episode2_locked_override).
+  const allDone = completedList.length >= TOTAL_DAYS;
+  const { data: profileRow } = await supabase
+    .from("profiles")
+    .select("episode2_locked_override")
+    .eq("id", user.id)
+    .single();
+  const episode2Locked = profileRow?.episode2_locked_override ?? !allDone;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
@@ -74,17 +77,9 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <ChallengePathHorizontal
-            completedDays={completedList}
-            locked={episode1Locked}
-            admin={admin}
-          />
+          <ChallengePathHorizontal completedDays={completedList} />
           <div className="md:hidden">
-            <ChallengePath
-              completedDays={completedList}
-              locked={episode1Locked}
-              admin={admin}
-            />
+            <ChallengePath completedDays={completedList} />
           </div>
 
           <Episode2Card locked={episode2Locked} admin={admin} />

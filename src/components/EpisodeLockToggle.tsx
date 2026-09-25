@@ -1,20 +1,14 @@
-import { toggleEpisodeLock } from "@/app/actions";
+import { toggleEpisode2LockOverride } from "@/app/actions";
 
-export default function EpisodeLockToggle({
-  episode,
-  locked,
-}: {
-  episode: number;
-  locked: boolean;
-}) {
-  const action = toggleEpisodeLock.bind(null, episode);
-
+export default function EpisodeLockToggle({ locked }: { locked: boolean }) {
   return (
-    <form action={action} className="absolute right-4 top-4 z-20">
+    <form action={toggleEpisode2LockOverride} className="absolute right-4 top-4 z-20">
       <button
         type="submit"
         title={
-          locked ? `Desbloquear Episodio ${episode}` : `Bloquear Episodio ${episode}`
+          locked
+            ? "Desbloquear Episodio 2 (solo en mi cuenta, para pruebas)"
+            : "Bloquear Episodio 2 (solo en mi cuenta, para pruebas)"
         }
         className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${
           locked
@@ -22,7 +16,7 @@ export default function EpisodeLockToggle({
             : "border-red-400/40 bg-red-400/10 text-red-300 hover:bg-red-400/20"
         }`}
       >
-        {locked ? "🔓 Desbloquear" : "🔒 Bloquear"}
+        {locked ? "🔓 Desbloquear (test)" : "🔒 Bloquear (test)"}
       </button>
     </form>
   );

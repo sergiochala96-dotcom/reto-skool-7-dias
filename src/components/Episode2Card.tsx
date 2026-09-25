@@ -10,7 +10,7 @@ export default function Episode2Card({
 }) {
   return (
     <div className="relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-10 lg:pt-12">
-      {admin && <EpisodeLockToggle episode={2} locked={locked} />}
+      {admin && <EpisodeLockToggle locked={locked} />}
 
       <h2 className="mb-0 text-center text-base sm:text-lg lg:text-xl">
         <span className="font-bold text-fuchsia-300">{EPISODE_2_LABEL}</span>{" "}
@@ -22,16 +22,29 @@ export default function Episode2Card({
           locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""
         }`}
       >
-        {EPISODE_2_CHECKPOINTS.map((cp) => (
-          <div key={cp.id} className="flex w-20 flex-col items-center sm:w-24">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-white/20 bg-white/10 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl">
-              {cp.emoji}
+        {EPISODE_2_CHECKPOINTS.map((cp, i) => {
+          const itemUnlocked = i === 0;
+          return (
+            <div key={cp.id} className="flex w-20 flex-col items-center sm:w-24">
+              <div
+                className={`flex h-14 w-14 items-center justify-center rounded-full border-4 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl ${
+                  itemUnlocked
+                    ? "border-white/30 bg-white/10"
+                    : "border-white/10 bg-white/5 grayscale"
+                }`}
+              >
+                {itemUnlocked ? cp.emoji : "🔒"}
+              </div>
+              <p
+                className={`mt-3 line-clamp-2 text-center text-[11px] leading-tight ${
+                  itemUnlocked ? "text-white/60" : "text-white/30"
+                }`}
+              >
+                {cp.title}
+              </p>
             </div>
-            <p className="mt-3 line-clamp-2 text-center text-[11px] leading-tight text-white/60">
-              {cp.title}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {locked && (

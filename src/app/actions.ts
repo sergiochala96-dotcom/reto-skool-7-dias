@@ -219,7 +219,10 @@ export async function adminResetProgress(): Promise<void> {
   redirect("/dashboard");
 }
 
-export async function toggleEpisodeLock(episode: number): Promise<void> {
+// Solo para pruebas del propio admin: fuerza el Episodio 2 bloqueado o
+// desbloqueado en SU PROPIA cuenta, sin afectar a los demás usuarios (para
+// quienes el Episodio 2 se desbloquea automáticamente al completar los 7 días).
+export async function toggleEpisode2LockOverride(): Promise<void> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -227,16 +230,25 @@ export async function toggleEpisodeLock(episode: number): Promise<void> {
 
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
-  const { data: row } = await supabase
-    .from("episode_locks")
-    .select("locked")
-    .eq("episode", episode)
-    .single();
+  const [{ data: profile }, { count }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("episode2_locked_override")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("challenge_progress")
+      .select("day", { count: "exact", head: true })
+      .eq("user_id", user.id),
+  ]);
+
+  const naturalLocked = (count ?? 0) < TOTAL_DAYS;
+  const currentLocked = profile?.episode2_locked_override ?? naturalLocked;
 
   await supabase
-    .from("episode_locks")
-    .update({ locked: !(row?.locked ?? false) })
-    .eq("episode", episode);
+    .from("profiles")
+    .update({ episode2_locked_override: !currentLocked })
+    .eq("id", user.id);
 
   revalidatePath("/", "layout");
   redirect("/dashboard");

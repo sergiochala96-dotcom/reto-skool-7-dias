@@ -7,7 +7,6 @@ import {
 } from "@/lib/challenge";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 import MascotCashButton from "@/components/MascotCashButton";
-import EpisodeLockToggle from "@/components/EpisodeLockToggle";
 
 const AMPLITUDE = 55;
 const SPACING = 160;
@@ -17,12 +16,8 @@ const OFFSETS = [0, 1, 1.4, 1, 0, -1, -1.4]; // patrón zigzag por día
 
 export default function ChallengePath({
   completedDays,
-  locked = false,
-  admin = false,
 }: {
   completedDays: number[];
-  locked?: boolean;
-  admin?: boolean;
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
@@ -74,31 +69,26 @@ export default function ChallengePath({
   return (
     <div className="mx-auto max-w-2xl">
       <div className="relative mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-8 shadow-2xl shadow-fuchsia-900/40">
-        {admin && <EpisodeLockToggle episode={1} locked={locked} />}
-
         <h2 className="mb-1 px-4 text-center text-base">
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
         <div
-          className={`${locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""}`}
+          className="absolute z-10"
+          style={{ left: 4, top: mascotLeftY - MASCOT_SIZE / 2 }}
         >
-          <div
-            className="absolute z-10"
-            style={{ left: 4, top: mascotLeftY - MASCOT_SIZE / 2 }}
-          >
-            <MascotCashButton className="h-[130px] w-[130px]" />
-          </div>
+          <MascotCashButton className="h-[130px] w-[130px]" />
+        </div>
 
-          <div
-            className="absolute z-10"
-            style={{ right: 4, top: mascotRightY - MASCOT_SIZE / 2 }}
-          >
-            <MascotCashButton className="h-[130px] w-[130px]" />
-          </div>
+        <div
+          className="absolute z-10"
+          style={{ right: 4, top: mascotRightY - MASCOT_SIZE / 2 }}
+        >
+          <MascotCashButton className="h-[130px] w-[130px]" />
+        </div>
 
-          <div className="overflow-x-auto">
+        <div className="overflow-x-auto">
           <div className="relative mx-auto" style={{ width, height: height + 90 }}>
         <svg
           width={width}
@@ -222,16 +212,6 @@ export default function ChallengePath({
         </div>
         </div>
         </div>
-        </div>
-
-        {locked && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-3xl bg-black/50 backdrop-blur-[1px]">
-            <span className="text-3xl grayscale">🔒</span>
-            <span className="text-base font-semibold text-white/70">
-              Bloqueado por el admin
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
