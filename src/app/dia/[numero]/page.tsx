@@ -41,7 +41,13 @@ export default async function DiaPage({
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
-      {introVideo && <DayIntroVideo key={day} src={introVideo} />}
+      {introVideo && (
+        <DayIntroVideo
+          key={day}
+          src={introVideo}
+          title={`Día ${day}: ${mission.title}`}
+        />
+      )}
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}

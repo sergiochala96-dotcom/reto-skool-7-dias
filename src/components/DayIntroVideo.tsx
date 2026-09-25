@@ -10,6 +10,8 @@ type Props = {
   large?: boolean;
   /** Se llama cuando el video se cierra (por X, clic afuera o el botón Continuar). */
   onClose?: () => void;
+  /** Título en H1 blanco, centrado, arriba del video (ej. "Día 1: Inicia el Reto"). */
+  title?: string;
 };
 
 export default function DayIntroVideo({
@@ -17,6 +19,7 @@ export default function DayIntroVideo({
   closable = true,
   large = false,
   onClose,
+  title,
 }: Props) {
   const [open, setOpen] = useState(true);
   const [needsTap, setNeedsTap] = useState(false);
@@ -55,9 +58,18 @@ export default function DayIntroVideo({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/85 p-4"
       onClick={() => closable && close()}
     >
+      {title && (
+        <h1
+          className={`px-2 text-center text-2xl font-extrabold text-white sm:text-3xl ${
+            large ? "max-w-6xl" : "max-w-2xl"
+          }`}
+        >
+          {title}
+        </h1>
+      )}
       <div
         onClick={(e) => e.stopPropagation()}
         className={`relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl ${
