@@ -69,7 +69,7 @@ export default function TreasureChest({ nombre }: Props) {
             <div className="overflow-hidden rounded-xl">
               <iframe
                 className="aspect-video w-full"
-                src="https://www.youtube.com/embed/YzMBgs4k5yc?modestbranding=1&rel=0&iv_load_policy=3"
+                src="https://www.youtube.com/embed/YzMBgs4k5yc?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3"
                 title="Video final del reto"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
