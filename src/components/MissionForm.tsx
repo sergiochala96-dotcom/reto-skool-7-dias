@@ -243,16 +243,26 @@ function CheckField({
   field,
   value,
   onChange,
+  dark = false,
 }: {
   field: MissionField;
   value: string | undefined;
   onChange: (id: string, value: string) => void;
+  dark?: boolean;
 }) {
   const checked = value === "si";
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+      <label
+        className={`mb-1.5 block text-sm font-medium ${dark ? "text-white" : "text-gray-800"}`}
+      >
+        {field.label}
+      </label>
+      {field.helper && (
+        <p className={`mb-2 text-xs ${dark ? "text-white/70" : "text-gray-500"}`}>
+          {field.helper}
+        </p>
+      )}
       <button
         type="button"
         onClick={() => onChange(field.id, checked ? "" : "si")}
@@ -622,11 +632,13 @@ function FieldInput({
   value,
   answers,
   onChange,
+  dark = false,
 }: {
   field: MissionField;
   value: string | string[] | undefined;
   answers: Answers;
   onChange: (id: string, value: string | string[]) => void;
+  dark?: boolean;
 }) {
   const [showNoPopup, setShowNoPopup] = useState(false);
 
@@ -641,7 +653,7 @@ function FieldInput({
       />
     );
   if (field.type === "check")
-    return <CheckField field={field} value={value as string} onChange={onChange} />;
+    return <CheckField field={field} value={value as string} onChange={onChange} dark={dark} />;
   if (field.type === "list")
     return <ListField field={field} value={value as string[]} onChange={onChange} />;
   if (field.type === "range")
@@ -721,8 +733,16 @@ function FieldInput({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
-      {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
+      <label
+        className={`mb-1.5 block text-sm font-medium ${dark ? "text-white" : "text-gray-800"}`}
+      >
+        {field.label}
+      </label>
+      {field.helper && (
+        <p className={`mb-2 text-xs ${dark ? "text-white/70" : "text-gray-500"}`}>
+          {field.helper}
+        </p>
+      )}
 
       {field.type === "text" && (
         <input
@@ -760,7 +780,7 @@ function FieldInput({
       )}
 
       {field.maxLength && (
-        <p className="mt-1 text-right text-[11px] text-gray-400">
+        <p className={`mt-1 text-right text-[11px] ${dark ? "text-white/50" : "text-gray-400"}`}>
           {textValue.length}/{field.maxLength}
         </p>
       )}
@@ -1207,6 +1227,7 @@ export default function MissionForm({
               value={answers[field.id]}
               answers={answers}
               onChange={handleChange}
+              dark={section.emphasis}
             />
           );
           if (section.mascotAfterField === field.id && mascotElement) {
@@ -1243,17 +1264,29 @@ export default function MissionForm({
               <div className="mb-4">{mascotElement}</div>
             )}
             {section.imagePosition === "above-heading" && sectionImage}
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
-              {section.heading}
-            </h2>
-            {section.imagePosition !== "above-heading" && sectionImage}
-            {section.layout === "split-calendar" ? (
-              <div className="grid gap-5 sm:grid-cols-2">
-                <CalendarMockup />
+            {section.emphasis ? (
+              <div className="rounded-xl bg-[#2a1150] p-4 lg:p-6">
+                <p className="mb-4 text-lg font-extrabold text-white sm:text-xl">
+                  {section.heading}
+                </p>
+                {section.imagePosition !== "above-heading" && sectionImage}
                 <div className="flex flex-col gap-5">{fieldsList}</div>
               </div>
             ) : (
-              <div className="flex flex-col gap-5">{fieldsList}</div>
+              <>
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
+                  {section.heading}
+                </h2>
+                {section.imagePosition !== "above-heading" && sectionImage}
+                {section.layout === "split-calendar" ? (
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <CalendarMockup />
+                    <div className="flex flex-col gap-5">{fieldsList}</div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-5">{fieldsList}</div>
+                )}
+              </>
             )}
           </section>
         );

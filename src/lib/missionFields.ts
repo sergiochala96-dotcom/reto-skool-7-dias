@@ -78,6 +78,8 @@ export type MissionSection = {
   mascot?: string;
   /** Si se define, la mascota se muestra justo después de este campo en vez de arriba de la sección. */
   mascotAfterField?: string;
+  /** Si es true, toda la sección (título + campos) se muestra dentro de una sola tarjeta morada oscura con título en H1. */
+  emphasis?: boolean;
 };
 
 const SI_NO = [
@@ -552,6 +554,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
       imageWidth: 993,
       imageHeight: 621,
       imagePosition: "above-heading",
+      emphasis: true,
       fields: [
         { id: "post_titulo", type: "text", label: "Título del post de bienvenida" },
         {
