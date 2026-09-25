@@ -219,6 +219,29 @@ export async function adminResetProgress(): Promise<void> {
   redirect("/dashboard");
 }
 
+export async function toggleEpisodeLock(episode: number): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  const { data: row } = await supabase
+    .from("episode_locks")
+    .select("locked")
+    .eq("episode", episode)
+    .single();
+
+  await supabase
+    .from("episode_locks")
+    .update({ locked: !(row?.locked ?? false) })
+    .eq("episode", episode);
+
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
+}
+
 export async function updateProfile(
   _prevState: AuthState,
   formData: FormData

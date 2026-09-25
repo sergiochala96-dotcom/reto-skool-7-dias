@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
 import ChallengePathHorizontal from "@/components/ChallengePathHorizontal";
+import Episode2Card from "@/components/Episode2Card";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import DayIntroVideo from "@/components/DayIntroVideo";
@@ -14,13 +15,22 @@ export default async function DashboardPage() {
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
 
+  const supabase = await createClient();
+
   if (!welcomeVideoSeen) {
-    const supabase = await createClient();
     await supabase
       .from("profiles")
       .update({ welcome_video_seen: true })
       .eq("id", user.id);
   }
+
+  const { data: episodeLockRows } = await supabase
+    .from("episode_locks")
+    .select("episode, locked");
+  const episode1Locked =
+    episodeLockRows?.find((r) => r.episode === 1)?.locked ?? false;
+  const episode2Locked =
+    episodeLockRows?.find((r) => r.episode === 2)?.locked ?? true;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
@@ -64,10 +74,20 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <ChallengePathHorizontal completedDays={completedList} />
+          <ChallengePathHorizontal
+            completedDays={completedList}
+            locked={episode1Locked}
+            admin={admin}
+          />
           <div className="md:hidden">
-            <ChallengePath completedDays={completedList} />
+            <ChallengePath
+              completedDays={completedList}
+              locked={episode1Locked}
+              admin={admin}
+            />
           </div>
+
+          <Episode2Card locked={episode2Locked} admin={admin} />
         </div>
       </main>
     </div>

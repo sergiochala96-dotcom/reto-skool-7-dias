@@ -56,7 +56,23 @@ export const TOTAL_DAYS = MISSIONS.length;
 // días más adelante (Episodio 2, etc.), esto pasará a ser una lista.
 export const CURRENT_EPISODE_LABEL = "Episodio 1:";
 export const CURRENT_EPISODE_NAME = "Crea tu Skool";
-export const NEXT_EPISODE_TEASER = "Episodio 2: Próximamente";
+
+export type Episode2Checkpoint = {
+  id: string;
+  emoji: string;
+  title: string;
+};
+
+export const EPISODE_2_LABEL = "Episodio 2:";
+export const EPISODE_2_NAME = "Escala tu Skool";
+
+export const EPISODE_2_CHECKPOINTS: Episode2Checkpoint[] = [
+  { id: "oferta-paga", emoji: "💰", title: "Lanza tu oferta paga" },
+  { id: "referidos", emoji: "🔗", title: "Consigue referidos" },
+  { id: "ads-pagados", emoji: "📢", title: "Escala con ads pagados" },
+  { id: "eventos-en-vivo", emoji: "🎥", title: "Activa tus eventos en vivo" },
+  { id: "gamifica", emoji: "🎮", title: "Gamifica tu comunidad" },
+];
 
 export function getMission(day: number): Mission | undefined {
   return MISSIONS.find((m) => m.day === day);
