@@ -81,9 +81,9 @@ export default function TreasureChest({ nombre }: Props) {
                 href="https://cal.com/sergiochala/auditoria-de-skool"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center rounded-xl bg-amber-300 px-4 py-3 text-center text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+                className="animate-pulse flex items-center justify-center rounded-xl bg-amber-300 px-4 py-3 text-center text-sm font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
               >
-                Quiero que revises mi Skool
+                Quiero que revises mi Skool en llamada
               </a>
               <button
                 type="button"
