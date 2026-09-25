@@ -51,6 +51,8 @@ export type MissionField = {
   required?: boolean;
   showIf?: { field: string; equals: string };
   syncTitlesFrom?: string;
+  /** Para campos "yesno": si eligen la opción "no", muestra un popup con este mensaje y un botón de WhatsApp. No bloquea la respuesta. */
+  noPopup?: { message: string; whatsappUrl: string; buttonLabel: string };
 };
 
 export type MissionSection = {
@@ -287,6 +289,13 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "yesno",
           label: "¿Ya creaste tu Skool?",
           options: SI_NO,
+          noPopup: {
+            message:
+              "Aún no te sientes seguro creando tu Skool. ¿Tienes dudas? Ponte en contacto con Sergio y su equipo para ayudarte a resolver esas dudas.",
+            whatsappUrl:
+              "https://api.whatsapp.com/send?phone=573015144829&text=Hola%20Sergio%20y%20equipo,%20quiero%20info%20de%20como%20crear%20mi%20Skool,%20a%C3%BAn%20tengo%20dudas...",
+            buttonLabel: "Quiero info sobre Skool",
+          },
         },
       ],
     },
