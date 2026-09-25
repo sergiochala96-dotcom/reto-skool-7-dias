@@ -29,6 +29,8 @@ export type MissionField = {
   inlineBadge?: boolean;
   confirm?: { id: string; label: string };
   promptText?: string;
+  /** Para campos "prompt": inputs editables que el usuario llena y que reemplazan los {{id}} dentro de promptText. */
+  promptVars?: { id: string; label: string; placeholder: string }[];
   infoText?: string;
   url?: string;
   buttonText?: string;
@@ -215,6 +217,16 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             "Se siente abrumado con tanta información gratis y contradictoria",
           ],
         },
+        {
+          id: "problemas_prompt",
+          type: "prompt",
+          label: "Prompt para encontrar los problemas de tu avatar",
+          promptText:
+            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 problemas, frustraciones y dolores más comunes que enfrenta mi avatar ideal dentro de este nicho, antes de encontrar una solución.\n\nPara cada problema:\n- Descríbelo en una frase clara y directa.\n- Explica brevemente por qué le duele.\n- Explica qué consecuencia le genera en su día a día si no lo resuelve.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje sencillo, como si se lo estuvieras explicando a la propia persona.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
+        },
       ],
     },
     {
@@ -234,6 +246,16 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           examples: [
             "Quiere generar ingresos extra sin renunciar a su trabajo actual",
             "Quiere sentirse parte de una comunidad que lo entienda",
+          ],
+        },
+        {
+          id: "deseos_prompt",
+          type: "prompt",
+          label: "Prompt para encontrar los deseos de tu avatar",
+          promptText:
+            "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 deseos, sueños y resultados que más anhela mi avatar ideal dentro de este nicho, es decir, en qué le gustaría convertirse o qué le gustaría lograr en su vida o negocio.\n\nPara cada deseo:\n- Descríbelo en una frase clara y directa.\n- Explica por qué es importante para esa persona.\n- Explica cómo se sentiría al lograrlo.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje claro y motivador.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
           ],
         },
       ],
@@ -328,10 +350,30 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           maxLength: 30,
         },
         {
+          id: "nombre_comunidad_prompt",
+          type: "prompt",
+          label: "Prompt para inspirarte con el nombre",
+          promptText:
+            "Actúa como un experto en branding y naming.\n\nMi nicho es: {{nicho}}\n\nAyúdame a generar 15 ideas de nombres para mi comunidad en Skool. Los nombres deben:\n- Ser cortos (máximo 3 palabras).\n- Ser fáciles de recordar y pronunciar.\n- Transmitir pertenencia y resultado, no solo el tema.\n- No sonar genéricos ni copiar marcas ya conocidas.\n\nOrganiza las 15 ideas en 3 grupos de 5: nombres directos (dicen el resultado), nombres aspiracionales (dicen la transformación) y nombres con personaje o apodo propio.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
+        },
+        {
           id: "descripcion_comunidad",
           type: "textarea",
           label: "Descripción de la Comunidad",
           maxLength: 150,
+        },
+        {
+          id: "descripcion_comunidad_prompt",
+          type: "prompt",
+          label: "Prompt para escribir tu descripción",
+          promptText:
+            "Actúa como un copywriter experto en páginas de venta.\n\nMi nicho es: {{nicho}}\n\nEscribe 5 opciones de descripción para mi comunidad en Skool, de máximo 150 caracteres cada una.\n\nCada opción debe:\n- Comunicar con claridad la promesa principal (el resultado que la persona va a lograr).\n- Generar curiosidad para que quiera unirse.\n- Usar un tono cercano y directo, sin tecnicismos.\n\nIndica el conteo de caracteres al lado de cada opción.",
+          promptVars: [
+            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+          ],
         },
         {
           id: "portada_link",

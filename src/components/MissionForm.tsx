@@ -30,10 +30,20 @@ function boxGridCols(count: number): string {
 
 function PromptField({ field }: { field: MissionField }) {
   const [copied, setCopied] = useState(false);
+  const [vars, setVars] = useState<Record<string, string>>(() =>
+    Object.fromEntries((field.promptVars ?? []).map((v) => [v.id, ""]))
+  );
+
+  const resolvedText = (field.promptText ?? "").replace(/\{\{(\w+)\}\}/g, (_, id: string) => {
+    const value = vars[id]?.trim();
+    if (value) return value;
+    const v = field.promptVars?.find((pv) => pv.id === id);
+    return `[${v?.label ?? id}]`;
+  });
 
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(field.promptText ?? "");
+      await navigator.clipboard.writeText(resolvedText);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -44,8 +54,27 @@ function PromptField({ field }: { field: MissionField }) {
   return (
     <div className="rounded-xl border border-dashed border-fuchsia-300 bg-fuchsia-50 p-4">
       <p className="mb-2 text-sm font-semibold text-fuchsia-700">💡 {field.label}</p>
+
+      {field.promptVars && field.promptVars.length > 0 && (
+        <div className="mb-3 flex flex-col gap-2">
+          {field.promptVars.map((v) => (
+            <div key={v.id}>
+              <label className="mb-1 block text-xs font-medium text-fuchsia-700">
+                {v.label}
+              </label>
+              <input
+                value={vars[v.id] ?? ""}
+                placeholder={v.placeholder}
+                onChange={(e) => setVars((prev) => ({ ...prev, [v.id]: e.target.value }))}
+                className={`${inputBase} bg-white`}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       <p className="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 font-mono text-xs leading-relaxed text-gray-700">
-        {field.promptText}
+        {resolvedText}
       </p>
       <button type="button" onClick={copy} className={`mt-3 ${blackButton}`}>
         {copied ? "Copiado ✓" : "📋 Copiar prompt"}
