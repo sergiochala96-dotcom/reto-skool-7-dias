@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import confetti from "canvas-confetti";
 import type { MissionField, MissionSection, Answers } from "@/lib/missionFields";
 import { countFieldsAnswered, countRequiredFields } from "@/lib/missionFields";
 import type { MissionState } from "@/app/actions";
@@ -13,7 +14,7 @@ import ModulosField from "@/components/ModulosField";
 import TemarioField from "@/components/TemarioField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
-import { playSuccessDing } from "@/lib/successSound";
+import { playSuccessDing, playVictoryFanfare } from "@/lib/successSound";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -881,6 +882,17 @@ export default function MissionForm({
   useEffect(() => {
     if (state?.dayComplete) {
       setCelebration({ total: state.total });
+      playVictoryFanfare();
+
+      const duration = 1500;
+      const end = Date.now() + duration;
+      const colors = ["#f59e0b", "#facc15", "#e879f9", "#a855f7"];
+      (function frame() {
+        confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors });
+        confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 }, colors });
     }
   }, [state]);
 
