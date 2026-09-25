@@ -30,7 +30,13 @@ export type MissionField = {
   confirm?: { id: string; label: string };
   promptText?: string;
   /** Para campos "prompt": inputs editables que el usuario llena y que reemplazan los {{id}} dentro de promptText. */
-  promptVars?: { id: string; label: string; placeholder: string }[];
+  promptVars?: {
+    id: string;
+    label: string;
+    placeholder: string;
+    /** Si es true, esta variable nunca se muestra "anclada": siempre queda como campo editable abierto. */
+    noLock?: boolean;
+  }[];
   infoText?: string;
   url?: string;
   buttonText?: string;
@@ -210,7 +216,12 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           promptText:
             "Actúa como un experto en investigación de audiencias y marketing digital.\n\nMi nicho es: {{nicho}}\n\nAyúdame a identificar los 10 problemas, frustraciones y dolores más comunes que enfrenta mi avatar ideal dentro de este nicho, antes de encontrar una solución.\n\nPara cada problema:\n- Descríbelo en una frase clara y directa.\n- Explica brevemente por qué le duele.\n- Explica qué consecuencia le genera en su día a día si no lo resuelve.\n\nPresenta la respuesta en una lista numerada del 1 al 10, con lenguaje sencillo, como si se lo estuvieras explicando a la propia persona.",
           promptVars: [
-            { id: "nicho", label: "Tu nicho", placeholder: "Ej: fitness para mujeres 40+" },
+            {
+              id: "nicho",
+              label: "Tu nicho",
+              placeholder: "Ej: fitness para mujeres 40+",
+              noLock: true,
+            },
           ],
         },
         {

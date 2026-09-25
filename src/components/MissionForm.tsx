@@ -106,23 +106,34 @@ function PromptField({ field }: { field: MissionField }) {
         <div className="mb-3 flex flex-col gap-2">
           {field.promptVars.map((v) => {
             const value = vars[v.id] ?? "";
-            const isLocked = value.trim().length > 0 && !editing[v.id];
+            const isLocked = value.trim().length > 0 && !editing[v.id] && !v.noLock;
             return (
               <div key={v.id}>
                 <label className="mb-1 block text-xs font-medium text-fuchsia-700">
                   {v.label}
                 </label>
                 {isLocked ? (
-                  <div className="flex items-center justify-between rounded-xl border border-gray-300 bg-white px-4 py-2.5">
-                    <span className="text-sm text-gray-800">{value}</span>
+                  <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5">
+                    <span className="text-sm text-gray-700">{value}</span>
                     <button
                       type="button"
                       onClick={() => setEditing((prev) => ({ ...prev, [v.id]: true }))}
                       aria-label={`Editar ${v.label}`}
                       title={`Editar ${v.label}`}
-                      className="ml-2 flex-shrink-0 text-gray-400 transition hover:text-fuchsia-600"
+                      className="ml-2 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-200 hover:text-gray-700"
                     >
-                      ✏️
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-4 w-4"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
                     </button>
                   </div>
                 ) : (
@@ -658,15 +669,16 @@ function FieldInput({
 
   return (
     <div>
-      <label
-        className={
-          field.emphasis
-            ? "mb-2 block border-b-4 border-fuchsia-400 pb-1.5 text-xl font-extrabold text-gray-900 sm:text-2xl"
-            : "mb-1.5 block text-sm font-medium text-gray-800"
-        }
-      >
-        {field.label}
-      </label>
+      {field.emphasis ? (
+        <div className="mb-3 rounded-xl bg-fuchsia-600 px-4 py-3">
+          <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
+          <p className="mt-0.5 text-xs font-semibold text-fuchsia-100">
+            Escríbelo a continuación
+          </p>
+        </div>
+      ) : (
+        <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      )}
       {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
 
       {field.type === "text" && (
