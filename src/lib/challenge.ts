@@ -81,3 +81,7 @@ export const DAY_INTRO_VIDEOS: Record<number, string> = {
 export function getDayIntroVideo(day: number): string | undefined {
   return DAY_INTRO_VIDEOS[day];
 }
+
+// Video de bienvenida que se muestra una única vez, la primera vez que un
+// usuario entra al dashboard tras crear su cuenta (ver profiles.welcome_video_seen).
+export const WELCOME_VIDEO_URL = `${SUPABASE_STORAGE_BASE}/welcome-intro.mp4`;

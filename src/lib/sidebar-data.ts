@@ -9,6 +9,7 @@ export type SidebarData = {
   avatarUrl: string | null;
   completedDays: Set<number>;
   admin: boolean;
+  welcomeVideoSeen: boolean;
 };
 
 export async function getSidebarData(): Promise<SidebarData> {
@@ -30,7 +31,7 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url")
+    .select("avatar_url, welcome_video_seen")
     .eq("id", user.id)
     .single();
 
@@ -46,5 +47,6 @@ export async function getSidebarData(): Promise<SidebarData> {
     avatarUrl,
     completedDays: new Set((progress ?? []).map((p) => p.day)),
     admin: isAdmin(user.email),
+    welcomeVideoSeen: profile?.welcome_video_seen ?? false,
   };
 }

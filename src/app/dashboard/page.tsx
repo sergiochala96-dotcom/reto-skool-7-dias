@@ -1,18 +1,30 @@
 import { getSidebarData } from "@/lib/sidebar-data";
-import { TOTAL_DAYS } from "@/lib/challenge";
+import { TOTAL_DAYS, WELCOME_VIDEO_URL } from "@/lib/challenge";
+import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
 import ChallengePathHorizontal from "@/components/ChallengePathHorizontal";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
+import DayIntroVideo from "@/components/DayIntroVideo";
 
 export default async function DashboardPage() {
-  const { nombre, user, avatarUrl, admin, completedDays } = await getSidebarData();
+  const { nombre, user, avatarUrl, admin, completedDays, welcomeVideoSeen } =
+    await getSidebarData();
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
 
+  if (!welcomeVideoSeen) {
+    const supabase = await createClient();
+    await supabase
+      .from("profiles")
+      .update({ welcome_video_seen: true })
+      .eq("id", user.id);
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+      {!welcomeVideoSeen && <DayIntroVideo src={WELCOME_VIDEO_URL} />}
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
