@@ -658,7 +658,15 @@ function FieldInput({
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-800">{field.label}</label>
+      <label
+        className={
+          field.emphasis
+            ? "mb-2 block border-b-4 border-fuchsia-400 pb-1.5 text-xl font-extrabold text-gray-900 sm:text-2xl"
+            : "mb-1.5 block text-sm font-medium text-gray-800"
+        }
+      >
+        {field.label}
+      </label>
       {field.helper && <p className="mb-2 text-xs text-gray-500">{field.helper}</p>}
 
       {field.type === "text" && (

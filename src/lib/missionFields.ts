@@ -358,6 +358,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "text",
           label: "Nombre de la Comunidad",
           maxLength: 30,
+          emphasis: true,
         },
         {
           id: "descripcion_comunidad_prompt",
@@ -374,6 +375,7 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           type: "textarea",
           label: "Descripción de la Comunidad",
           maxLength: 150,
+          emphasis: true,
         },
         {
           id: "portada_link",
