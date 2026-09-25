@@ -42,7 +42,7 @@ export default function TreasureChest({ nombre }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center text-center">
+    <div className="flex w-full flex-col items-center text-center">
       {!open ? (
         <button
           onClick={handleOpen}
@@ -57,19 +57,19 @@ export default function TreasureChest({ nombre }: Props) {
           </span>
         </button>
       ) : (
-        <div className="flex flex-col items-center gap-5 animate-[fadeIn_0.6s_ease]">
-          <TreasureChestOpenIcon className="h-40 w-40 drop-shadow-[0_0_30px_rgba(245,158,11,0.55)]" />
+        <div className="flex w-full flex-col items-center gap-5 animate-[fadeIn_0.6s_ease]">
+          <TreasureChestOpenIcon className="h-40 w-40 drop-shadow-[0_0_30px_rgba(245,158,11,0.55)] md:h-20 md:w-20" />
           <h2 className="text-2xl font-bold text-amber-300">
             ¡Felicidades, {nombre}!
           </h2>
           <p className="max-w-md text-white/80">
             Completaste el Reto de 7 Días. Este es tu premio final:
           </p>
-          <div className="w-full max-w-2xl rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-fuchsia-500/10 p-6">
+          <div className="w-full max-w-2xl rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-fuchsia-500/10 p-6 md:max-w-5xl">
             <div className="overflow-hidden rounded-xl">
               <iframe
                 className="aspect-video w-full"
-                src="https://www.youtube.com/embed/YzMBgs4k5yc"
+                src="https://www.youtube.com/embed/YzMBgs4k5yc?modestbranding=1&rel=0&iv_load_policy=3"
                 title="Video final del reto"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
@@ -104,13 +104,13 @@ export default function TreasureChest({ nombre }: Props) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex w-full max-w-md flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl"
+            className="relative flex w-full max-w-md flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl md:max-w-xl md:p-12"
           >
             <button
               type="button"
               onClick={() => setShowNivel2(false)}
               aria-label="Cerrar"
-              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white md:h-11 md:w-11 md:text-lg"
             >
               ✕
             </button>
@@ -120,13 +120,13 @@ export default function TreasureChest({ nombre }: Props) {
               alt="¡Muy pronto!"
               width={1254}
               height={1254}
-              className="h-40 w-40 object-contain"
+              className="h-40 w-40 object-contain md:h-56 md:w-56"
             />
 
-            <h3 className="mt-4 text-2xl font-extrabold text-white">
+            <h3 className="mt-4 text-2xl font-extrabold text-white md:mt-6 md:text-4xl">
               ¡Muy pronto!
             </h3>
-            <p className="mt-2 text-white/80">
+            <p className="mt-2 text-white/80 md:mt-3 md:text-xl">
               Estamos trabajando en el Nivel 2.
             </p>
           </div>
