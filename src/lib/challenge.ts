@@ -70,6 +70,12 @@ const SUPABASE_STORAGE_BASE =
 
 export const DAY_INTRO_VIDEOS: Record<number, string> = {
   1: `${SUPABASE_STORAGE_BASE}/dia-1-intro.mp4`,
+  2: `${SUPABASE_STORAGE_BASE}/dia-2-intro.mp4`,
+  3: `${SUPABASE_STORAGE_BASE}/dia-3-intro.mp4`,
+  4: `${SUPABASE_STORAGE_BASE}/dia-4-intro.mp4`,
+  5: `${SUPABASE_STORAGE_BASE}/dia-5-intro.mp4`,
+  6: `${SUPABASE_STORAGE_BASE}/dia-6-intro.mp4`,
+  7: `${SUPABASE_STORAGE_BASE}/dia-7-intro.mp4`,
 };
 
 export function getDayIntroVideo(day: number): string | undefined {
