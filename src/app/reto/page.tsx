@@ -18,14 +18,34 @@ const BENEFITS = [
   "100% gratis",
 ];
 
+function Checkpoints({ className }: { className?: string }) {
+  return (
+    <ul
+      className={`mx-auto max-w-lg grid-cols-3 gap-2 ${className ?? ""}`}
+    >
+      {BENEFITS.map((benefit) => (
+        <li
+          key={benefit}
+          className="relative flex flex-col items-center gap-2 text-center text-xs font-semibold leading-snug text-purple-950/80 after:absolute after:left-1/2 after:top-3.5 after:h-0.5 after:w-full after:bg-emerald-300 last:after:hidden sm:text-sm"
+        >
+          <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white ring-4 ring-white">
+            ✓
+          </span>
+          <span className="px-1">{benefit}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function RetoPage() {
   return (
     <>
       <CountdownBanner />
-      <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-8 text-purple-950 sm:py-12">
-        <div className="mx-auto grid max-w-6xl items-center gap-x-12 gap-y-8 lg:grid-cols-2 lg:gap-x-16">
+      <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-12">
+        <div className="mx-auto grid max-w-6xl items-center gap-x-12 gap-y-4 lg:gap-y-8 lg:grid-cols-2 lg:gap-x-16">
           <section className="text-center lg:text-left">
-            <div className="mb-5 flex items-center justify-center gap-2 lg:justify-start">
+            <div className="mb-3 flex items-center justify-center gap-2 lg:justify-start">
               <Image
                 src="/mascota-skooly.png"
                 alt="Skooly"
@@ -41,31 +61,19 @@ export default function RetoPage() {
               Reto gratuito · 7 días
             </span>
 
-            <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-purple-950 sm:text-5xl">
+            <h1 className="mt-4 text-3xl font-extrabold leading-[1.08] tracking-tight text-purple-950 sm:text-5xl">
               Crea tu Skool en <span className="text-purple-700">7 días</span>{" "}
               con nuestra nueva App:{" "}
               <span className="text-fuchsia-600">Skooly</span>
             </h1>
 
-            <p className="mt-4 text-lg text-purple-950/70">
+            <p className="mt-4 hidden text-lg text-purple-950/70 lg:block">
               Reserva tu lugar y recibe acceso gratis a la app con misiones
               diarias que te lleva de la mano, paso a paso, hasta tener tu
               comunidad lista para lanzar.
             </p>
 
-            <ul className="mx-auto mt-6 grid max-w-lg grid-cols-3 gap-2 lg:mx-0">
-              {BENEFITS.map((benefit) => (
-                <li
-                  key={benefit}
-                  className="relative flex flex-col items-center gap-2 text-center text-xs font-semibold leading-snug text-purple-950/80 after:absolute after:left-1/2 after:top-3.5 after:h-0.5 after:w-full after:bg-emerald-300 last:after:hidden sm:text-sm"
-                >
-                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white ring-4 ring-white">
-                    ✓
-                  </span>
-                  <span className="px-1">{benefit}</span>
-                </li>
-              ))}
-            </ul>
+            <Checkpoints className="mt-6 hidden lg:grid lg:mx-0" />
           </section>
 
           <div>
@@ -75,7 +83,7 @@ export default function RetoPage() {
               width={1672}
               height={941}
               sizes="320px"
-              className="relative z-10 mx-auto -mb-14 h-auto w-full max-w-[17rem] drop-shadow-[0_10px_20px_rgba(59,7,100,0.25)] sm:max-w-xs"
+              className="relative z-10 mx-auto -mb-14 h-auto w-full max-w-[14rem] drop-shadow-[0_10px_20px_rgba(59,7,100,0.25)] sm:max-w-xs"
               priority
             />
 
@@ -96,7 +104,8 @@ export default function RetoPage() {
                   Paso 1 de 2 · Sin contraseñas ni formularios largos
                 </p>
               </div>
-              <p className="mt-4 text-center text-sm text-purple-950/60">
+              <Checkpoints className="mt-6 grid lg:hidden" />
+              <p className="mt-5 text-center text-sm text-purple-950/60">
                 ¿Ya tienes cuenta?{" "}
                 <Link
                   href="/login"
