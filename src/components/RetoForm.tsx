@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { registrarContacto } from "@/app/reto/actions";
 
 const INPUT =
-  "w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-200";
+  "w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-300/40";
 
 export default function RetoForm() {
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function RetoForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-3" noValidate>
       <div>
-        <label htmlFor="reto-name" className="mb-1 block text-sm font-semibold text-gray-700">
+        <label htmlFor="reto-name" className="mb-1 block text-sm font-semibold text-white/90">
           Tu nombre
         </label>
         <input
@@ -47,7 +47,7 @@ export default function RetoForm() {
         />
       </div>
       <div>
-        <label htmlFor="reto-email" className="mb-1 block text-sm font-semibold text-gray-700">
+        <label htmlFor="reto-email" className="mb-1 block text-sm font-semibold text-white/90">
           Tu correo (mejor si es Gmail)
         </label>
         <input
@@ -64,7 +64,7 @@ export default function RetoForm() {
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">
+        <p role="alert" className="rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-100">
           {error}
         </p>
       )}

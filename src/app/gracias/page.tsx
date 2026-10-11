@@ -37,7 +37,7 @@ const STEPS = [
 
 export default function GraciasPage() {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-10 text-white sm:py-16">
+    <main className="min-h-screen bg-white px-4 py-10 text-purple-950 sm:py-16">
       <div className="mx-auto max-w-3xl text-center">
         <Image
           src="/celebracion-dia.png"
@@ -51,7 +51,7 @@ export default function GraciasPage() {
         <h1 className="mt-2 text-3xl font-extrabold leading-tight sm:text-5xl">
           ¡Listo! Tu acceso a la app va en camino a tu correo ✉️
         </h1>
-        <p className="mt-4 text-lg text-white/70">
+        <p className="mt-4 text-lg text-purple-950/70">
           Tu lugar en el Reto está reservado. Solo faltan 2 pasos rápidos:
         </p>
 
@@ -59,22 +59,22 @@ export default function GraciasPage() {
           {STEPS.map((step) => (
             <li
               key={step.title}
-              className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              className="flex items-start gap-3 rounded-2xl border border-purple-200 bg-purple-50 px-4 py-3"
             >
               <span className="text-2xl leading-none">{step.icon}</span>
               <span>
-                <span className="block font-bold text-white">{step.title}</span>
-                <span className="block text-sm text-white/70">{step.text}</span>
+                <span className="block font-bold text-purple-950">{step.title}</span>
+                <span className="block text-sm text-purple-950/70">{step.text}</span>
               </span>
             </li>
           ))}
         </ol>
 
-        <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-amber-300/40 bg-amber-300/10 px-5 py-4">
-          <p className="text-base font-bold text-amber-300 sm:text-lg">
+        <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4">
+          <p className="text-base font-bold text-amber-700 sm:text-lg">
             ⏳ Tu acceso queda reservado por 24 horas
           </p>
-          <p className="mt-1 text-sm text-white/70">
+          <p className="mt-1 text-sm text-purple-950/70">
             Abre el correo hoy para no perder tu lugar.
           </p>
         </div>
@@ -83,14 +83,14 @@ export default function GraciasPage() {
           <h2 className="text-2xl font-extrabold sm:text-3xl">
             ¿Quieres seguir aprendiendo de Skool?
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-white/70">
+          <p className="mx-auto mt-2 max-w-xl text-purple-950/70">
             Únete a mi boletín de WhatsApp{" "}
-            <strong className="text-white">Universo Skool</strong>, donde comparto noticias y
+            <strong className="text-purple-900">Universo Skool</strong>, donde comparto noticias y
             recursos semanales sobre Skool.
           </p>
 
           {GRACIAS_VIDEO_URL && (
-            <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl shadow-fuchsia-900/40">
+            <div className="mt-6 overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30">
               <GraciasVideo src={GRACIAS_VIDEO_URL} />
             </div>
           )}
