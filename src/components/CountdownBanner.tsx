@@ -52,10 +52,7 @@ export default function CountdownBanner() {
   const s = seconds % 60;
 
   return (
-    <a
-      href="#reserva"
-      className="block bg-amber-400 px-4 py-3 text-black transition hover:bg-amber-300"
-    >
+    <div className="bg-amber-400 px-4 py-3 text-black">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-2 text-center sm:flex-row sm:gap-5">
         <p className="text-sm font-extrabold leading-snug sm:text-base">
           🔥 Regístrate totalmente gratis a nuestra app por tiempo limitado
@@ -72,6 +69,6 @@ export default function CountdownBanner() {
           <Unit value={pad(s)} label="seg" />
         </div>
       </div>
-    </a>
+    </div>
   );
 }
