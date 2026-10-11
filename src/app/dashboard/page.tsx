@@ -51,7 +51,7 @@ export default async function DashboardPage() {
 
       <main className="flex-1 px-4 py-10 md:py-5">
         <div className="mx-auto max-w-2xl md:max-w-7xl">
-          <div className="mb-8 text-center md:mb-4">
+          <div className="mb-8 text-center md:mb-9">
             <div className="mb-3 flex justify-center md:mb-2">
               <Avatar avatarUrl={avatarUrl} nombre={nombre} size={64} editable />
             </div>

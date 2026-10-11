@@ -20,14 +20,14 @@ export default function ChallengePathHorizontal({
   )?.day;
 
   return (
-    <div className="mx-auto mb-5 hidden md:block">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-5 pt-7 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-5 lg:pt-7">
+    <div className="mx-auto mb-5 hidden md:block lg:mb-8">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-5 pt-7 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-9 lg:pt-10">
         <h2 className="mb-0 text-center text-lg lg:text-xl">
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
-        <div className="flex items-center gap-6 overflow-x-auto pt-5">
+        <div className="flex items-center gap-6 overflow-x-auto pt-5 lg:pt-8">
           <MascotCashButton className="hidden h-32 w-32 lg:block lg:h-28 lg:w-28" />
 
           <div className="flex items-start">

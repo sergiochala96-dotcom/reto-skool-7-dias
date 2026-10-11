@@ -9,7 +9,7 @@ export default function Episode2Card({
   admin: boolean;
 }) {
   return (
-    <div className="relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-5 lg:pt-7">
+    <div className="relative mx-auto mt-5 overflow-hidden lg:mt-8 rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-9 lg:pt-10">
       {admin && <EpisodeLockToggle locked={locked} />}
 
       <h2 className="mb-0 text-center text-base sm:text-lg lg:text-xl">
@@ -18,7 +18,7 @@ export default function Episode2Card({
       </h2>
 
       <div
-        className={`mt-7 lg:mt-5 flex flex-wrap items-start justify-center gap-x-5 gap-y-6 sm:gap-x-8 ${
+        className={`mt-7 lg:mt-8 flex flex-wrap items-start justify-center gap-x-5 gap-y-6 sm:gap-x-8 ${
           locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""
         }`}
       >
