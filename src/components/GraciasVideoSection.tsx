@@ -5,8 +5,10 @@ import GraciasPopup from "@/components/GraciasPopup";
 
 // Caja vertical (9:16) para el video. Mientras el popup está abierto (o no hay
 // video aún) se muestra un espacio reservado; al cerrar el popup arranca el video.
+// El iframe es más alto que la caja y se recorta arriba y abajo: así quedan fuera
+// (en las franjas negras) el título/canal y la barra "Shorts" que pone YouTube.
 const BOX =
-  "relative mx-auto aspect-[9/16] w-full max-w-[17rem] overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30 sm:max-w-[21rem]";
+  "relative mx-auto aspect-[9/16] w-full max-w-[17rem] overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30 sm:max-w-[21rem] lg:max-w-[23rem]";
 
 function VideoPlaceholder({ label }: { label: string }) {
   return (
@@ -26,14 +28,14 @@ function VideoPlayer({ src, playing }: { src: string; playing: boolean }) {
 
   if (src.includes("youtube.com/embed")) {
     const sep = src.includes("?") ? "&" : "?";
-    const url = `${src}${sep}autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`;
+    const url = `${src}${sep}autoplay=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0`;
     return (
       <iframe
         src={url}
         title="Mensaje de bienvenida"
         allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
-        className="absolute inset-0 h-full w-full"
+        className="absolute -top-[22%] left-0 h-[144%] w-full"
       />
     );
   }

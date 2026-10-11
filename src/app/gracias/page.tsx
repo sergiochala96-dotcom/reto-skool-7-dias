@@ -16,7 +16,7 @@ const LINE = "h-1 w-10 rounded-full bg-purple-200 sm:w-16";
 
 function Checkpoints() {
   return (
-    <div className="flex items-center justify-center" aria-hidden="true">
+    <div className="flex items-center justify-center lg:justify-start" aria-hidden="true">
       <span
         className={`${CIRCLE} bg-emerald-500 text-3xl font-bold text-white shadow-lg shadow-emerald-500/30`}
       >
@@ -53,16 +53,17 @@ export default function GraciasPage() {
   return (
     <>
       <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-10 text-purple-950 sm:py-14">
-        <div className="mx-auto max-w-3xl text-center">
-          <Checkpoints />
+        <div className="mx-auto grid max-w-5xl items-center gap-x-12 gap-y-6 text-center lg:grid-cols-2 lg:gap-x-16 lg:text-left">
+          <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
+            <Checkpoints />
 
-          <h1 className="mt-8 text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl">
-            ¡Listo! Tu acceso a <span className="text-fuchsia-600">Skooly</span> va en camino a tu
-            correo
-          </h1>
-          <p className="mt-3 text-lg text-purple-950/70">Solo te hacen falta dos pasos rápidos.</p>
+            <h1 className="mt-8 text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl">
+              Tu acceso a <span className="text-fuchsia-600">Skooly</span> va en camino a tu correo.{" "}
+              <span className="text-purple-700">Pero te hace falta un paso.</span>
+            </h1>
+          </div>
 
-          <div className="mt-6 sm:mt-8">
+          <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
             <GraciasVideoSection src={GRACIAS_VIDEO_URL} />
           </div>
 
@@ -70,7 +71,7 @@ export default function GraciasPage() {
             href={WHATSAPP_COMMUNITY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex w-full max-w-md animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-5 sm:text-xl"
+            className="mx-auto inline-flex w-full max-w-md animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-5 sm:text-xl lg:col-start-1 lg:row-start-2 lg:mx-0 lg:self-start"
           >
             <svg viewBox="0 0 32 32" fill="currentColor" className="h-6 w-6 shrink-0 sm:h-7 sm:w-7">
               <path d={WHATSAPP_PATH} />
