@@ -13,7 +13,7 @@ export const SYSTEME_OPTIN = {
 // Comunidad/boletín de WhatsApp "Universo Skool".
 export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/CmjqJnIevwW6V7wv03p3FQ";
 
-// Video de la página de gracias. Mientras sea null, la página no muestra el
-// bloque de video (y el botón de WhatsApp queda solo). Acepta un .mp4 directo
-// o un enlace de YouTube con formato https://www.youtube.com/embed/ID
+// Video de la página de gracias. Mientras sea null, la página muestra un espacio
+// reservado para el video. Acepta un .mp4 directo o un enlace de YouTube con
+// formato https://www.youtube.com/embed/ID
 export const GRACIAS_VIDEO_URL: string | null = null;
