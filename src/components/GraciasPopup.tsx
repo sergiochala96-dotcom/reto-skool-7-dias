@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import confetti from "canvas-confetti";
+import GraciasCheckpoints from "@/components/GraciasCheckpoints";
 
 // Ventana emergente de bienvenida que se abre apenas se entra a /gracias,
 // acompañada de confeti. El botón "Continuar" la cierra.
@@ -44,12 +45,13 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-purple-950/70 p-4 backdrop-blur-sm"
     >
       <div className="w-full max-w-md animate-[popIn_0.35s_ease-out] rounded-3xl bg-white p-6 text-center shadow-2xl shadow-purple-950/40 sm:p-8">
+        <GraciasCheckpoints size="sm" labels />
         <Image
           src="/celebracion-dia.png"
           alt="Sergio y Skooly saltando de alegría"
           width={1254}
           height={1254}
-          className="mx-auto h-48 w-48 object-contain sm:h-56 sm:w-56"
+          className="mx-auto mt-3 h-40 w-40 object-contain sm:h-52 sm:w-52"
           priority
         />
         <h2
