@@ -9,7 +9,7 @@ export default function Episode2Card({
   admin: boolean;
 }) {
   return (
-    <div className="relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-10 lg:pt-12">
+    <div className="relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-5 lg:pt-7">
       {admin && <EpisodeLockToggle locked={locked} />}
 
       <h2 className="mb-0 text-center text-base sm:text-lg lg:text-xl">
@@ -18,7 +18,7 @@ export default function Episode2Card({
       </h2>
 
       <div
-        className={`mt-7 flex flex-wrap items-start justify-center gap-x-5 gap-y-6 sm:gap-x-8 ${
+        className={`mt-7 lg:mt-5 flex flex-wrap items-start justify-center gap-x-5 gap-y-6 sm:gap-x-8 ${
           locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""
         }`}
       >
@@ -27,7 +27,7 @@ export default function Episode2Card({
           return (
             <div key={cp.id} className="flex w-20 flex-col items-center sm:w-24">
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-full border-4 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl ${
+                className={`flex h-14 w-14 items-center justify-center rounded-full border-4 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl lg:h-14 lg:w-14 ${
                   itemUnlocked
                     ? "border-white/30 bg-white/10"
                     : "border-white/10 bg-white/5 grayscale"

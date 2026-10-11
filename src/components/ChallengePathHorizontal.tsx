@@ -21,14 +21,14 @@ export default function ChallengePathHorizontal({
 
   return (
     <div className="mx-auto mb-5 hidden md:block">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-6 pt-10 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-8 lg:pt-12">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-5 pt-7 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-5 lg:pt-7">
         <h2 className="mb-0 text-center text-lg lg:text-xl">
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
-        <div className="flex items-center gap-6 overflow-x-auto pt-8">
-          <MascotCashButton className="hidden h-32 w-32 lg:block lg:h-40 lg:w-40" />
+        <div className="flex items-center gap-6 overflow-x-auto pt-5">
+          <MascotCashButton className="hidden h-32 w-32 lg:block lg:h-28 lg:w-28" />
 
           <div className="flex items-start">
             {MISSIONS.map((mission, i) => {
@@ -38,7 +38,7 @@ export default function ChallengePathHorizontal({
 
               const node = (
                 <div
-                  className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-4 text-xl shadow-lg transition lg:h-16 lg:w-16 lg:text-2xl ${
+                  className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-4 text-xl shadow-lg transition lg:h-14 lg:w-14 lg:text-2xl ${
                     isDone
                       ? "border-amber-300 bg-gradient-to-br from-fuchsia-500 to-amber-400"
                       : isCurrent
@@ -79,7 +79,7 @@ export default function ChallengePathHorizontal({
                     {label}
                   </div>
                   <div
-                    className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:mt-8 lg:w-10 ${
+                    className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:w-10 ${
                       isDone
                         ? "bg-gradient-to-r from-fuchsia-500 to-amber-400"
                         : "bg-white/10"
@@ -90,7 +90,7 @@ export default function ChallengePathHorizontal({
             })}
 
             <div
-              className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:mt-8 lg:w-10 ${
+              className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:w-10 ${
                 allDone ? "bg-gradient-to-r from-amber-400 to-yellow-300" : "bg-white/10"
               }`}
             />
@@ -99,12 +99,12 @@ export default function ChallengePathHorizontal({
               {allDone ? (
                 <Link
                   href="/cofre"
-                  className="flex h-16 w-16 flex-shrink-0 animate-bounce items-center justify-center drop-shadow-[0_0_18px_rgba(245,158,11,0.6)] lg:h-20 lg:w-20"
+                  className="flex h-16 w-16 flex-shrink-0 animate-bounce items-center justify-center drop-shadow-[0_0_18px_rgba(245,158,11,0.6)] lg:h-16 lg:w-16"
                 >
                   <TreasureChestIcon locked={false} className="h-full w-full" />
                 </Link>
               ) : (
-                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center opacity-70 lg:h-20 lg:w-20">
+                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center opacity-70 lg:h-16 lg:w-16">
                   <TreasureChestIcon locked className="h-full w-full" />
                 </div>
               )}

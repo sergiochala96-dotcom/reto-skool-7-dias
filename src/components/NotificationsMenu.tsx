@@ -107,11 +107,11 @@ export default function NotificationsMenu({
         }}
         title={collapsed ? "Notificaciones" : undefined}
         aria-label={`Notificaciones${unread.length ? `, ${unread.length} sin leer` : ""}`}
-        className={`flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-left text-sm transition hover:bg-white/5 ${
+        className={`flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-left text-sm transition hover:bg-white/5 md:text-base ${
           open ? "bg-white/5 text-white" : "text-white/70 hover:text-white"
         }`}
       >
-        <span className="relative text-lg leading-none">
+        <span className="relative text-lg leading-none md:text-2xl">
           🔔
           {unread.length > 0 && (
             <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-[#150826]">

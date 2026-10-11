@@ -180,20 +180,20 @@ export default function Sidebar({
           <Link
             href="/dashboard"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-semibold transition ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-semibold transition md:text-base ${
               pathname === "/dashboard"
                 ? "bg-fuchsia-500/20 text-white"
                 : "text-white/70 hover:bg-white/5 hover:text-white"
             }`}
           >
-            <span className="text-lg">🏠</span>
+            <span className="text-lg md:text-xl">🏠</span>
             {!effectiveCollapsed && <span>Inicio</span>}
           </Link>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3">
           {!effectiveCollapsed && (
-            <p className="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wide text-white/30">
+            <p className="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wide text-white/30 md:text-[13px]">
               Reto de 7 días
             </p>
           )}
@@ -207,7 +207,7 @@ export default function Sidebar({
               const content = (
                 <div
                   title={effectiveCollapsed ? `Día ${mission.day}: ${mission.title}` : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition ${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition md:text-base ${
                     active
                       ? "bg-fuchsia-500/20 text-white"
                       : unlocked
@@ -215,11 +215,11 @@ export default function Sidebar({
                       : "text-white/30"
                   }`}
                 >
-                  <span className="text-lg">{mission.emoji}</span>
+                  <span className="text-lg md:text-xl">{mission.emoji}</span>
                   {!effectiveCollapsed && (
                     <>
                       <span className="flex min-w-0 flex-1 items-center gap-2">
-                        <span className="flex-shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/60">
+                        <span className="flex-shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/60 md:text-[11px]">
                           Día {mission.day}
                         </span>
                         <span className="truncate">{mission.title}</span>
@@ -253,21 +253,21 @@ export default function Sidebar({
                   href="/cofre"
                   onClick={() => setMobileOpen(false)}
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition ${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition md:text-base ${
                     pathname === "/cofre"
                       ? "bg-amber-400/20 text-amber-200"
                       : "text-amber-300/80 hover:bg-amber-400/10"
                   }`}
                 >
-                  <span className="text-lg">🗝️</span>
+                  <span className="text-lg md:text-xl">🗝️</span>
                   {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
                 </Link>
               ) : (
                 <div
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-1.5 text-sm text-white/20"
+                  className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-1.5 text-sm text-white/20 md:text-base"
                 >
-                  <span className="text-lg">🔒</span>
+                  <span className="text-lg md:text-xl">🔒</span>
                   {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
                 </div>
               )}
@@ -295,10 +295,10 @@ export default function Sidebar({
             {!effectiveCollapsed && (
               <>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-white">
+                  <span className="block truncate text-sm font-medium text-white md:text-base">
                     {nombre}
                   </span>
-                  <span className="block truncate text-xs text-white/40">
+                  <span className="block truncate text-xs text-white/40 md:text-sm">
                     {email}
                   </span>
                 </span>

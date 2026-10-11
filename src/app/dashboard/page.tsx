@@ -49,21 +49,21 @@ export default async function DashboardPage() {
         notifications={notifications}
       />
 
-      <main className="flex-1 px-4 py-10">
+      <main className="flex-1 px-4 py-10 md:py-5">
         <div className="mx-auto max-w-2xl md:max-w-7xl">
-          <div className="mb-8 text-center md:mb-10">
-            <div className="mb-3 flex justify-center">
-              <Avatar avatarUrl={avatarUrl} nombre={nombre} size={72} editable />
+          <div className="mb-8 text-center md:mb-4">
+            <div className="mb-3 flex justify-center md:mb-2">
+              <Avatar avatarUrl={avatarUrl} nombre={nombre} size={64} editable />
             </div>
-            <p className="text-sm text-white/50 md:text-xl">Hola, {nombre} 👋</p>
-            <h1 className="text-2xl font-bold text-white md:mt-1 md:text-5xl md:font-extrabold">
+            <p className="text-sm text-white/50 md:text-lg">Hola, {nombre} 👋</p>
+            <h1 className="text-2xl font-bold text-white md:mt-0.5 md:text-4xl md:font-extrabold">
               Tu progreso en <SkoolyLogo />
             </h1>
-            <p className="mt-1 text-sm text-white/60 md:mt-3 md:text-xl">
+            <p className="mt-1 text-sm text-white/60 md:mt-1.5 md:text-lg">
               {completedCount}/{TOTAL_DAYS} días completados
             </p>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-6">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-3">
               <p className="text-sm text-white/60 md:text-base">
                 Si aún no has creado tu Skool, hazlo con este botón:
               </p>
