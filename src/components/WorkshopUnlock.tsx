@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { WORKSHOP_START, WORKSHOP_URL } from "@/lib/captacion";
+import { WORKSHOP_SOLD_PERCENT, WORKSHOP_START, WORKSHOP_URL } from "@/lib/captacion";
 
 const WORKSHOP_IMAGE = "/mascota-workshop-envivo.png";
 
@@ -136,10 +136,11 @@ export default function WorkshopUnlock() {
                 id="workshop-title"
                 className="mt-4 text-2xl font-extrabold leading-tight text-purple-950"
               >
-                Únete al workshop en vivo para crear y lanzar tu Skool
+                Únete al workshop EN VIVO🔴 para crear y lanzar tu Skool
               </h2>
               <p className="mt-3 text-base leading-relaxed text-gray-700">
-                Segunda edición del reto de Skool del 21 al 22 de octubre. 30 cupos disponibles.
+                Segunda edición del reto de Skool del{" "}
+                <strong className="font-bold text-gray-900">21 al 22 de octubre</strong>. 30 cupos disponibles.
               </p>
               <a
                 href={WORKSHOP_URL}
@@ -149,13 +150,24 @@ export default function WorkshopUnlock() {
               >
                 Quiero unirme al workshop en vivo
               </a>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="mt-3 text-sm font-medium text-gray-500 hover:text-gray-700"
-              >
-                Cerrar
-              </button>
+              <div className="mt-5">
+                <p className="mb-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-500">
+                  Cupos vendidos
+                </p>
+                <div
+                  role="progressbar"
+                  aria-label="Cupos vendidos"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={WORKSHOP_SOLD_PERCENT}
+                  className="h-3 w-full overflow-hidden rounded-full bg-gray-200"
+                >
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-purple-700"
+                    style={{ width: `${WORKSHOP_SOLD_PERCENT}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>,
           document.body
