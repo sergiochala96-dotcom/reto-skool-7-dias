@@ -18,7 +18,7 @@ const BENEFITS = [
 
 export default function RetoPage() {
   return (
-    <main className="min-h-screen bg-white px-4 py-8 text-purple-950 sm:py-12">
+    <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-8 text-purple-950 sm:py-12">
       <div className="mx-auto grid max-w-6xl items-center gap-x-12 gap-y-8 lg:grid-cols-2 lg:gap-x-16">
         <section className="text-center lg:text-left">
           <div className="mb-5 flex items-center justify-center gap-2 lg:justify-start">
@@ -37,7 +37,7 @@ export default function RetoPage() {
             Reto gratuito · 7 días
           </span>
 
-          <h1 className="mt-4 text-4xl font-extrabold leading-tight text-purple-950 sm:text-5xl">
+          <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-purple-950 sm:text-5xl">
             Crea tu Skool en <span className="text-purple-700">7 días</span> con
             nuestra App: <span className="text-fuchsia-600">Skooly</span>
           </h1>
@@ -66,13 +66,13 @@ export default function RetoPage() {
             alt="Skooly te muestra la app con tu progreso en el Reto"
             width={1672}
             height={941}
-            sizes="(min-width: 1024px) 560px, 100vw"
-            className="mx-auto h-auto w-full max-w-md lg:max-w-lg"
+            sizes="320px"
+            className="relative z-10 mx-auto -mb-14 h-auto w-full max-w-[17rem] drop-shadow-[0_10px_20px_rgba(59,7,100,0.25)] sm:max-w-xs"
             priority
           />
 
           <section className="mx-auto mt-2 w-full max-w-md">
-            <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 text-white shadow-2xl shadow-purple-900/30 sm:p-7">
+            <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 pt-20 text-white shadow-2xl shadow-purple-900/30 sm:p-7 sm:pt-20">
               <h2 className="text-center text-2xl font-extrabold">
                 Reserva tu lugar en el Reto
               </h2>

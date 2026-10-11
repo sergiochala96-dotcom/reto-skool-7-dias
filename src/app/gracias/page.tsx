@@ -37,7 +37,7 @@ const STEPS = [
 
 export default function GraciasPage() {
   return (
-    <main className="min-h-screen bg-white px-4 py-10 text-purple-950 sm:py-16">
+    <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-10 text-purple-950 sm:py-16">
       <div className="mx-auto max-w-3xl text-center">
         <Image
           src="/celebracion-dia.png"
