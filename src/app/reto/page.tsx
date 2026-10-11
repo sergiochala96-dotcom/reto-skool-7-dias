@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import SkoolyLogo from "@/components/SkoolyLogo";
-import SystemeForm from "@/components/SystemeForm";
-import { SYSTEME_FORM } from "@/lib/captacion";
+import RetoForm from "@/components/RetoForm";
 
 export const metadata: Metadata = {
   title: "Reto de Skool en 7 Días | Accede gratis a Skooly",
@@ -71,10 +70,10 @@ export default function RetoPage() {
           />
           <div className="rounded-3xl bg-white p-6 pt-12 text-gray-900 shadow-2xl shadow-fuchsia-900/50 sm:p-8 sm:pt-14">
             <h2 className="text-center text-2xl font-extrabold">Recibe tu acceso gratis</h2>
-            <p className="mb-4 mt-1 text-center text-sm text-gray-500">
+            <p className="mb-5 mt-1 text-center text-sm text-gray-500">
               Déjanos tu nombre y correo y te enviamos el acceso a la app.
             </p>
-            <SystemeForm scriptId={SYSTEME_FORM.scriptId} src={SYSTEME_FORM.src} />
+            <RetoForm />
             <p className="mt-4 text-center text-xs text-gray-400">
               🔒 Tus datos están seguros. Sin spam.
             </p>
