@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import GraciasPopup from "@/components/GraciasPopup";
+import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
+import { WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 
 // Caja vertical (9:16) para el video.
 // - Computadora: el video se carga detrás del popup y arranca con sonido desde el
@@ -56,6 +58,32 @@ function PlayOverlay({ onPlay }: { onPlay: () => void }) {
   );
 }
 
+// Capa de fin de video (solo celular): volver a ver o unirse a WhatsApp.
+function EndOverlay({ onReplay }: { onReplay: () => void }) {
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/70 px-5">
+      <button
+        type="button"
+        onClick={onReplay}
+        className="w-full whitespace-nowrap rounded-xl bg-amber-400 px-3 py-3.5 text-sm font-extrabold text-black shadow-lg transition hover:bg-amber-300 active:scale-[0.99]"
+      >
+        ↺ Volver a ver
+      </button>
+      <a
+        href={WHATSAPP_COMMUNITY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#25D366] px-3 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+      >
+        <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0" aria-hidden="true">
+          <path d={WHATSAPP_PATH} />
+        </svg>
+        Unirme a WhatsApp
+      </a>
+    </div>
+  );
+}
+
 function SoundButton({ onClick }: { onClick: () => void }) {
   return (
     <button
@@ -78,6 +106,8 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
   const closedRef = useRef(false);
   const playingRef = useRef(false);
   const mutedRef = useRef(true);
+  const watchingRef = useRef(false); // celular: ya tocó "Reproducir" (se espera el final)
+  const [ended, setEnded] = useState(false);
   const [ready, setReady] = useState<{ origin: string; desktop: boolean } | null>(null);
   const [started, setStarted] = useState(false);
   const [needsSound, setNeedsSound] = useState(false);
@@ -110,7 +140,11 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
       try {
         const data = JSON.parse(e.data);
         const state = data.event === "onStateChange" ? data.info : data.info?.playerState;
-        if (state === 1) playingRef.current = true;
+        if (state === 1) {
+          playingRef.current = true;
+          setEnded(false);
+        }
+        if (state === 0 && watchingRef.current) setEnded(true);
         if (typeof data.info?.muted === "boolean") mutedRef.current = data.info.muted;
       } catch {
         // mensaje que no es JSON: se ignora
@@ -160,6 +194,7 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
   // Celular: clic en "Reproducir" → desde el inicio y con sonido.
   function handlePlayMobile() {
     setStarted(true);
+    watchingRef.current = true;
     post("setLoop", [false]);
     post("unMute");
     post("setVolume", [100]);
@@ -168,6 +203,14 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
     window.setTimeout(() => {
       if (mutedRef.current) setNeedsSound(true);
     }, 1200);
+  }
+
+  // Celular: "Volver a ver" reinicia el video (ya con sonido).
+  function handleReplay() {
+    setEnded(false);
+    post("unMute");
+    post("seekTo", [0, true]);
+    post("playVideo");
   }
 
   function enableSound() {
@@ -200,6 +243,7 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
       />
       {!ready.desktop && !started && <PlayOverlay onPlay={handlePlayMobile} />}
       {needsSound && <SoundButton onClick={enableSound} />}
+      {ended && <EndOverlay onReplay={handleReplay} />}
     </>
   );
 }
@@ -208,6 +252,7 @@ function FileVideo({ src, startRef }: { src: string; startRef: StartRef }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [desktop, setDesktop] = useState<boolean | null>(null);
   const [started, setStarted] = useState(false);
+  const [ended, setEnded] = useState(false);
 
   useEffect(() => setDesktop(window.matchMedia(DESKTOP_QUERY).matches), []);
 
@@ -240,12 +285,21 @@ function FileVideo({ src, startRef }: { src: string; startRef: StartRef }) {
         loop={desktop === false}
         playsInline
         preload="auto"
+        onEnded={() => desktop === false && started && setEnded(true)}
         className="absolute inset-0 h-full w-full bg-black object-contain"
       />
       {desktop === false && !started && (
         <PlayOverlay
           onPlay={() => {
             setStarted(true);
+            playFromStart();
+          }}
+        />
+      )}
+      {ended && (
+        <EndOverlay
+          onReplay={() => {
+            setEnded(false);
             playFromStart();
           }}
         />
