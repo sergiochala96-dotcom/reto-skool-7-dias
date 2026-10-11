@@ -14,26 +14,60 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
+    // Mientras el popup está abierto se pausan las animaciones de la página de atrás
+    // (ver globals.css) para que el confeti y el popup vayan fluidos.
+    document.body.dataset.popup = "open";
     return () => {
       document.body.style.overflow = "";
+      delete document.body.dataset.popup;
     };
   }, [open]);
 
+  // Al aparecer el popup: sonido de victoria (x2) y confeti. Si el navegador aún no
+  // permite audio sin interacción, el sonido se omite (al continuar suena igual).
   useEffect(() => {
+    playVictoryFanfare(2, true);
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const colors = ["#7e22ce", "#c026d3", "#f59e0b", "#facc15", "#10b981", "#3b82f6"];
-    const end = Date.now() + 2000;
-    let raf = 0;
+    // Confeti liviano: menos partículas y ráfagas espaciadas (no una por frame).
+    const colors = [
+      "#7e22ce",
+      "#c026d3",
+      "#f59e0b",
+      "#facc15",
+      "#10b981",
+      "#3b82f6",
+    ];
+    const end = Date.now() + 1500;
+    let timer = 0;
 
-    confetti({ particleCount: 120, spread: 100, origin: { y: 0.4 }, colors });
-    (function frame() {
-      confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors });
-      confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors });
-      if (Date.now() < end) raf = requestAnimationFrame(frame);
+    confetti({
+      particleCount: 70,
+      spread: 90,
+      origin: { y: 0.45 },
+      colors,
+      disableForReducedMotion: true,
+    });
+    (function burst() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors,
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors,
+      });
+      if (Date.now() < end) timer = window.setTimeout(burst, 90);
     })();
 
-    return () => cancelAnimationFrame(raf);
+    return () => window.clearTimeout(timer);
   }, []);
 
   if (!open) return null;
@@ -43,16 +77,16 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="gracias-popup-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-purple-950/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-purple-950/80 p-4"
     >
       <div className="w-full max-w-md animate-[popIn_0.35s_ease-out] rounded-3xl bg-white p-6 text-center shadow-2xl shadow-purple-950/40 sm:p-8">
         <GraciasCheckpoints size="sm" labels />
         <Image
-          src="/celebracion-dia.png"
-          alt="Sergio y Skooly saltando de alegría"
+          src="/mascota-whatsapp-gato.png"
+          alt="Skooly con el logo de WhatsApp"
           width={1254}
           height={1254}
-          className="mx-auto mt-3 h-40 w-40 object-contain sm:h-52 sm:w-52"
+          className="mx-auto mt-2 h-44 w-44 object-contain sm:h-56 sm:w-56"
           priority
         />
         <h2
@@ -65,7 +99,7 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
           type="button"
           autoFocus
           onClick={() => {
-            playVictoryFanfare();
+            playVictoryFanfare(2);
             setOpen(false);
             onClose?.();
           }}

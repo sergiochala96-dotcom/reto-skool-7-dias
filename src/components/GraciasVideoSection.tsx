@@ -35,7 +35,12 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
   const [origin, setOrigin] = useState<string | null>(null);
   const [needsSound, setNeedsSound] = useState(false);
 
-  useEffect(() => setOrigin(window.location.origin), []);
+  // El reproductor se monta un instante después (cuando termina la ráfaga de confeti)
+  // para que la carga de YouTube no compita con la animación del popup.
+  useEffect(() => {
+    const t = window.setTimeout(() => setOrigin(window.location.origin), 1500);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const post = useCallback((func: string, args: unknown[] = []) => {
     iframeRef.current?.contentWindow?.postMessage(

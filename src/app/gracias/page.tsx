@@ -24,7 +24,7 @@ function ArrowsDown() {
           strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="-mb-2.5 h-7 w-7 animate-[arrowFlow_1.2s_ease-in-out_infinite] text-fuchsia-600 motion-reduce:animate-none sm:h-8 sm:w-8"
+          className="page-anim -mb-2.5 h-7 w-7 animate-[arrowFlow_1.2s_ease-in-out_infinite] text-fuchsia-600 motion-reduce:animate-none sm:h-8 sm:w-8"
           style={{ animationDelay: `${i * 0.18}s` }}
         >
           <path d="m6 9 6 6 6-6" />
@@ -40,7 +40,11 @@ export default function GraciasPage() {
       <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-10">
         <div className="mx-auto grid max-w-5xl items-center gap-x-12 gap-y-4 text-center lg:grid-cols-2 lg:gap-x-16 lg:text-left">
           <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
-            <GraciasCheckpoints size="sm" className="lg:justify-start" />
+            <GraciasCheckpoints
+              size="sm"
+              pausable
+              className="lg:justify-start"
+            />
 
             <h1 className="mt-4 text-2xl font-extrabold leading-[1.12] tracking-tight sm:text-3xl lg:mt-6 lg:text-4xl">
               Tu acceso a <span className="text-fuchsia-600">Skooly</span> va en
@@ -61,7 +65,7 @@ export default function GraciasPage() {
               href={WHATSAPP_COMMUNITY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-4 sm:text-xl"
+              className="page-anim inline-flex w-full animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-4 sm:text-xl"
             >
               <svg
                 viewBox="0 0 32 32"

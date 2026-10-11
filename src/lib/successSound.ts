@@ -33,7 +33,9 @@ export function playSuccessDing() {
 
 // Fanfarria corta de "victoria" (arpegio ascendente + acorde final), para
 // cuando se completa un día entero del reto. Dura menos de 1 segundo.
-export function playVictoryFanfare() {
+// repeat: cuántas veces suena seguida. onlyIfAllowed: si el navegador bloquea el
+// audio (aún no hubo interacción), no suena en vez de quedar pendiente.
+export function playVictoryFanfare(repeat = 1, onlyIfAllowed = false) {
   if (typeof window === "undefined") return;
   const AudioCtxClass =
     window.AudioContext ||
@@ -41,9 +43,10 @@ export function playVictoryFanfare() {
   if (!AudioCtxClass) return;
 
   const ctx = new AudioCtxClass();
-  const now = ctx.currentTime;
+  const GAP = 0.85; // segundos entre repeticiones
 
   function tone(freq: number, start: number, duration: number, peakGain: number) {
+    const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "triangle";
@@ -57,11 +60,38 @@ export function playVictoryFanfare() {
     osc.stop(now + start + duration + 0.05);
   }
 
-  tone(523.25, 0, 0.16, 0.16); // Do
-  tone(659.25, 0.1, 0.16, 0.16); // Mi
-  tone(783.99, 0.2, 0.16, 0.16); // Sol
-  tone(1046.5, 0.3, 0.5, 0.2); // Do agudo
-  tone(1318.5, 0.32, 0.45, 0.12); // Mi agudo (acorde)
+  function schedule() {
+    for (let n = 0; n < repeat; n++) {
+      const t = n * GAP;
+      tone(523.25, t, 0.16, 0.16); // Do
+      tone(659.25, t + 0.1, 0.16, 0.16); // Mi
+      tone(783.99, t + 0.2, 0.16, 0.16); // Sol
+      tone(1046.5, t + 0.3, 0.5, 0.2); // Do agudo
+      tone(1318.5, t + 0.32, 0.45, 0.12); // Mi agudo (acorde)
+    }
+    setTimeout(() => ctx.close().catch(() => {}), 1000 + (repeat - 1) * GAP * 1000);
+  }
 
-  setTimeout(() => ctx.close().catch(() => {}), 1000);
+  if (!onlyIfAllowed || ctx.state === "running") {
+    schedule();
+    return;
+  }
+
+  // Contexto suspendido (el navegador aún no permite audio): se intenta reanudar
+  // y, si no se logra enseguida, se descarta sin sonar.
+  let done = false;
+  ctx
+    .resume()
+    .then(() => {
+      if (done) return;
+      done = true;
+      if (ctx.state === "running") schedule();
+      else ctx.close().catch(() => {});
+    })
+    .catch(() => {});
+  setTimeout(() => {
+    if (done) return;
+    done = true;
+    ctx.close().catch(() => {});
+  }, 400);
 }

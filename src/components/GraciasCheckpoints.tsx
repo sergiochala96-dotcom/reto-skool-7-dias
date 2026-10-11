@@ -3,7 +3,10 @@ export const WHATSAPP_PATH =
 
 type Size = "md" | "sm";
 
-const SIZES: Record<Size, { circle: string; line: string; icon: string; wa: string }> = {
+const SIZES: Record<
+  Size,
+  { circle: string; line: string; icon: string; wa: string }
+> = {
   md: {
     circle: "h-14 w-14 sm:h-16 sm:w-16",
     line: "mt-[1.625rem] w-10 sm:mt-[1.875rem] sm:w-16",
@@ -22,16 +25,19 @@ const SIZES: Record<Size, { circle: string; line: string; icon: string; wa: stri
 export default function GraciasCheckpoints({
   size = "md",
   labels = false,
+  pausable = false,
   className = "",
 }: {
   size?: Size;
   labels?: boolean;
+  pausable?: boolean; // su pulso se pausa mientras el popup está abierto
   className?: string;
 }) {
   const s = SIZES[size];
   const circle = `flex ${s.circle} items-center justify-center rounded-full`;
   const line = `h-1 ${s.line} shrink-0 rounded-full bg-purple-200`;
-  const label = "text-xs font-bold uppercase tracking-wide text-purple-950/70 sm:text-sm";
+  const label =
+    "text-xs font-bold uppercase tracking-wide text-purple-950/70 sm:text-sm";
 
   return (
     <div className={`flex items-start justify-center ${className}`}>
@@ -45,7 +51,9 @@ export default function GraciasCheckpoints({
       </div>
       <span className={line} />
       <div className="flex flex-col items-center gap-1.5">
-        <span className={`${circle} bg-purple-700 text-white shadow-lg shadow-purple-700/30`}>
+        <span
+          className={`${circle} bg-purple-700 text-white shadow-lg shadow-purple-700/30`}
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -65,9 +73,14 @@ export default function GraciasCheckpoints({
       <span className={line} />
       <div className="flex flex-col items-center gap-1.5">
         <span
-          className={`${circle} animate-[softPulse_1.8s_ease-in-out_infinite] bg-[#25D366] text-white`}
+          className={`${circle} ${pausable ? "page-anim" : ""} animate-[softPulse_1.8s_ease-in-out_infinite] bg-[#25D366] text-white`}
         >
-          <svg viewBox="0 0 32 32" fill="currentColor" className={s.wa} aria-hidden="true">
+          <svg
+            viewBox="0 0 32 32"
+            fill="currentColor"
+            className={s.wa}
+            aria-hidden="true"
+          >
             <path d={WHATSAPP_PATH} />
           </svg>
         </span>

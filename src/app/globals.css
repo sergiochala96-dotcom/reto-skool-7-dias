@@ -91,3 +91,8 @@ body {
     width: 100%;
   }
 }
+
+/* Con el popup de /gracias abierto, la página de atrás no anima (menos lag). */
+body[data-popup="open"] .page-anim {
+  animation-play-state: paused !important;
+}
