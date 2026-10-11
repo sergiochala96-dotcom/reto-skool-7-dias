@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import GraciasPopup from "@/components/GraciasPopup";
 
-// Caja vertical (9:16) para el video. El video se carga desde el principio (detrás
-// del popup) para que no haya espera, y arranca cuando se cierra el popup.
+// Caja vertical (9:16) para el video. El video arranca solo y en silencio como vista
+// previa (los navegadores sí lo permiten), con un botón flotante "Reproducir" encima.
+// Al tocarlo, el video vuelve al inicio y se reproduce con sonido.
 // El iframe es más alto que la caja y se recorta arriba y abajo: así quedan fuera
 // (en las franjas negras) el título/canal y la barra "Shorts" que pone YouTube.
 const BOX =
@@ -25,14 +26,37 @@ function VideoPlaceholder({ label }: { label: string }) {
   );
 }
 
-type StartRef = { current: (() => void) | null };
+// Capa sobre el video: etiqueta de "vista previa" y botón flotante "Reproducir".
+function PlayOverlay({ onPlay }: { onPlay: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPlay}
+      aria-label="Reproducir el video con sonido"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/25 transition hover:bg-black/15"
+    >
+      <span className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white">
+        🔇 Vista previa sin sonido
+      </span>
+      <span className="page-anim flex animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center gap-2 rounded-full bg-amber-400 px-6 py-3.5 text-lg font-extrabold text-black shadow-xl motion-reduce:animate-none sm:text-xl">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6" aria-hidden="true">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        Reproducir
+      </span>
+    </button>
+  );
+}
 
-function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
+function getYouTubeId(src: string) {
+  return src.match(/youtube\.com\/embed\/([\w-]+)/)?.[1] ?? "";
+}
+
+function YouTubeVideo({ src }: { src: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const loadedRef = useRef(false);
-  const closedRef = useRef(false);
-  const playingRef = useRef(false);
+  const mutedRef = useRef(true);
   const [origin, setOrigin] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
   const [needsSound, setNeedsSound] = useState(false);
 
   // El reproductor se monta un instante después (cuando termina la ráfaga de confeti)
@@ -49,27 +73,13 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
     );
   }, []);
 
-  // Intenta arrancar con sonido. Si el navegador (sobre todo en celular) no lo
-  // permite, arranca en silencio y se muestra un botón para activar el sonido.
-  const startPlayback = useCallback(() => {
-    post("playVideo");
-    window.setTimeout(() => {
-      if (!playingRef.current) {
-        post("mute");
-        post("playVideo");
-        setNeedsSound(true);
-      }
-    }, 1000);
-  }, [post]);
-
-  // Mensajes del reproductor: nos enteramos de si ya está reproduciendo.
+  // Mensajes del reproductor: nos enteramos de si está en silencio o no.
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       if (e.origin !== YT_ORIGIN || typeof e.data !== "string") return;
       try {
         const data = JSON.parse(e.data);
-        const state = data.event === "onStateChange" ? data.info : data.info?.playerState;
-        if (state === 1) playingRef.current = true;
+        if (typeof data.info?.muted === "boolean") mutedRef.current = data.info.muted;
       } catch {
         // mensaje que no es JSON: se ignora
       }
@@ -78,20 +88,7 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
-  // El padre llama a esto dentro del clic en "Continuar" (así el navegador deja
-  // arrancar el video con sonido). Si el reproductor aún no carga, arranca al cargar.
-  useEffect(() => {
-    startRef.current = () => {
-      closedRef.current = true;
-      if (loadedRef.current) startPlayback();
-    };
-    return () => {
-      startRef.current = null;
-    };
-  }, [startRef, startPlayback]);
-
   function handleLoad() {
-    loadedRef.current = true;
     const listen = () =>
       iframeRef.current?.contentWindow?.postMessage(
         JSON.stringify({ event: "listening", id: 1, channel: "widget" }),
@@ -99,7 +96,20 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
       );
     listen();
     window.setTimeout(listen, 500);
-    if (closedRef.current) startPlayback();
+  }
+
+  // Clic en "Reproducir": desde el inicio y con sonido.
+  function handlePlay() {
+    setStarted(true);
+    post("setLoop", [false]);
+    post("unMute");
+    post("setVolume", [100]);
+    post("seekTo", [0, true]);
+    post("playVideo");
+    // Si el navegador no dejó activar el sonido, se ofrece un botón para hacerlo.
+    window.setTimeout(() => {
+      if (mutedRef.current) setNeedsSound(true);
+    }, 1200);
   }
 
   function enableSound() {
@@ -111,8 +121,12 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
 
   if (!origin) return <VideoPlaceholder label="Cargando tu video..." />;
 
+  const id = getYouTubeId(src);
   const sep = src.includes("?") ? "&" : "?";
-  const url = `${src}${sep}enablejsapi=1&origin=${encodeURIComponent(origin)}&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0`;
+  const url =
+    `${src}${sep}enablejsapi=1&origin=${encodeURIComponent(origin)}` +
+    `&autoplay=1&mute=1&loop=1&playlist=${id}` +
+    `&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0`;
 
   return (
     <>
@@ -125,7 +139,8 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
         onLoad={handleLoad}
         className="absolute -top-[22%] left-0 h-[144%] w-full"
       />
-      {needsSound && (
+      {!started && <PlayOverlay onPlay={handlePlay} />}
+      {started && needsSound && (
         <button
           type="button"
           onClick={enableSound}
@@ -138,44 +153,49 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
   );
 }
 
-function FileVideo({ src, popupClosed }: { src: string; popupClosed: boolean }) {
+function FileVideo({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [started, setStarted] = useState(false);
 
-  useEffect(() => {
-    if (popupClosed) ref.current?.play().catch(() => {});
-  }, [popupClosed]);
-
-  return (
-    <video
-      ref={ref}
-      src={src}
-      controls
-      playsInline
-      preload="auto"
-      className="absolute inset-0 h-full w-full bg-black object-contain"
-    />
-  );
-}
-
-export default function GraciasVideoSection({ src }: { src: string | null }) {
-  const [popupClosed, setPopupClosed] = useState(false);
-  const startRef = useRef<(() => void) | null>(null);
-
-  function handlePopupClose() {
-    setPopupClosed(true);
-    startRef.current?.();
+  function handlePlay() {
+    const v = ref.current;
+    if (!v) return;
+    setStarted(true);
+    v.loop = false;
+    v.muted = false;
+    v.currentTime = 0;
+    v.play().catch(() => {});
   }
 
   return (
     <>
-      <GraciasPopup onClose={handlePopupClose} />
+      <video
+        ref={ref}
+        src={src}
+        controls={started}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="absolute inset-0 h-full w-full bg-black object-contain"
+      />
+      {!started && <PlayOverlay onPlay={handlePlay} />}
+    </>
+  );
+}
+
+export default function GraciasVideoSection({ src }: { src: string | null }) {
+  return (
+    <>
+      <GraciasPopup />
       <div className={BOX}>
         {!src ? (
           <VideoPlaceholder label="Tu video estará aquí muy pronto" />
         ) : src.includes("youtube.com/embed") ? (
-          <YouTubeVideo src={src} startRef={startRef} />
+          <YouTubeVideo src={src} />
         ) : (
-          <FileVideo src={src} popupClosed={popupClosed} />
+          <FileVideo src={src} />
         )}
       </div>
     </>
