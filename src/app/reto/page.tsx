@@ -40,9 +40,9 @@ function Checkpoints({ className }: { className?: string }) {
 
 export default function RetoPage() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <CountdownBanner />
-      <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-12">
+      <main className="flex-1 bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-5">
         <div className="mx-auto grid max-w-6xl items-center gap-x-12 gap-y-4 lg:gap-y-8 lg:grid-cols-2 lg:gap-x-16">
           <section className="text-center lg:text-left">
             <div className="mb-3 flex items-center justify-center gap-2 lg:justify-start">
@@ -91,7 +91,7 @@ export default function RetoPage() {
               id="reserva"
               className="mx-auto mt-2 w-full max-w-md scroll-mt-4"
             >
-              <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 pt-20 text-white shadow-2xl shadow-purple-900/30 sm:p-7 sm:pt-20">
+              <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 pt-[4.5rem] text-white shadow-2xl shadow-purple-900/30 sm:p-7 sm:pt-[4.5rem]">
                 <h2 className="text-center text-2xl font-extrabold">
                   Solicitar Acceso a la App + Reto de Skool
                 </h2>
@@ -118,6 +118,6 @@ export default function RetoPage() {
         </div>
       </main>
       <CaptacionFooter />
-    </>
+    </div>
   );
 }

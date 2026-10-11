@@ -36,8 +36,8 @@ function ArrowsDown() {
 
 export default function GraciasPage() {
   return (
-    <>
-      <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-10">
+    <div className="flex min-h-screen flex-col">
+      <main className="flex-1 bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-5 text-purple-950 sm:py-10">
         <div className="mx-auto grid max-w-5xl items-center gap-x-12 gap-y-4 text-center lg:grid-cols-2 lg:gap-x-16 lg:text-left">
           <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
             <GraciasCheckpoints
@@ -80,6 +80,6 @@ export default function GraciasPage() {
         </div>
       </main>
       <CaptacionFooter />
-    </>
+    </div>
   );
 }

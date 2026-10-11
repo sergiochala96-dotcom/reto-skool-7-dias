@@ -23,10 +23,10 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
     };
   }, [open]);
 
-  // Al aparecer el popup: sonido de victoria (x2) y confeti. Si el navegador aún no
+  // Al aparecer el popup: sonido de victoria y confeti. Si el navegador aún no
   // permite audio sin interacción, el sonido se omite (al continuar suena igual).
   useEffect(() => {
-    playVictoryFanfare(2, true);
+    playVictoryFanfare(1, true);
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -99,7 +99,7 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
           type="button"
           autoFocus
           onClick={() => {
-            playVictoryFanfare(2);
+            playVictoryFanfare();
             setOpen(false);
             onClose?.();
           }}
