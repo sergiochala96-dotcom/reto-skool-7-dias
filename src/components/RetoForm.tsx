@@ -48,7 +48,7 @@ export default function RetoForm() {
       </div>
       <div>
         <label htmlFor="reto-email" className="mb-1 block text-sm font-semibold text-gray-700">
-          Tu mejor correo
+          Tu correo (mejor si es Gmail)
         </label>
         <input
           id="reto-email"
@@ -56,7 +56,7 @@ export default function RetoForm() {
           type="email"
           autoComplete="email"
           inputMode="email"
-          placeholder="tucorreo@ejemplo.com"
+          placeholder="tucorreo@gmail.com"
           required
           maxLength={200}
           className={INPUT}
@@ -74,7 +74,7 @@ export default function RetoForm() {
         disabled={pending}
         className="mt-1 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {pending ? "Enviando..." : "Iniciar el Reto"}
+        {pending ? "Enviando..." : "Quiero mi acceso"}
       </button>
     </form>
   );

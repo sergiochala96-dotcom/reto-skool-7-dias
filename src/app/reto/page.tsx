@@ -43,7 +43,7 @@ export default function RetoPage() {
           </h1>
 
           <p className="mt-5 text-lg text-white/70 sm:text-xl">
-            Regístrate y recibe acceso gratis a <strong className="text-white">Skooly</strong>,
+            Reserva tu lugar y recibe acceso gratis a <strong className="text-white">Skooly</strong>,
             la app con misiones diarias que te lleva de la mano, paso a paso, hasta tener tu
             comunidad lista para lanzar.
           </p>
@@ -69,13 +69,13 @@ export default function RetoPage() {
             className="relative z-10 mx-auto -mb-10 h-36 w-36 object-contain drop-shadow-[0_0_25px_rgba(217,70,239,0.45)] sm:h-40 sm:w-40"
           />
           <div className="rounded-3xl bg-white p-6 pt-12 text-gray-900 shadow-2xl shadow-fuchsia-900/50 sm:p-8 sm:pt-14">
-            <h2 className="text-center text-2xl font-extrabold">Recibe tu acceso gratis</h2>
+            <h2 className="text-center text-2xl font-extrabold">Reserva tu lugar en el Reto</h2>
             <p className="mb-5 mt-1 text-center text-sm text-gray-500">
-              Déjanos tu nombre y correo y te enviamos el acceso a la app.
+              Te enviamos tu acceso a tu correo. Después entras con un solo clic con Google.
             </p>
             <RetoForm />
             <p className="mt-4 text-center text-xs text-gray-400">
-              🔒 Tus datos están seguros. Sin spam.
+              Paso 1 de 2 · Sin contraseñas ni formularios largos
             </p>
           </div>
           <p className="mt-6 text-center text-sm text-white/50">

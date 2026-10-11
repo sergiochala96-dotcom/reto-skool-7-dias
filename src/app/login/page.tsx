@@ -23,7 +23,7 @@ export default function LoginPage() {
               <SkoolyLogo />
             </h1>
             <p className="mt-1 text-sm text-white/60">
-              Inicia sesión para continuar tu misión
+              Entra con el mismo correo con el que reservaste tu lugar
             </p>
           </div>
 

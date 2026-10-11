@@ -22,6 +22,19 @@ function GraciasVideo({ src }: { src: string }) {
   return <video src={src} controls playsInline className="aspect-video w-full bg-black" />;
 }
 
+const STEPS = [
+  {
+    icon: "📩",
+    title: "Abre el correo que te enviamos",
+    text: "Búscalo en tu bandeja de entrada (y revisa spam o promociones).",
+  },
+  {
+    icon: "👆",
+    title: "Entra con Google en 1 clic",
+    text: "Usa el mismo correo con el que reservaste tu lugar y empieza el Día 1.",
+  },
+];
+
 export default function GraciasPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-10 text-white sm:py-16">
@@ -36,19 +49,33 @@ export default function GraciasPage() {
         />
 
         <h1 className="mt-2 text-3xl font-extrabold leading-tight sm:text-5xl">
-          ¡Listo! Tus accesos a la app están en camino a tu correo ✉️
+          ¡Listo! Tu acceso a la app va en camino a tu correo ✉️
         </h1>
         <p className="mt-4 text-lg text-white/70">
-          Revisa la bandeja de entrada del email que pusiste (y también la carpeta de spam o
-          promociones).
+          Tu lugar en el Reto está reservado. Solo faltan 2 pasos rápidos:
         </p>
+
+        <ol className="mx-auto mt-6 max-w-xl space-y-3 text-left">
+          {STEPS.map((step) => (
+            <li
+              key={step.title}
+              className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <span className="text-2xl leading-none">{step.icon}</span>
+              <span>
+                <span className="block font-bold text-white">{step.title}</span>
+                <span className="block text-sm text-white/70">{step.text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
 
         <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-amber-300/40 bg-amber-300/10 px-5 py-4">
           <p className="text-base font-bold text-amber-300 sm:text-lg">
-            ⏳ Solo tienes 24 horas para crear tu cuenta gratis en la app
+            ⏳ Tu acceso queda reservado por 24 horas
           </p>
           <p className="mt-1 text-sm text-white/70">
-            Abre el correo y crea tu cuenta hoy para no perder tu acceso.
+            Abre el correo hoy para no perder tu lugar.
           </p>
         </div>
 

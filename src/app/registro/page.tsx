@@ -19,10 +19,10 @@ export default function RegistroPage() {
             priority
           />
           <h1 className="text-2xl font-extrabold text-white">
-            Únete a <SkoolyLogo />
+            ¡Bienvenido/a a <SkoolyLogo />!
           </h1>
           <p className="mt-1 text-sm text-white/60">
-            Reto de Skool en 7 Días · 7 misiones, 1 tesoro final
+            Activa tu acceso con el correo con el que reservaste tu lugar
           </p>
         </div>
 
