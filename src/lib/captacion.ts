@@ -16,4 +16,4 @@ export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/CmjqJnIevwW6V7w
 // Video de la página de gracias. Mientras sea null, la página muestra un espacio
 // reservado para el video. Acepta un .mp4 directo o un enlace de YouTube con
 // formato https://www.youtube.com/embed/ID
-export const GRACIAS_VIDEO_URL: string | null = null;
+export const GRACIAS_VIDEO_URL: string | null = "https://www.youtube.com/embed/jxwq8aQm5pI";

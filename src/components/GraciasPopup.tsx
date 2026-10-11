@@ -6,7 +6,7 @@ import confetti from "canvas-confetti";
 
 // Ventana emergente de bienvenida que se abre apenas se entra a /gracias,
 // acompañada de confeti. El botón "Continuar" la cierra.
-export default function GraciasPopup() {
+export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -61,7 +61,10 @@ export default function GraciasPopup() {
         <button
           type="button"
           autoFocus
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setOpen(false);
+            onClose?.();
+          }}
           className="mt-6 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 active:scale-[0.99]"
         >
           Continuar

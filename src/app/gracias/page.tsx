@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CaptacionFooter from "@/components/CaptacionFooter";
-import GraciasPopup from "@/components/GraciasPopup";
+import GraciasVideoSection from "@/components/GraciasVideoSection";
 import { GRACIAS_VIDEO_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 
 export const metadata: Metadata = {
@@ -49,40 +49,10 @@ function Checkpoints() {
   );
 }
 
-function GraciasVideo({ src }: { src: string }) {
-  if (src.includes("youtube.com/embed")) {
-    return (
-      <iframe
-        src={src}
-        title="Mensaje de bienvenida"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        className="aspect-video w-full"
-      />
-    );
-  }
-  return <video src={src} controls playsInline className="aspect-video w-full bg-black" />;
-}
-
-// Mientras no haya video grabado, se muestra este espacio reservado.
-function VideoPlaceholder() {
-  return (
-    <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-[#3b0764] to-[#1e0a3c] text-white">
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-2 ring-white/30">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-7 w-7">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </span>
-      <span className="text-sm font-medium text-white/70">Tu video estará aquí muy pronto</span>
-    </div>
-  );
-}
-
 export default function GraciasPage() {
   return (
     <>
       <main className="min-h-screen bg-white bg-[radial-gradient(ellipse_at_top_right,#ede9fe_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#fae8ff_0%,transparent_50%)] px-4 py-10 text-purple-950 sm:py-14">
-        <GraciasPopup />
         <div className="mx-auto max-w-3xl text-center">
           <Checkpoints />
 
@@ -92,17 +62,17 @@ export default function GraciasPage() {
           </h1>
           <p className="mt-3 text-lg text-purple-950/70">Solo te hacen falta dos pasos rápidos.</p>
 
-          <div className="mx-auto mt-8 max-w-2xl overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30">
-            {GRACIAS_VIDEO_URL ? <GraciasVideo src={GRACIAS_VIDEO_URL} /> : <VideoPlaceholder />}
+          <div className="mt-6 sm:mt-8">
+            <GraciasVideoSection src={GRACIAS_VIDEO_URL} />
           </div>
 
           <a
             href={WHATSAPP_COMMUNITY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:brightness-105 sm:text-lg"
+            className="mt-6 inline-flex w-full max-w-md animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-5 sm:text-xl"
           >
-            <svg viewBox="0 0 32 32" fill="currentColor" className="h-6 w-6">
+            <svg viewBox="0 0 32 32" fill="currentColor" className="h-6 w-6 shrink-0 sm:h-7 sm:w-7">
               <path d={WHATSAPP_PATH} />
             </svg>
             Unirme al boletín de Skool en WhatsApp
