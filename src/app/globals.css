@@ -96,3 +96,15 @@ body {
 body[data-popup="open"] .page-anim {
   animation-play-state: paused !important;
 }
+
+@keyframes amberPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 12px rgba(251, 191, 36, 0);
+  }
+}

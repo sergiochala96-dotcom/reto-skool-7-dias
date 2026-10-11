@@ -21,3 +21,6 @@ export const GRACIAS_VIDEO_URL: string | null = "https://www.youtube.com/embed/j
 // Workshop EN VIVO (se ofrece en el Episodio 2 bloqueado del panel).
 export const WORKSHOP_URL =
   "https://www.skool.com/the-creators-community-4018/classroom/ed4870c8?md=1e0a7dd2170a4b0b883d30fa3ac44179";
+
+// Inicio del workshop: 21 de octubre de 2026, 8:00 pm (hora de Colombia, UTC-5).
+export const WORKSHOP_START = "2026-10-21T20:00:00-05:00";
