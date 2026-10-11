@@ -93,11 +93,10 @@ export default function RetoPage() {
             >
               <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 pt-20 text-white shadow-2xl shadow-purple-900/30 sm:p-7 sm:pt-20">
                 <h2 className="text-center text-2xl font-extrabold">
-                  Reserva tu lugar en el Reto
+                  Solicitar Acceso a la App + Reto de Skool
                 </h2>
                 <p className="mb-5 mt-1 text-center text-sm text-white/70">
-                  Te enviamos tu acceso a tu correo. Después entras con un solo
-                  clic con Google.
+                  Te enviamos el acceso a tu correo electrónico en menos de 3 minutos
                 </p>
                 <RetoForm />
                 <p className="mt-4 text-center text-xs text-white/50">
