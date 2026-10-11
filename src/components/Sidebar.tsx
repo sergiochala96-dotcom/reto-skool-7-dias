@@ -5,9 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
+import type { SidebarNotification } from "@/lib/sidebar-data";
 import { adminResetProgress, adminUnlockAll, signOut } from "@/app/actions";
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
+import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
 
@@ -17,12 +19,14 @@ export default function Sidebar({
   avatarUrl,
   admin,
   completedDays,
+  notifications,
 }: {
   nombre: string;
   email: string;
   avatarUrl: string | null;
   admin: boolean;
   completedDays: number[];
+  notifications: SidebarNotification[];
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -159,7 +163,7 @@ export default function Sidebar({
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-2 ${
-            effectiveCollapsed ? "justify-center px-2 pb-4 pt-12" : "px-5 py-6"
+            effectiveCollapsed ? "justify-center px-2 pb-3 pt-12" : "px-5 py-4"
           }`}
         >
           <Image
@@ -172,11 +176,11 @@ export default function Sidebar({
           {!effectiveCollapsed && <SkoolyLogo className="text-xl font-extrabold" />}
         </Link>
 
-        <div className="px-3 pb-3">
+        <div className="px-3 pb-2">
           <Link
             href="/dashboard"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-semibold transition ${
               pathname === "/dashboard"
                 ? "bg-fuchsia-500/20 text-white"
                 : "text-white/70 hover:bg-white/5 hover:text-white"
@@ -189,11 +193,11 @@ export default function Sidebar({
 
         <nav className="flex-1 overflow-y-auto px-3">
           {!effectiveCollapsed && (
-            <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-white/30">
+            <p className="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wide text-white/30">
               Reto de 7 días
             </p>
           )}
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-0.5">
             {MISSIONS.map((mission) => {
               const isDone = done.has(mission.day);
               const unlocked = mission.day === 1 || done.has(mission.day - 1);
@@ -203,7 +207,7 @@ export default function Sidebar({
               const content = (
                 <div
                   title={effectiveCollapsed ? `Día ${mission.day}: ${mission.title}` : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition ${
                     active
                       ? "bg-fuchsia-500/20 text-white"
                       : unlocked
@@ -243,13 +247,13 @@ export default function Sidebar({
               );
             })}
 
-            <li className="mt-1">
+            <li className="mt-0.5">
               {allDone ? (
                 <Link
                   href="/cofre"
                   onClick={() => setMobileOpen(false)}
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition ${
                     pathname === "/cofre"
                       ? "bg-amber-400/20 text-amber-200"
                       : "text-amber-300/80 hover:bg-amber-400/10"
@@ -261,7 +265,7 @@ export default function Sidebar({
               ) : (
                 <div
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/20"
+                  className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-1.5 text-sm text-white/20"
                 >
                   <span className="text-lg">🔒</span>
                   {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
@@ -270,51 +274,16 @@ export default function Sidebar({
             </li>
           </ul>
 
-          {admin && (
-            <>
-              {!effectiveCollapsed && (
-                <p className="mt-6 px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-white/30">
-                  Administración
-                </p>
-              )}
-              <Link
-                href="/admin"
-                onClick={() => setMobileOpen(false)}
-                title={effectiveCollapsed ? "Panel de admin" : undefined}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-                  pathname === "/admin"
-                    ? "bg-amber-400/20 text-amber-200"
-                    : "text-amber-300/80 hover:bg-amber-400/10"
-                }`}
-              >
-                <span className="text-lg">🛠️</span>
-                {!effectiveCollapsed && <span>Panel de admin</span>}
-              </Link>
-
-              <form action={adminUnlockAll}>
-                <button
-                  type="submit"
-                  title={effectiveCollapsed ? "Desbloquear todo" : undefined}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-emerald-300/80 transition hover:bg-emerald-400/10"
-                >
-                  <span className="text-lg">🔓</span>
-                  {!effectiveCollapsed && <span>Desbloquear todo</span>}
-                </button>
-              </form>
-
-              <form action={adminResetProgress}>
-                <button
-                  type="submit"
-                  title={effectiveCollapsed ? "Reiniciar mi progreso" : undefined}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-red-300/70 transition hover:bg-red-400/10"
-                >
-                  <span className="text-lg">🔄</span>
-                  {!effectiveCollapsed && <span>Reiniciar mi progreso</span>}
-                </button>
-              </form>
-            </>
-          )}
         </nav>
+
+        <div className="border-t border-white/10 pt-2">
+          <NotificationsMenu
+            notifications={notifications}
+            collapsed={effectiveCollapsed}
+            onOpenNotification={() => setMobileOpen(false)}
+            onToggle={() => setMenuOpen(false)}
+          />
+        </div>
 
         <div className="relative border-t border-white/10 p-3">
           <button
@@ -339,20 +308,61 @@ export default function Sidebar({
           </button>
 
           {menuOpen && (
-            <div className="absolute bottom-full left-3 z-10 mb-1 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#1f0f38] shadow-xl">
+            <div className="absolute bottom-full left-3 z-10 mb-1 w-60 overflow-hidden rounded-xl border border-white/10 bg-[#1f0f38] shadow-xl">
+              {admin && (
+                <>
+                  <Link
+                    href="/admin"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-amber-300/90 hover:bg-white/5"
+                  >
+                    🛠️ Panel de admin
+                  </Link>
+                  <Link
+                    href="/admin/notificaciones"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-amber-300/90 hover:bg-white/5"
+                  >
+                    ✉️ Escribir notificaciones
+                  </Link>
+                  <form action={adminUnlockAll}>
+                    <button
+                      type="submit"
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-emerald-300/90 hover:bg-white/5"
+                    >
+                      🔓 Desbloquear todo
+                    </button>
+                  </form>
+                  <form action={adminResetProgress}>
+                    <button
+                      type="submit"
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-300/80 hover:bg-white/5"
+                    >
+                      🔄 Reiniciar mi progreso
+                    </button>
+                  </form>
+                  <div className="my-1 h-px bg-white/10" />
+                </>
+              )}
               <button
                 onClick={() => {
                   setAccountOpen(true);
                   setMenuOpen(false);
                 }}
-                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white/80 hover:bg-white/5"
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-white/80 hover:bg-white/5"
               >
                 👤 Mi cuenta
               </button>
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white/80 hover:bg-white/5"
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-white/80 hover:bg-white/5"
                 >
                   🚪 Cerrar sesión
                 </button>

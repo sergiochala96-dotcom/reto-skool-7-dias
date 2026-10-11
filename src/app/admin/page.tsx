@@ -14,7 +14,8 @@ export default async function AdminPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { nombre, user, avatarUrl, admin, completedDays } = await getSidebarData();
+  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+    await getSidebarData();
   if (!admin) redirect("/dashboard");
 
   const supabase = await createClient();
@@ -47,6 +48,7 @@ export default async function AdminPage({
         avatarUrl={avatarUrl}
         admin={admin}
         completedDays={Array.from(completedDays)}
+        notifications={notifications}
       />
 
       <main className="flex-1 px-4 py-10">

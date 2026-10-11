@@ -10,7 +10,7 @@ import SkoolyLogo from "@/components/SkoolyLogo";
 import DayIntroVideo from "@/components/DayIntroVideo";
 
 export default async function DashboardPage() {
-  const { nombre, user, avatarUrl, admin, completedDays, welcomeVideoSeen } =
+  const { nombre, user, avatarUrl, admin, completedDays, welcomeVideoSeen, notifications } =
     await getSidebarData();
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
@@ -46,6 +46,7 @@ export default async function DashboardPage() {
         avatarUrl={avatarUrl}
         admin={admin}
         completedDays={completedList}
+        notifications={notifications}
       />
 
       <main className="flex-1 px-4 py-10">

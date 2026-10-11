@@ -368,3 +368,63 @@ function traducirError(message: string): string {
     return "La contraseña es muy corta (mínimo 6 caracteres).";
   return message;
 }
+
+// ---------------------------------------------------------------------------
+// Notificaciones
+// ---------------------------------------------------------------------------
+
+// Marca una notificación como leída para el usuario actual.
+export async function markNotificationRead(notificationId: string): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase
+    .from("notification_reads")
+    .upsert(
+      { user_id: user.id, notification_id: notificationId },
+      { onConflict: "user_id,notification_id", ignoreDuplicates: true }
+    );
+}
+
+export type NotificationState = { error?: string; ok?: boolean } | undefined;
+
+// El admin escribe un comunicado que le aparece a todos los usuarios en la campanita.
+export async function adminCreateNotification(
+  _prevState: NotificationState,
+  formData: FormData
+): Promise<NotificationState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  const title = String(formData.get("title") || "").trim();
+  const body = String(formData.get("body") || "").trim();
+  if (!title) return { error: "Escribe un título." };
+  if (!body) return { error: "Escribe el mensaje." };
+  if (title.length > 120) return { error: "El título es muy largo (máximo 120 caracteres)." };
+  if (body.length > 5000) return { error: "El mensaje es muy largo (máximo 5000 caracteres)." };
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert({ title, body, created_by: user.id });
+  if (error) return { error: "No se pudo enviar la notificación. Intenta de nuevo." };
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function adminDeleteNotification(notificationId: string): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  await supabase.from("notifications").delete().eq("id", notificationId);
+  revalidatePath("/", "layout");
+}

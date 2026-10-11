@@ -3,6 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
 import type { User } from "@supabase/supabase-js";
 
+export type SidebarNotification = {
+  id: string;
+  title: string;
+  body: string;
+  created_at: string;
+  read: boolean;
+};
+
 export type SidebarData = {
   user: User;
   nombre: string;
@@ -10,6 +18,7 @@ export type SidebarData = {
   completedDays: Set<number>;
   admin: boolean;
   welcomeVideoSeen: boolean;
+  notifications: SidebarNotification[];
 };
 
 export async function getSidebarData(): Promise<SidebarData> {
@@ -35,6 +44,24 @@ export async function getSidebarData(): Promise<SidebarData> {
     .eq("id", user.id)
     .single();
 
+  // Notificaciones del admin (más recientes primero) y cuáles ya leyó este usuario.
+  const [{ data: notifs }, { data: reads }] = await Promise.all([
+    supabase
+      .from("notifications")
+      .select("id, title, body, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase.from("notification_reads").select("notification_id").eq("user_id", user.id),
+  ]);
+  const readIds = new Set((reads ?? []).map((r) => r.notification_id as string));
+  const notifications: SidebarNotification[] = (notifs ?? []).map((n) => ({
+    id: n.id as string,
+    title: n.title as string,
+    body: n.body as string,
+    created_at: n.created_at as string,
+    read: readIds.has(n.id as string),
+  }));
+
   const nombre =
     (user.user_metadata?.display_name as string | undefined) ||
     user.email?.split("@")[0] ||
@@ -48,5 +75,6 @@ export async function getSidebarData(): Promise<SidebarData> {
     completedDays: new Set((progress ?? []).map((p) => p.day)),
     admin: isAdmin(user.email),
     welcomeVideoSeen: profile?.welcome_video_seen ?? false,
+    notifications,
   };
 }
