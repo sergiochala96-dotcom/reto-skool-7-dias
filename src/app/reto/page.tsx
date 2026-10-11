@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import CaptacionFooter from "@/components/CaptacionFooter";
 import CountdownBanner from "@/components/CountdownBanner";
 import RetoForm from "@/components/RetoForm";
 import SkoolyLogo from "@/components/SkoolyLogo";
@@ -36,13 +37,14 @@ export default function RetoPage() {
               <SkoolyLogo className="text-2xl font-extrabold" />
             </div>
 
-            <span className="inline-block rounded-full bg-purple-700 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
+            <span className="inline-block rounded-full bg-purple-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
               Reto gratuito · 7 días
             </span>
 
             <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-purple-950 sm:text-5xl">
               Crea tu Skool en <span className="text-purple-700">7 días</span>{" "}
-              con nuestra App: <span className="text-fuchsia-600">Skooly</span>
+              con nuestra nueva App:{" "}
+              <span className="text-fuchsia-600">Skooly</span>
             </h1>
 
             <p className="mt-4 text-lg text-purple-950/70">
@@ -51,13 +53,16 @@ export default function RetoPage() {
               comunidad lista para lanzar.
             </p>
 
-            <ul className="mt-5 flex flex-col items-center gap-2 text-base font-medium text-purple-950/80 lg:items-start">
+            <ul className="mx-auto mt-6 grid max-w-lg grid-cols-3 gap-2 lg:mx-0">
               {BENEFITS.map((benefit) => (
-                <li key={benefit} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
+                <li
+                  key={benefit}
+                  className="relative flex flex-col items-center gap-2 text-center text-xs font-semibold leading-snug text-purple-950/80 after:absolute after:left-1/2 after:top-3.5 after:h-0.5 after:w-full after:bg-emerald-300 last:after:hidden sm:text-sm"
+                >
+                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white ring-4 ring-white">
                     ✓
                   </span>
-                  {benefit}
+                  <span className="px-1">{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -104,6 +109,7 @@ export default function RetoPage() {
           </div>
         </div>
       </main>
+      <CaptacionFooter />
     </>
   );
 }
