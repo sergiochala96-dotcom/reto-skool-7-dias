@@ -17,3 +17,7 @@ export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/CmjqJnIevwW6V7w
 // reservado para el video. Acepta un .mp4 directo o un enlace de YouTube con
 // formato https://www.youtube.com/embed/ID
 export const GRACIAS_VIDEO_URL: string | null = "https://www.youtube.com/embed/jxwq8aQm5pI";
+
+// Workshop EN VIVO (se ofrece en el Episodio 2 bloqueado del panel).
+export const WORKSHOP_URL =
+  "https://www.skool.com/the-creators-community-4018/classroom/ed4870c8?md=1e0a7dd2170a4b0b883d30fa3ac44179";

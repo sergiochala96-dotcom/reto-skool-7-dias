@@ -1,5 +1,6 @@
 import { EPISODE_2_CHECKPOINTS, EPISODE_2_LABEL, EPISODE_2_NAME } from "@/lib/challenge";
 import EpisodeLockToggle from "@/components/EpisodeLockToggle";
+import WorkshopUnlock from "@/components/WorkshopUnlock";
 
 export default function Episode2Card({
   locked,
@@ -9,7 +10,7 @@ export default function Episode2Card({
   admin: boolean;
 }) {
   return (
-    <div className="relative mx-auto mt-5 overflow-hidden lg:mt-8 rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-9 lg:pt-10">
+    <div className={`relative mx-auto mt-5 overflow-hidden lg:mt-8 rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 pb-8 pt-8 shadow-2xl shadow-fuchsia-900/40 sm:px-6 lg:px-8 lg:pb-9 lg:pt-10 ${locked ? "min-h-[17rem]" : ""}`}>
       {admin && <EpisodeLockToggle locked={locked} />}
 
       <h2 className="mb-0 text-center text-base sm:text-lg lg:text-xl">
@@ -48,11 +49,9 @@ export default function Episode2Card({
       </div>
 
       {locked && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-3xl bg-black/50 backdrop-blur-[1px]">
-          <span className="text-4xl grayscale">🔒</span>
-          <span className="text-lg font-semibold text-white/70 lg:text-xl">
-            Episodio 2: Próximamente
-          </span>
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-3xl bg-black/50 backdrop-blur-[1px]">
+          <span className="text-3xl grayscale lg:text-4xl">🔒</span>
+          <WorkshopUnlock />
         </div>
       )}
     </div>
