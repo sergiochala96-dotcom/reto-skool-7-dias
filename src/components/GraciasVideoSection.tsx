@@ -8,7 +8,7 @@ import GraciasPopup from "@/components/GraciasPopup";
 // El iframe es más alto que la caja y se recorta arriba y abajo: así quedan fuera
 // (en las franjas negras) el título/canal y la barra "Shorts" que pone YouTube.
 const BOX =
-  "relative mx-auto aspect-[9/16] w-full max-w-[17rem] overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30 sm:max-w-[21rem] lg:max-w-[23rem]";
+  "relative mx-auto aspect-[9/16] w-full max-w-[15rem] overflow-hidden rounded-2xl border border-purple-200 bg-black shadow-2xl shadow-purple-900/30 sm:max-w-[21rem] lg:max-w-[23rem]";
 
 const YT_ORIGIN = "https://www.youtube.com";
 
@@ -124,9 +124,9 @@ function YouTubeVideo({ src, startRef }: { src: string; startRef: StartRef }) {
         <button
           type="button"
           onClick={enableSound}
-          className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-amber-400 px-4 py-2 text-sm font-extrabold text-black shadow-lg transition hover:bg-amber-300"
+          className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-4 py-2 text-sm font-extrabold text-black shadow-lg transition hover:bg-amber-300"
         >
-          🔊 Toca para activar el sonido
+          🔊 Activar sonido
         </button>
       )}
     </>
