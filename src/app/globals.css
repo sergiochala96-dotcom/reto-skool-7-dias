@@ -82,3 +82,12 @@ body {
     transform: translateY(3px);
   }
 }
+
+@keyframes fillBar {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

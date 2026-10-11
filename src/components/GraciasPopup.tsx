@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import confetti from "canvas-confetti";
 import GraciasCheckpoints from "@/components/GraciasCheckpoints";
+import { playVictoryFanfare } from "@/lib/successSound";
 
 // Ventana emergente de bienvenida que se abre apenas se entra a /gracias,
 // acompañada de confeti. El botón "Continuar" la cierra.
@@ -64,6 +65,7 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
           type="button"
           autoFocus
           onClick={() => {
+            playVictoryFanfare();
             setOpen(false);
             onClose?.();
           }}
@@ -71,6 +73,21 @@ export default function GraciasPopup({ onClose }: { onClose?: () => void }) {
         >
           Continuar
         </button>
+
+        {/* Progreso: la primera mitad ya está llena, falta la segunda. */}
+        <div
+          role="progressbar"
+          aria-label="Progreso"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={50}
+          className="mt-5 flex gap-2"
+        >
+          <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-purple-100">
+            <div className="h-full w-full animate-[fillBar_0.9s_ease-out] rounded-full bg-emerald-500" />
+          </div>
+          <div className="h-2.5 flex-1 rounded-full bg-purple-100" />
+        </div>
       </div>
     </div>
   );
