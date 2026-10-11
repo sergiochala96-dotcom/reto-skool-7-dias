@@ -108,3 +108,14 @@ body[data-popup="open"] .page-anim {
     box-shadow: 0 0 0 12px rgba(251, 191, 36, 0);
   }
 }
+
+@keyframes tickPop {
+  from {
+    opacity: 0.25;
+    transform: translateY(-35%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

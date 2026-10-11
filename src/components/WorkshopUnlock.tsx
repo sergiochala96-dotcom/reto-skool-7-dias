@@ -65,9 +65,56 @@ function WorkshopCountdown() {
   );
 }
 
+// Contador pequeño de la tarjeta bloqueada: solo para generar curiosidad. Los segundos
+// hacen una pequeña animación en cada cambio.
+function MiniCountdown({ className = "" }: { className?: string }) {
+  const [remaining, setRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    const target = new Date(WORKSHOP_START).getTime();
+    const tick = () => setRemaining(Math.max(0, target - Date.now()));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (remaining === null || remaining <= 0) return null;
+
+  const total = Math.floor(remaining / 1000);
+  const units = [
+    { value: Math.floor(total / 86400), label: "días" },
+    { value: Math.floor((total % 86400) / 3600), label: "hrs" },
+    { value: Math.floor((total % 3600) / 60), label: "min" },
+    { value: total % 60, label: "seg", tick: true },
+  ];
+
+  return (
+    <div className={`items-center gap-1.5 ${className}`} role="timer" aria-label="Tiempo que falta para el workshop">
+      {units.map((u) => (
+        <div
+          key={u.label}
+          className="flex min-w-[2.6rem] flex-col items-center overflow-hidden rounded-lg bg-black px-1.5 py-1 ring-1 ring-white/20"
+        >
+          <span
+            key={u.tick ? u.value : undefined}
+            className={`text-base font-extrabold leading-none tabular-nums text-white ${
+              u.tick ? "animate-[tickPop_0.45s_ease-out] motion-reduce:animate-none" : ""
+            }`}
+          >
+            {pad(u.value)}
+          </span>
+          <span className="mt-0.5 text-[8px] font-semibold uppercase tracking-wide text-white/60">
+            {u.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // Texto + botón "Desbloquear" del Episodio 2 bloqueado. Al tocarlo se abre un popup
 // con el comunicado del workshop en vivo.
-export default function WorkshopUnlock() {
+export default function WorkshopUnlock({ admin = false }: { admin?: boolean }) {
   const [open, setOpen] = useState(false);
 
   // Precarga la imagen del popup para que aparezca completa al abrirlo.
@@ -99,6 +146,13 @@ export default function WorkshopUnlock() {
       >
         Desbloquear
       </button>
+
+      {/* Celular: debajo del botón. */}
+      <MiniCountdown className="mt-2 flex lg:hidden" />
+      {/* Computadora: arriba a la derecha de la tarjeta (a la izquierda si hay botón de admin). */}
+      <MiniCountdown
+        className={`absolute top-4 hidden lg:flex ${admin ? "left-4" : "right-4"}`}
+      />
 
       {open &&
         createPortal(

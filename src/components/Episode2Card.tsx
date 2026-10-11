@@ -51,7 +51,7 @@ export default function Episode2Card({
       {locked && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-3xl bg-black/50 backdrop-blur-[1px]">
           <span className="text-3xl grayscale lg:text-4xl">🔒</span>
-          <WorkshopUnlock />
+          <WorkshopUnlock admin={admin} />
         </div>
       )}
     </div>
