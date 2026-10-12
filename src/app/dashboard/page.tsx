@@ -24,16 +24,15 @@ export default async function DashboardPage() {
       .eq("id", user.id);
   }
 
-  // El Episodio 2 se desbloquea automáticamente por usuario al completar
-  // los 7 días. El admin puede forzar el estado en SU PROPIA cuenta para
-  // probar la vista bloqueada/desbloqueada (episode2_locked_override).
-  const allDone = completedList.length >= TOTAL_DAYS;
+  // El Episodio 2 está bloqueado para todos. Solo el admin lo abre, usuario por usuario
+  // desde el panel de admin (o en su propia cuenta con el botón de prueba):
+  // episode2_locked_override = false => desbloqueado.
   const { data: profileRow } = await supabase
     .from("profiles")
     .select("episode2_locked_override")
     .eq("id", user.id)
     .single();
-  const episode2Locked = profileRow?.episode2_locked_override ?? !allDone;
+  const episode2Locked = profileRow?.episode2_locked_override !== false;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">

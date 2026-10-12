@@ -247,9 +247,11 @@ export async function adminResetUserProgress(targetUserId: string): Promise<void
   revalidatePath("/admin");
 }
 
-// Solo para pruebas del propio admin: fuerza el Episodio 2 bloqueado o
-// desbloqueado en SU PROPIA cuenta, sin afectar a los demás usuarios (para
-// quienes el Episodio 2 se desbloquea automáticamente al completar los 7 días).
+// El Episodio 2 está bloqueado para todos por defecto: solo se desbloquea cuando
+// episode2_locked_override es exactamente false, y solo el admin puede escribir ese campo
+// (también lo protege un trigger en la base de datos).
+//
+// Botón de prueba del propio admin: bloquea/desbloquea el Episodio 2 en SU PROPIA cuenta.
 export async function toggleEpisode2LockOverride(): Promise<void> {
   const supabase = await createClient();
   const {
@@ -258,28 +260,41 @@ export async function toggleEpisode2LockOverride(): Promise<void> {
 
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
-  const [{ data: profile }, { count }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("episode2_locked_override")
-      .eq("id", user.id)
-      .single(),
-    supabase
-      .from("challenge_progress")
-      .select("day", { count: "exact", head: true })
-      .eq("user_id", user.id),
-  ]);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("episode2_locked_override")
+    .eq("id", user.id)
+    .single();
 
-  const naturalLocked = (count ?? 0) < TOTAL_DAYS;
-  const currentLocked = profile?.episode2_locked_override ?? naturalLocked;
+  const currentlyLocked = profile?.episode2_locked_override !== false;
 
   await supabase
     .from("profiles")
-    .update({ episode2_locked_override: !currentLocked })
+    .update({ episode2_locked_override: currentlyLocked ? false : true })
     .eq("id", user.id);
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
+}
+
+// Desde el panel de admin: da o quita el acceso al Episodio 2 a un usuario.
+export async function adminSetEpisode2Access(
+  targetUserId: string,
+  enabled: boolean
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  await supabase
+    .from("profiles")
+    .update({ episode2_locked_override: enabled ? false : null })
+    .eq("id", targetUserId);
+
+  revalidatePath("/admin");
 }
 
 export async function updateProfile(

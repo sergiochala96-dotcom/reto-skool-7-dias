@@ -4,6 +4,7 @@ import { TOTAL_DAYS } from "@/lib/challenge";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 import ResetUserButton from "@/components/ResetUserButton";
+import Episode2AccessToggle from "@/components/Episode2AccessToggle";
 
 const PAGE_SIZES = [15, 50, 100] as const;
 
@@ -86,7 +87,7 @@ export default async function AdminPage({
             </p>
           )}
 
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-white/50">
@@ -95,6 +96,7 @@ export default async function AdminPage({
                   <th className="px-4 py-3 font-medium">Progreso</th>
                   <th className="px-4 py-3 font-medium">Última actividad</th>
                   <th className="px-4 py-3 font-medium">Registrado</th>
+                  <th className="px-4 py-3 font-medium">Nivel 2</th>
                   <th className="px-4 py-3 font-medium">Respuestas</th>
                   <th className="px-4 py-3 font-medium">Reiniciar usuario</th>
                 </tr>
@@ -127,6 +129,13 @@ export default async function AdminPage({
                       {new Date(row.created_at).toLocaleDateString("es")}
                     </td>
                     <td className="px-4 py-3">
+                      <Episode2AccessToggle
+                        userId={row.id}
+                        enabled={row.episode2_locked_override === false}
+                        label={row.display_name ?? row.email}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
                       <a
                         href={`/admin/${row.id}`}
                         className="font-medium text-fuchsia-300 hover:underline"
@@ -144,7 +153,7 @@ export default async function AdminPage({
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={8} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>
