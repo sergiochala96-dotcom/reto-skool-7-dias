@@ -19,7 +19,7 @@ export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/CmjqJnIevwW6V7w
 export const GRACIAS_VIDEO_URL: string | null = "https://www.youtube.com/embed/jxwq8aQm5pI";
 
 // Workshop EN VIVO (se ofrece en el Episodio 2 bloqueado del panel).
-export const WORKSHOP_URL = "https://pay.hotmart.com/M107993635C";
+export const WORKSHOP_URL = "https://pay.hotmart.com/M107993635C?checkoutMode=10";
 
 // Inicio del workshop: 21 de octubre de 2026, 8:00 pm (hora de Colombia, UTC-5).
 export const WORKSHOP_START = "2026-10-21T20:00:00-05:00";
