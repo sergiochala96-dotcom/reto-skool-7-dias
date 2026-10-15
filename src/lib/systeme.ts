@@ -67,7 +67,8 @@ export async function createTag(name: string): Promise<number> {
 // Busca un contacto por correo. Se valida que el correo devuelto sea el pedido, para no
 // tocar a otra persona si el filtro no se aplicara.
 export async function findContactByEmail(email: string): Promise<SystemeContact | null> {
-  const qs = new URLSearchParams({ email, limit: "5" });
+  // Systeme.io exige un límite entre 10 y 100.
+  const qs = new URLSearchParams({ email, limit: "10" });
   const page = await api<Page<SystemeContact>>(`/api/contacts?${qs}`);
   const match = (page?.items ?? []).find(
     (c) => (c.email ?? "").trim().toLowerCase() === email.trim().toLowerCase()
