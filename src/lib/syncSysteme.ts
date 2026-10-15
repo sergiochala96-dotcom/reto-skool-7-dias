@@ -9,25 +9,22 @@ import {
   removeTag,
 } from "@/lib/systeme";
 
-// Etiquetas que maneja la app en Systeme.io (solo estas 7; el resto de tu cuenta no se toca).
+// Etiquetas que maneja la app en Systeme.io (solo estas 4; el resto de tu cuenta no se toca).
 //
-// Avance (siempre una sola): reto_sin_empezar | reto_en_progreso | reto_casi_listo | reto_completado
-// Inactividad (a lo sumo una): sin_conexion_7d | sin_conexion_15d | sin_conexion_30d
+// Avance (a lo sumo una): reto_sin_empezar (0 días) | reto_casi_listo (5 o 6 días) | reto_completado (7)
+//   Quien va entre 1 y 4 días no lleva etiqueta de avance.
+// Inactividad: sin_conexion (7 o más días sin entrar; se quita cuando la persona vuelve).
+//   Los plazos de 7, 15 y 30 días se arman en la automatización de Systeme.io con esperas.
 // Cada vez que se AGREGA una etiqueta puedes disparar una automatización en Systeme.io.
-export const PROGRESS_TAGS = [
-  "reto_sin_empezar",
-  "reto_en_progreso",
-  "reto_casi_listo",
-  "reto_completado",
-] as const;
-export const INACTIVITY_TAGS = ["sin_conexion_7d", "sin_conexion_15d", "sin_conexion_30d"] as const;
+export const PROGRESS_TAGS = ["reto_sin_empezar", "reto_casi_listo", "reto_completado"] as const;
+export const INACTIVITY_TAGS = ["sin_conexion"] as const;
 export const MANAGED_TAGS: string[] = [...PROGRESS_TAGS, ...INACTIVITY_TAGS];
 
-export function progressTag(completedDays: number): string {
+export function progressTag(completedDays: number): string | null {
   if (completedDays >= TOTAL_DAYS) return "reto_completado";
   if (completedDays >= TOTAL_DAYS - 2) return "reto_casi_listo"; // 5 o 6 de 7
-  if (completedDays >= 1) return "reto_en_progreso";
-  return "reto_sin_empezar";
+  if (completedDays === 0) return "reto_sin_empezar";
+  return null; // 1 a 4 días: sin etiqueta de avance
 }
 
 export function daysSince(dateIso: string | null, today: string): number {
@@ -36,13 +33,10 @@ export function daysSince(dateIso: string | null, today: string): number {
   return Math.max(0, Math.floor(ms / 86_400_000));
 }
 
-// Quien ya terminó el reto no recibe etiquetas de inactividad.
+// Quien ya terminó el reto no recibe la etiqueta de inactividad.
 export function inactivityTag(completedDays: number, daysAway: number): string | null {
   if (completedDays >= TOTAL_DAYS) return null;
-  if (daysAway >= 30) return "sin_conexion_30d";
-  if (daysAway >= 15) return "sin_conexion_15d";
-  if (daysAway >= 7) return "sin_conexion_7d";
-  return null;
+  return daysAway >= 7 ? "sin_conexion" : null;
 }
 
 export type SyncResult = {
@@ -116,14 +110,14 @@ export async function syncSysteme(supabase: SupabaseClient): Promise<SyncResult>
       const completed = Number(u.completed_days ?? 0);
       const progress = progressTag(completed);
       const inactivity = inactivityTag(completed, daysSince(u.last_seen_date, today));
-      const wanted = [progress, ...(inactivity ? [inactivity] : [])];
+      const wanted = [...(progress ? [progress] : []), ...(inactivity ? [inactivity] : [])];
       return { user: u, wanted, key: wanted.join("|") };
     })
     .filter((t) => t.key !== (t.user.systeme_tags ?? ""));
   result.unchanged = result.total - todo.length;
   if (todo.length === 0) return result;
 
-  // 3) Las 7 etiquetas deben existir en Systeme.io (si faltan se crean).
+  // 3) Las 4 etiquetas deben existir en Systeme.io (si faltan se crean).
   const tagIds = await listTags();
   for (const name of MANAGED_TAGS) {
     if (!tagIds.has(name)) {
