@@ -5,9 +5,18 @@ import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 import ResetUserButton from "@/components/ResetUserButton";
 import Episode2AccessToggle from "@/components/Episode2AccessToggle";
+import SyncSystemeButton from "@/components/SyncSystemeButton";
 import { classifyTraffic, TRAFFIC_LABEL, TRAFFIC_STYLE } from "@/lib/traffic";
 
+// La sincronización con Systeme.io (botón de abajo) puede tardar si hay muchos cambios.
+export const maxDuration = 60;
+
 const PAGE_SIZES = [15, 50, 100] as const;
+
+// Fecha (YYYY-MM-DD) de hace N días, para contar quién lleva más de N días sin entrar.
+function dateDaysAgo(n: number) {
+  return new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+}
 
 type SearchParams = { pageSize?: string; page?: string };
 
@@ -51,6 +60,19 @@ export default async function AdminPage({
     (leadRows ?? []).map((l) => [String(l.email).toLowerCase(), l])
   );
 
+  // Cuántos llevan más de 5, 7 y 15 días sin entrar (sin contar a quienes ya terminaron el reto).
+  const inactivityCounts = await Promise.all(
+    [5, 7, 15].map(async (days) => {
+      const { count: n } = await supabase
+        .from("admin_users_overview")
+        .select("id", { count: "exact", head: true })
+        .lt("last_seen_date", dateDaysAgo(days))
+        .lt("completed_days", TOTAL_DAYS);
+      return { days, n: n ?? 0 };
+    })
+  );
+  const todayIso = new Date().toISOString().slice(0, 10);
+
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -71,6 +93,24 @@ export default async function AdminPage({
             <p className="text-sm text-white/50">Panel de administración</p>
             <h1 className="text-2xl font-bold text-white">Usuarios de Skooly</h1>
           </header>
+
+          <div className="mb-6 grid grid-cols-3 gap-3 sm:max-w-2xl">
+            {inactivityCounts.map(({ days, n }) => (
+              <div key={days} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-white/40">
+                  Más de {days} días sin entrar
+                </p>
+                <p className="mt-1 text-3xl font-extrabold text-white">{n}</p>
+              </div>
+            ))}
+          </div>
+          <p className="-mt-3 mb-6 text-xs text-white/40">
+            No cuenta a quienes ya completaron los 7 días.
+          </p>
+
+          <div className="mb-6">
+            <SyncSystemeButton />
+          </div>
 
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-white/60">
@@ -108,6 +148,7 @@ export default async function AdminPage({
                   <th className="px-3 py-3 xl:px-4 font-medium">Email</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Origen</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Progreso</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Días sin entrar</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Última actividad</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Registrado</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Nivel 2</th>
@@ -152,6 +193,27 @@ export default async function AdminPage({
                         {row.completed_days}/{TOTAL_DAYS}
                       </span>
                     </td>
+                    <td className="px-3 py-3 xl:px-4">
+                      {(() => {
+                        if (!row.last_seen_date) return <span className="text-white/30">—</span>;
+                        const away = Math.max(
+                          0,
+                          Math.floor(
+                            (new Date(todayIso).getTime() - new Date(row.last_seen_date).getTime()) /
+                              86_400_000
+                          )
+                        );
+                        const done = row.completed_days >= TOTAL_DAYS;
+                        const tone = done
+                          ? "text-white/40"
+                          : away >= 15
+                          ? "font-semibold text-red-300"
+                          : away >= 7
+                          ? "font-semibold text-amber-300"
+                          : "text-white/70";
+                        return <span className={tone}>{away === 0 ? "Hoy" : `${away} d`}</span>;
+                      })()}
+                    </td>
                     <td className="px-3 py-3 xl:px-4 text-white/60">
                       {row.last_activity
                         ? new Date(row.last_activity).toLocaleDateString("es")
@@ -185,7 +247,7 @@ export default async function AdminPage({
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={10} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>

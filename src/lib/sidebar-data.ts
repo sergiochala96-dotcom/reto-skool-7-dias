@@ -40,9 +40,16 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen")
+    .select("avatar_url, welcome_video_seen, last_seen_date")
     .eq("id", user.id)
     .single();
+
+  // Última visita: solo se guarda la FECHA y únicamente cuando cambia el día, así que es
+  // como máximo una escritura pequeña por persona al día (no se acumula ningún historial).
+  const today = new Date().toISOString().slice(0, 10);
+  if (profile && profile.last_seen_date !== today) {
+    await supabase.from("profiles").update({ last_seen_date: today }).eq("id", user.id);
+  }
 
   // Notificaciones del admin (más recientes primero) y cuáles ya leyó este usuario.
   const [{ data: notifs }, { data: reads }] = await Promise.all([

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
+import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import {
   countRequiredFields,
   getFlatFields,
@@ -442,4 +443,34 @@ export async function adminDeleteNotification(notificationId: string): Promise<v
 
   await supabase.from("notifications").delete().eq("id", notificationId);
   revalidatePath("/", "layout");
+}
+
+// ---------------------------------------------------------------------------
+// Sincronización con Systeme.io (etiquetas de avance e inactividad)
+// ---------------------------------------------------------------------------
+
+// Botón del panel de admin: ejecuta la sincronización ahora (la misma que corre a diario).
+export async function adminSyncSysteme(): Promise<SyncResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  try {
+    const result = await syncSysteme(supabase);
+    revalidatePath("/admin");
+    return result;
+  } catch (e) {
+    return {
+      ok: false,
+      total: 0,
+      unchanged: 0,
+      updated: 0,
+      contactsCreated: 0,
+      tagsCreated: [],
+      pending: 0,
+      errors: [e instanceof Error ? e.message : String(e)],
+    };
+  }
 }
