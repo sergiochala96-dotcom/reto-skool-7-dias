@@ -322,6 +322,16 @@ export default function Sidebar({
                     🛠️ Panel de admin
                   </Link>
                   <Link
+                    href="/admin/origen"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-amber-300/90 hover:bg-white/5"
+                  >
+                    📈 Origen del tráfico
+                  </Link>
+                  <Link
                     href="/admin/notificaciones"
                     onClick={() => {
                       setMenuOpen(false);
