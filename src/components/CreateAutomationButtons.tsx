@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { adminCreateAutomation, adminCreateCampaign } from "@/app/actions";
+import { adminCreateAutomation, adminCreateCampaign, adminUpdateAutomationEmails } from "@/app/actions";
 import type { AutomationResult } from "@/lib/systemeAutomations";
 import type { CampaignResult } from "@/lib/systemeCampaigns";
 
@@ -17,7 +17,7 @@ const OPTIONS: Option[] = [
     key: "completado",
     kind: "email",
     label: "reto_completado",
-    confirm: "1 correo (felicitación + workshop) y 1 regla: al agregar la etiqueta reto_completado se envía ese correo.",
+    confirm: "1 correo (felicitación) y 1 regla: al agregar la etiqueta reto_completado se envía ese correo.",
   },
   {
     key: "casi_listo",
@@ -88,6 +88,22 @@ export default function CreateAutomationButtons() {
     });
   };
 
+  const updateEmails = () => {
+    if (
+      !window.confirm(
+        "Esto ACTUALIZARÁ el asunto, la vista previa y el texto de los correos de reto_completado y reto_casi_listo en Systeme.io (versión sin workshop). Las reglas no cambian. ¿Continuar?"
+      )
+    )
+      return;
+    setShown(null);
+    setRunning("update");
+    startTransition(async () => {
+      const r = await adminUpdateAutomationEmails();
+      setShown({ label: "Actualizar correos", ok: r.ok, error: r.error, lines: r.lines });
+      setRunning(null);
+    });
+  };
+
   return (
     <div className="flex flex-col items-start gap-2">
       <div className="flex flex-wrap gap-2">
@@ -102,6 +118,14 @@ export default function CreateAutomationButtons() {
             {running === o.key ? "Creando..." : `🧪 ${o.label}`}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={updateEmails}
+          disabled={pending}
+          className="rounded-lg border border-sky-300/40 px-4 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-300/10 disabled:opacity-60"
+        >
+          {running === "update" ? "Actualizando..." : "✏️ Actualizar correos (sin workshop)"}
+        </button>
       </div>
 
       {shown && (

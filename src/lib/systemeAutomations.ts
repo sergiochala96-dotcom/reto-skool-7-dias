@@ -20,12 +20,14 @@ export const AUTOMATION_SPECS: Record<string, AutomationSpec> = {
   completado: {
     tag: "reto_completado",
     subject: "Lo lograste: tu Skool ya está armado",
-    previewText: "Y ahora viene lo mejor",
+    previewText: "Tu comunidad ya está lista para recibir gente",
     bodyHtml: `
-<p>Hola,</p>
+<p>Hola {first_name},</p>
 <p>Terminaste los 7 días del reto. En serio, felicitaciones: la mayoría se queda en la intención y tú lo hiciste.</p>
-<p>Ya tienes tu comunidad armada. El siguiente paso es lanzarla y ponerla a vender, y de eso trata el <strong>workshop en vivo del 21 al 22 de octubre</strong>: crear y lanzar tu Skool conmigo, paso a paso. Hay 30 cupos.</p>
-<p style="text-align:center;margin:28px 0;"><a href="https://pay.hotmart.com/M107993635C?checkoutMode=10" style="${BUTTON_STYLE}">Quiero unirme al workshop</a></p>
+<p>Ya tienes tu comunidad armada: su identidad, la fachada, los niveles y el mapa de ruta. <strong>Lo más importante ahora es no dejarla quieta.</strong> Invita a tus primeras personas y publica tu mensaje de bienvenida esta misma semana.</p>
+<p>Y no olvides abrir tu <strong>Cofre del Tesoro</strong>: es tu premio por haber terminado.</p>
+<p style="text-align:center;margin:28px 0;"><a href="https://skool.neobrandclub.com/cofre" style="${BUTTON_STYLE}">Abrir mi Cofre del Tesoro</a></p>
+<p>Cuéntame cómo va tu comunidad: respóndeme este correo, que lo leo yo.</p>
 <p>Sergio</p>
 `.trim(),
   },
@@ -36,9 +38,9 @@ export const AUTOMATION_SPECS: Record<string, AutomationSpec> = {
     bodyHtml: `
 <p>Hola {first_name},</p>
 <p>Vi que ya vas por el final del reto. Y justo ese tramo es donde mucha gente se frena, aunque ya hizo lo más difícil.</p>
-<p><strong>Te faltan solo 1 o 2 misiones</strong>, unos 15 minutos cada una. Si las terminas antes del 21 de octubre, llegas con tu Skool listo al workshop en vivo.</p>
+<p><strong>Te faltan solo 1 o 2 misiones</strong>, unos 15 minutos cada una. Al terminarlas, tu Skool queda armado y desbloqueas tu Cofre del Tesoro.</p>
 <p style="text-align:center;margin:28px 0;"><a href="https://skool.neobrandclub.com/login" style="${BUTTON_STYLE}">Terminar mi reto</a></p>
-<p>Cualquier duda, escríbeme.</p>
+<p>Si te trabaste en alguna misión, respóndeme este correo y lo resolvemos.</p>
 <p>Sergio</p>
 `.trim(),
   },
@@ -138,5 +140,43 @@ export async function createAutomation(key: string): Promise<AutomationResult> {
     };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// Actualiza el asunto, la vista previa y el texto de un correo ya creado (se busca por su
+// asunto). No cambia nada más (ni la regla ni la etiqueta).
+export type UpdateResult = { ok: boolean; lines: string[]; error?: string };
+
+export async function updateAutomationEmails(keys: string[]): Promise<UpdateResult> {
+  const lines: string[] = [];
+  try {
+    const emails = await listAll<AutomationEmail>("/api/mailing/automation-emails");
+    for (const key of keys) {
+      const spec = AUTOMATION_SPECS[key];
+      if (!spec) {
+        lines.push(`${key}: automatización desconocida`);
+        continue;
+      }
+      const email = emails.find((e) => e.content?.subject === spec.subject);
+      if (!email) {
+        lines.push(`${spec.tag}: no se encontró el correo "${spec.subject}" (¿aún no lo creaste?)`);
+        continue;
+      }
+      await systemeApi<AutomationEmail>(`/api/mailing/automation-emails/${email.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/merge-patch+json" },
+        body: JSON.stringify({
+          content: {
+            subject: spec.subject,
+            previewText: spec.previewText,
+            bodyHtml: spec.bodyHtml,
+          },
+        }),
+      });
+      lines.push(`${spec.tag}: correo #${email.id} actualizado`);
+    }
+    return { ok: true, lines };
+  } catch (e) {
+    return { ok: false, lines, error: e instanceof Error ? e.message : String(e) };
   }
 }

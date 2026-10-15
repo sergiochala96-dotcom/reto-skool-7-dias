@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
-import { createAutomation, type AutomationResult } from "@/lib/systemeAutomations";
+import { createAutomation, updateAutomationEmails, type AutomationResult, type UpdateResult } from "@/lib/systemeAutomations";
 import { createCampaignAutomation, type CampaignResult } from "@/lib/systemeCampaigns";
 import {
   countRequiredFields,
@@ -500,4 +500,15 @@ export async function adminCreateCampaign(key: string): Promise<CampaignResult> 
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
   return createCampaignAutomation(key);
+}
+
+// Actualiza el texto de los correos de reto_completado y reto_casi_listo (sin workshop).
+export async function adminUpdateAutomationEmails(): Promise<UpdateResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  return updateAutomationEmails(["completado", "casi_listo"]);
 }
