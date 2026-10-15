@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { WORKSHOP_SOLD_PERCENT, WORKSHOP_START, WORKSHOP_URL } from "@/lib/captacion";
+import { trackEvent } from "@/lib/metaPixel";
 
 const WORKSHOP_IMAGE = "/mascota-workshop-envivo.png";
 
@@ -198,6 +199,7 @@ export default function WorkshopUnlock({ admin = false }: { admin?: boolean }) {
               </p>
               <a
                 href={WORKSHOP_URL}
+                onClick={() => trackEvent("InitiateCheckout", { content_name: "Workshop EN VIVO" })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 block w-full animate-[amberPulse_1.8s_ease-in-out_infinite] rounded-xl bg-amber-400 px-5 py-4 text-base font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 motion-reduce:animate-none sm:text-lg"

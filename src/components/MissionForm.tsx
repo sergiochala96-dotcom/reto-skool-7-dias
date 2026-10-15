@@ -15,6 +15,7 @@ import TemarioField from "@/components/TemarioField";
 import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
 import { playSuccessDing, playVictoryFanfare } from "@/lib/successSound";
+import { trackCustomEvent } from "@/lib/metaPixel";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
@@ -1093,6 +1094,9 @@ export default function MissionForm({
   // Popup de celebración cuando el día se completa por primera vez.
   useEffect(() => {
     if (state?.dayComplete) {
+      trackCustomEvent("DiaCompletado", { dia: day });
+      if (day === 1) trackCustomEvent("Dia1Completado");
+      if (day === totalDays) trackCustomEvent("RetoCompletado");
       setCelebration({ total: state.total });
       playVictoryFanfare();
 

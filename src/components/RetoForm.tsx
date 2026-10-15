@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { registrarContacto } from "@/app/reto/actions";
 import type { Attribution } from "@/lib/traffic";
+import { trackEvent } from "@/lib/metaPixel";
 
 const INPUT =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-300/40";
@@ -52,6 +53,7 @@ export default function RetoForm() {
     startTransition(async () => {
       const result = await registrarContacto(name, email, attributionRef.current);
       if (result.ok) {
+        trackEvent("Lead", { content_name: "Reto Skool 7 dias" });
         router.push("/gracias");
       } else {
         setError(result.error);

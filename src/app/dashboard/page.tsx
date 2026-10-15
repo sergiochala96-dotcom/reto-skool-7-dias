@@ -8,6 +8,7 @@ import Episode2Card from "@/components/Episode2Card";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import DayIntroVideo from "@/components/DayIntroVideo";
+import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 
 export default async function DashboardPage() {
   const { nombre, user, avatarUrl, admin, completedDays, welcomeVideoSeen, notifications } =
@@ -39,6 +40,10 @@ export default async function DashboardPage() {
       {!welcomeVideoSeen && (
         <DayIntroVideo src={WELCOME_VIDEO_URL} closable={false} large />
       )}
+      <MetaRegistrationEvent
+        userId={user.id}
+        isNew={Date.now() - new Date(user.created_at).getTime() < 15 * 60 * 1000}
+      />
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
