@@ -35,6 +35,9 @@ async function api<T>(path: string, init: RequestInit = {}, retry = true): Promi
   return (await res.json().catch(() => undefined)) as T;
 }
 
+// Llamada genérica a la API (la usan las herramientas de automatización).
+export const systemeApi = api;
+
 type Page<T> = { items?: T[]; hasMore?: boolean };
 
 export type SystemeTag = { id: number; name: string };
