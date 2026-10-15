@@ -86,8 +86,8 @@ export default async function OrigenPage({
         notifications={notifications}
       />
 
-      <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-5xl">
+      <main className="min-w-0 flex-1 px-4 py-10 md:px-8">
+        <div className="mx-auto max-w-[110rem]">
           <header className="mb-8">
             <p className="text-sm text-white/50">Panel de administración</p>
             <h1 className="text-2xl font-bold text-white">Origen del tráfico</h1>
@@ -124,28 +124,28 @@ export default async function OrigenPage({
 
           <h2 className="mb-3 text-lg font-bold text-white">Por campaña</h2>
           <div className="mb-10 overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
-            <table className="w-full text-left text-sm">
+            <table className="w-full whitespace-nowrap text-left text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-white/50">
-                  <th className="px-4 py-3 font-medium">Tipo</th>
-                  <th className="px-4 py-3 font-medium">Fuente</th>
-                  <th className="px-4 py-3 font-medium">Campaña</th>
-                  <th className="px-4 py-3 text-right font-medium">Correos</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Tipo</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Fuente</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Campaña</th>
+                  <th className="px-3 py-3 xl:px-4 text-right font-medium">Correos</th>
                 </tr>
               </thead>
               <tbody>
                 {campaigns.map((c, i) => (
                   <tr key={i} className="border-b border-white/5 text-white/80 last:border-0">
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${TRAFFIC_STYLE[c.type]}`}
                       >
                         {TRAFFIC_LABEL[c.type]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-white/60">{c.source}</td>
-                    <td className="px-4 py-3">{c.campaign}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{c.count}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{c.source}</td>
+                    <td className="px-3 py-3 xl:px-4">{c.campaign}</td>
+                    <td className="px-3 py-3 xl:px-4 text-right font-semibold">{c.count}</td>
                   </tr>
                 ))}
                 {campaigns.length === 0 && (
@@ -179,34 +179,34 @@ export default async function OrigenPage({
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
-            <table className="w-full text-left text-sm">
+            <table className="w-full whitespace-nowrap text-left text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-white/50">
-                  <th className="px-4 py-3 font-medium">Nombre</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Tipo</th>
-                  <th className="px-4 py-3 font-medium">Fuente</th>
-                  <th className="px-4 py-3 font-medium">Campaña</th>
-                  <th className="px-4 py-3 font-medium">Contenido</th>
-                  <th className="px-4 py-3 font-medium">Fecha</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Nombre</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Email</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Tipo</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Fuente</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Campaña</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Contenido</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Fecha</th>
                 </tr>
               </thead>
               <tbody>
                 {shown.map((l) => (
                   <tr key={l.id} className="border-b border-white/5 text-white/80 last:border-0">
-                    <td className="px-4 py-3">{l.name}</td>
-                    <td className="px-4 py-3 text-white/60">{l.email}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">{l.name}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{l.email}</td>
+                    <td className="px-3 py-3 xl:px-4">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${TRAFFIC_STYLE[l.type]}`}
                       >
                         {TRAFFIC_LABEL[l.type]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-white/60">{l.utm_source ?? "—"}</td>
-                    <td className="px-4 py-3 text-white/60">{l.utm_campaign ?? "—"}</td>
-                    <td className="px-4 py-3 text-white/60">{l.utm_content ?? "—"}</td>
-                    <td className="px-4 py-3 text-white/60">
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{l.utm_source ?? "—"}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{l.utm_campaign ?? "—"}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{l.utm_content ?? "—"}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">
                       {new Date(l.created_at).toLocaleDateString("es")}
                     </td>
                   </tr>

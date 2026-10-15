@@ -65,8 +65,8 @@ export default async function AdminPage({
         notifications={notifications}
       />
 
-      <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-5xl">
+      <main className="min-w-0 flex-1 px-4 py-10 md:px-8">
+        <div className="mx-auto max-w-[110rem]">
           <header className="mb-8">
             <p className="text-sm text-white/50">Panel de administración</p>
             <h1 className="text-2xl font-bold text-white">Usuarios de Skooly</h1>
@@ -101,18 +101,18 @@ export default async function AdminPage({
           )}
 
           <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
-            <table className="w-full text-left text-sm">
+            <table className="w-full whitespace-nowrap text-left text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-white/50">
-                  <th className="px-4 py-3 font-medium">Nombre</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Origen</th>
-                  <th className="px-4 py-3 font-medium">Progreso</th>
-                  <th className="px-4 py-3 font-medium">Última actividad</th>
-                  <th className="px-4 py-3 font-medium">Registrado</th>
-                  <th className="px-4 py-3 font-medium">Nivel 2</th>
-                  <th className="px-4 py-3 font-medium">Respuestas</th>
-                  <th className="px-4 py-3 font-medium">Reiniciar usuario</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Nombre</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Email</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Origen</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Progreso</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Última actividad</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Registrado</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Nivel 2</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Respuestas</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Reiniciar usuario</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,9 +121,9 @@ export default async function AdminPage({
                     key={row.id}
                     className="border-b border-white/5 text-white/80 last:border-0"
                   >
-                    <td className="px-4 py-3">{row.display_name ?? "—"}</td>
-                    <td className="px-4 py-3 text-white/60">{row.email}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">{row.display_name ?? "—"}</td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">{row.email}</td>
+                    <td className="px-3 py-3 xl:px-4">
                       {(() => {
                         const lead = leadByEmail.get(String(row.email ?? "").toLowerCase());
                         const type = classifyTraffic(lead?.utm_medium);
@@ -141,7 +141,7 @@ export default async function AdminPage({
                         );
                       })()}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${
                           row.completed_days >= TOTAL_DAYS
@@ -152,22 +152,22 @@ export default async function AdminPage({
                         {row.completed_days}/{TOTAL_DAYS}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-white/60">
+                    <td className="px-3 py-3 xl:px-4 text-white/60">
                       {row.last_activity
                         ? new Date(row.last_activity).toLocaleDateString("es")
                         : "—"}
                     </td>
-                    <td className="px-4 py-3 text-white/60">
+                    <td className="px-3 py-3 xl:px-4 text-white/60">
                       {new Date(row.created_at).toLocaleDateString("es")}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">
                       <Episode2AccessToggle
                         userId={row.id}
                         enabled={row.episode2_locked_override === false}
                         label={row.display_name ?? row.email}
                       />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">
                       <a
                         href={`/admin/${row.id}`}
                         className="font-medium text-fuchsia-300 hover:underline"
@@ -175,7 +175,7 @@ export default async function AdminPage({
                         Ver respuestas →
                       </a>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 xl:px-4">
                       <ResetUserButton
                         userId={row.id}
                         label={row.display_name ?? row.email}
