@@ -469,6 +469,7 @@ export async function adminSyncSysteme(): Promise<SyncResult> {
       updated: 0,
       contactsCreated: 0,
       tagsCreated: [],
+      tagsDeleted: [],
       pending: 0,
       errors: [e instanceof Error ? e.message : String(e)],
     };

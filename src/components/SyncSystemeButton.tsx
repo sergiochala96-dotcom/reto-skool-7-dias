@@ -45,6 +45,9 @@ export default function SyncSystemeButton() {
           {result.tagsCreated.length > 0 && (
             <p>Etiquetas creadas en Systeme.io: {result.tagsCreated.join(", ")}</p>
           )}
+          {result.tagsDeleted.length > 0 && (
+            <p>Etiquetas viejas borradas de Systeme.io: {result.tagsDeleted.join(", ")}</p>
+          )}
           {result.errors.map((e, i) => (
             <p key={i} className="break-all">
               • {e}

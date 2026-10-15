@@ -76,6 +76,11 @@ export async function findContactByEmail(email: string): Promise<SystemeContact 
   return match ?? null;
 }
 
+// Borra una etiqueta de la cuenta (Systeme.io también la quita de todos los contactos).
+export async function deleteTag(tagId: number): Promise<void> {
+  await api<void>(`/api/tags/${tagId}`, { method: "DELETE" });
+}
+
 export async function createContact(email: string, firstName: string): Promise<SystemeContact> {
   return api<SystemeContact>("/api/contacts", {
     method: "POST",

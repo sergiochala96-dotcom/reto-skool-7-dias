@@ -6,6 +6,7 @@ import {
   createTag,
   findContactByEmail,
   listTags,
+  deleteTag,
   removeTag,
 } from "@/lib/systeme";
 
@@ -19,6 +20,11 @@ import {
 export const PROGRESS_TAGS = ["reto_sin_empezar", "reto_casi_listo", "reto_completado"] as const;
 export const INACTIVITY_TAGS = ["sin_conexion"] as const;
 export const MANAGED_TAGS: string[] = [...PROGRESS_TAGS, ...INACTIVITY_TAGS];
+
+// Etiquetas de versiones anteriores de este esquema. Cuando ya no queda nadie por migrar,
+// la sincronización las borra de Systeme.io (solo estas, por su nombre exacto) para liberar
+// cupo en tu cuenta.
+export const OBSOLETE_TAGS = ["reto_en_progreso", "sin_conexion_7d", "sin_conexion_15d", "sin_conexion_30d"];
 
 export function progressTag(completedDays: number): string | null {
   if (completedDays >= TOTAL_DAYS) return "reto_completado";
@@ -46,6 +52,7 @@ export type SyncResult = {
   updated: number; // personas a las que se les cambiaron etiquetas
   contactsCreated: number; // contactos que no existían en Systeme.io y se crearon
   tagsCreated: string[]; // etiquetas nuevas creadas en Systeme.io
+  tagsDeleted: string[]; // etiquetas viejas borradas de Systeme.io
   pending: number; // quedaron para la próxima corrida (límite por corrida)
   errors: string[];
 };
@@ -71,6 +78,7 @@ export async function syncSysteme(supabase: SupabaseClient): Promise<SyncResult>
     updated: 0,
     contactsCreated: 0,
     tagsCreated: [],
+    tagsDeleted: [],
     pending: 0,
     errors: [],
   };
@@ -115,7 +123,10 @@ export async function syncSysteme(supabase: SupabaseClient): Promise<SyncResult>
     })
     .filter((t) => t.key !== (t.user.systeme_tags ?? ""));
   result.unchanged = result.total - todo.length;
-  if (todo.length === 0) return result;
+  if (todo.length === 0) {
+    await deleteObsoleteTags(result);
+    return result;
+  }
 
   // 3) Las 4 etiquetas deben existir en Systeme.io (si faltan se crean).
   const tagIds = await listTags();
@@ -157,5 +168,24 @@ export async function syncSysteme(supabase: SupabaseClient): Promise<SyncResult>
       }
     }
   }
+
+  // Ya migrados todos: se borran las etiquetas viejas (si hubo errores o quedan pendientes,
+  // no se borra nada todavía).
+  if (result.ok && result.pending === 0) await deleteObsoleteTags(result);
   return result;
+}
+
+async function deleteObsoleteTags(result: SyncResult) {
+  try {
+    const tagIds = await listTags();
+    for (const name of OBSOLETE_TAGS) {
+      const id = tagIds.get(name);
+      if (id === undefined) continue;
+      await deleteTag(id);
+      result.tagsDeleted.push(name);
+    }
+  } catch (e) {
+    result.ok = false;
+    result.errors.push(`No se pudieron borrar las etiquetas viejas (bórralas a mano en Systeme.io): ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
