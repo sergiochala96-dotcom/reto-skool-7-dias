@@ -46,14 +46,14 @@ export const AUTOMATION_SPECS: Record<string, AutomationSpec> = {
 
 type Page<T> = { items?: T[]; hasMore?: boolean };
 type AutomationEmail = { id: number; content?: { subject?: string } };
-type AutomationRule = {
+export type AutomationRule = {
   id: number;
   triggers?: { type: string; details?: { tagId?: number | null } }[];
   actions?: { type: string; details?: { automationEmailId?: number | null } }[];
   state?: { isActive?: boolean };
 };
 
-async function listAll<T extends { id: number }>(path: string): Promise<T[]> {
+export async function listAll<T extends { id: number }>(path: string): Promise<T[]> {
   const all: T[] = [];
   let after: number | undefined;
   for (let i = 0; i < 10; i++) {

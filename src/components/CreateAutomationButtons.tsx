@@ -1,33 +1,89 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { adminCreateAutomation } from "@/app/actions";
+import { adminCreateAutomation, adminCreateCampaign } from "@/app/actions";
 import type { AutomationResult } from "@/lib/systemeAutomations";
+import type { CampaignResult } from "@/lib/systemeCampaigns";
 
-const OPTIONS = [
-  { key: "completado", label: "reto_completado", note: "felicitación + workshop" },
-  { key: "casi_listo", label: "reto_casi_listo", note: "motivación para terminar" },
+type Option = {
+  key: string;
+  kind: "email" | "campaign";
+  label: string;
+  confirm: string;
+};
+
+const OPTIONS: Option[] = [
+  {
+    key: "completado",
+    kind: "email",
+    label: "reto_completado",
+    confirm: "1 correo (felicitación + workshop) y 1 regla: al agregar la etiqueta reto_completado se envía ese correo.",
+  },
+  {
+    key: "casi_listo",
+    kind: "email",
+    label: "reto_casi_listo",
+    confirm: "1 correo (motivación para terminar) y 1 regla: al agregar la etiqueta reto_casi_listo se envía ese correo.",
+  },
+  {
+    key: "sin_conexion",
+    kind: "campaign",
+    label: "sin_conexion (campaña)",
+    confirm:
+      "1 campaña con 3 correos (día 7, día 15 y día 30) y 2 reglas: al agregar la etiqueta sin_conexion se suscribe a la campaña, y al quitarla se cancela.",
+  },
+  {
+    key: "sin_empezar",
+    kind: "campaign",
+    label: "reto_sin_empezar (campaña)",
+    confirm:
+      "1 campaña con 1 correo (1 día después) y 2 reglas: al agregar la etiqueta reto_sin_empezar se suscribe a la campaña, y al quitarla se cancela.",
+  },
 ];
 
-// Botones del panel de admin: crean en Systeme.io el correo y la regla de cada etiqueta
-// (etiqueta agregada -> enviar correo) y muestran lo que se creó. Es seguro repetirlos.
+type Shown = { label: string; ok: boolean; lines: string[]; error?: string };
+
+// Botones del panel de admin: crean en Systeme.io los correos, campañas y reglas de cada
+// etiqueta y muestran lo que se creó. Solo crean cosas nuevas y es seguro repetirlos.
 export default function CreateAutomationButtons() {
   const [pending, startTransition] = useTransition();
   const [running, setRunning] = useState<string | null>(null);
-  const [result, setResult] = useState<{ label: string; data: AutomationResult } | null>(null);
+  const [shown, setShown] = useState<Shown | null>(null);
 
-  const run = (key: string, label: string, note: string) => {
+  const run = (o: Option) => {
     if (
       !window.confirm(
-        `Esto creará en tu Systeme.io 1 correo (${note}) y 1 regla: cuando se agregue la etiqueta ${label}, se enviará ese correo. No modifica nada existente. ¿Continuar?`
+        `Esto creará en tu Systeme.io: ${o.confirm} No modifica nada existente. ¿Continuar?`
       )
     )
       return;
-    setResult(null);
-    setRunning(key);
+    setShown(null);
+    setRunning(o.key);
     startTransition(async () => {
-      const data = await adminCreateAutomation(key);
-      setResult({ label, data });
+      if (o.kind === "email") {
+        const r: AutomationResult = await adminCreateAutomation(o.key);
+        setShown({
+          label: o.label,
+          ok: r.ok,
+          error: r.error,
+          lines: r.ok
+            ? [
+                `Correo #${r.emailId} ${r.emailReused ? "(ya existía, se reutilizó)" : "(creado)"}`,
+                `Regla #${r.ruleId} ${r.ruleReused ? "(ya existía, no se duplicó)" : "(creada)"}`,
+                `Estado de la regla: ${
+                  r.isActive === null || r.isActive === undefined
+                    ? "revísalo en Systeme.io"
+                    : r.isActive
+                    ? "ACTIVA"
+                    : "inactiva"
+                }`,
+              ]
+            : [],
+        });
+      } else {
+        const r: CampaignResult = await adminCreateCampaign(o.key);
+        setShown({ label: o.label, ok: r.ok, error: r.error, lines: r.lines ?? [] });
+      }
       setRunning(null);
     });
   };
@@ -39,43 +95,28 @@ export default function CreateAutomationButtons() {
           <button
             key={o.key}
             type="button"
-            onClick={() => run(o.key, o.label, o.note)}
+            onClick={() => run(o)}
             disabled={pending}
             className="rounded-lg border border-amber-300/40 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-300/10 disabled:opacity-60"
           >
-            {running === o.key ? "Creando..." : `🧪 Automatización ${o.label}`}
+            {running === o.key ? "Creando..." : `🧪 ${o.label}`}
           </button>
         ))}
       </div>
 
-      {result && (
+      {shown && (
         <div
           className={`max-w-xl rounded-lg px-3 py-2 text-xs leading-relaxed ${
-            result.data.ok ? "bg-emerald-500/15 text-emerald-200" : "bg-red-500/15 text-red-200"
+            shown.ok ? "bg-emerald-500/15 text-emerald-200" : "bg-red-500/15 text-red-200"
           }`}
         >
-          {result.data.ok ? (
-            <>
-              <p className="font-semibold">✅ {result.label}: listo en Systeme.io</p>
-              <p>
-                Correo #{result.data.emailId} {result.data.emailReused ? "(ya existía, se reutilizó)" : "(creado)"} ·
-                Regla #{result.data.ruleId} {result.data.ruleReused ? "(ya existía, no se duplicó)" : "(creada)"}
-              </p>
-              <p>
-                Estado de la regla:{" "}
-                {result.data.isActive === null || result.data.isActive === undefined
-                  ? "revísalo en Systeme.io"
-                  : result.data.isActive
-                  ? "ACTIVA"
-                  : "inactiva"}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="font-semibold">⚠️ {result.label}: no se pudo crear</p>
-              <p className="break-all">{result.data.error}</p>
-            </>
-          )}
+          <p className="font-semibold">
+            {shown.ok ? "✅" : "⚠️"} {shown.label}: {shown.ok ? "listo en Systeme.io" : "no se pudo completar"}
+          </p>
+          {shown.lines.map((l, i) => (
+            <p key={i}>• {l}</p>
+          ))}
+          {shown.error && <p className="break-all">{shown.error}</p>}
         </div>
       )}
     </div>

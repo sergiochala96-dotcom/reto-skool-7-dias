@@ -7,6 +7,7 @@ import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { createAutomation, type AutomationResult } from "@/lib/systemeAutomations";
+import { createCampaignAutomation, type CampaignResult } from "@/lib/systemeCampaigns";
 import {
   countRequiredFields,
   getFlatFields,
@@ -487,4 +488,16 @@ export async function adminCreateAutomation(key: string): Promise<AutomationResu
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
   return createAutomation(key);
+}
+
+// Crea en Systeme.io una campaña de correos con esperas y sus dos reglas
+// (etiqueta agregada -> suscribir; etiqueta eliminada -> cancelar). Solo crea cosas nuevas.
+export async function adminCreateCampaign(key: string): Promise<CampaignResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  return createCampaignAutomation(key);
 }
