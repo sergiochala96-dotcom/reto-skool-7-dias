@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
-import { createAutomation, updateAutomationEmails, type AutomationResult, type UpdateResult } from "@/lib/systemeAutomations";
-import { createCampaignAutomation, type CampaignResult } from "@/lib/systemeCampaigns";
+import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
+import { updateCampaignSteps } from "@/lib/systemeCampaigns";
 import {
   countRequiredFields,
   getFlatFields,
@@ -478,37 +478,21 @@ export async function adminSyncSysteme(): Promise<SyncResult> {
   }
 }
 
-// Crea en Systeme.io un correo de automatización y su regla
-// ("etiqueta agregada -> enviar ese correo"). Solo crea cosas nuevas.
-export async function adminCreateAutomation(key: string): Promise<AutomationResult> {
+// Aplica en Systeme.io el texto actual de los 6 correos automáticos (2 correos sueltos y
+// los pasos de las 2 campañas). Reemplaza el texto que haya allí; no toca reglas, esperas
+// ni etiquetas.
+export async function adminApplyEmailTexts(): Promise<UpdateResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
-  return createAutomation(key);
-}
-
-// Crea en Systeme.io una campaña de correos con esperas y sus dos reglas
-// (etiqueta agregada -> suscribir; etiqueta eliminada -> cancelar). Solo crea cosas nuevas.
-export async function adminCreateCampaign(key: string): Promise<CampaignResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !isAdmin(user.email)) redirect("/dashboard");
-
-  return createCampaignAutomation(key);
-}
-
-// Actualiza el texto de los correos de reto_completado y reto_casi_listo (sin workshop).
-export async function adminUpdateAutomationEmails(): Promise<UpdateResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !isAdmin(user.email)) redirect("/dashboard");
-
-  return updateAutomationEmails(["completado", "casi_listo"]);
+  const emails = await updateAutomationEmails(["completado", "casi_listo"]);
+  const steps = await updateCampaignSteps(["sin_conexion", "sin_empezar"]);
+  return {
+    ok: emails.ok && steps.ok,
+    lines: [...emails.lines, ...(steps.lines ?? [])],
+    error: [emails.error, steps.error].filter(Boolean).join(" | ") || undefined,
+  };
 }

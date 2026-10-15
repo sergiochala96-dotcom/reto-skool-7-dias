@@ -209,3 +209,47 @@ export async function createCampaignAutomation(key: string): Promise<CampaignRes
     };
   }
 }
+
+// Actualiza el asunto, la vista previa y el texto de los pasos de campaña ya creados.
+// Los pasos se reconocen por su comentario ("Día 7", "Día 15"...), que no cambia aunque se
+// edite el asunto. NO toca las esperas, el orden ni las reglas.
+export async function updateCampaignSteps(keys: string[]): Promise<CampaignResult> {
+  const lines: string[] = [];
+  try {
+    const campaigns = await listAll<Campaign>("/api/mailing/campaigns");
+    for (const key of keys) {
+      const spec = CAMPAIGN_SPECS[key];
+      if (!spec) {
+        lines.push(`${key}: campaña desconocida`);
+        continue;
+      }
+      const campaign = campaigns.find((c) => c.name === spec.campaignName);
+      if (!campaign) {
+        lines.push(`${spec.campaignName}: no se encontró la campaña`);
+        continue;
+      }
+      const steps = await listAll<Step & { comment?: string | null }>(
+        `/api/mailing/campaigns/${campaign.id}/steps`
+      );
+      for (const s of spec.steps) {
+        const step = steps.find((e) => e.comment === s.comment) ?? steps.find((e) => e.content?.subject === s.subject);
+        if (!step) {
+          lines.push(`${s.comment}: no se encontró el paso "${s.subject}"`);
+          continue;
+        }
+        await systemeApi(`/api/mailing/campaign-steps/${step.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/merge-patch+json" },
+          body: JSON.stringify({
+            comment: s.comment,
+            content: { subject: s.subject, previewText: s.previewText, bodyHtml: s.bodyHtml },
+          }),
+        });
+        lines.push(`${spec.tag} · ${s.comment}: paso #${step.id} actualizado`);
+      }
+    }
+    return { ok: true, lines };
+  } catch (e) {
+    return { ok: false, lines, error: e instanceof Error ? e.message : String(e) };
+  }
+}
