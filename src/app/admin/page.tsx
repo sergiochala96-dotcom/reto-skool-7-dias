@@ -74,6 +74,13 @@ export default async function AdminPage({
   );
   const todayIso = new Date().toISOString().slice(0, 10);
 
+  // Huella de la última sincronización con Systeme.io (manual o automática).
+  const { data: lastSync } = await supabase
+    .from("sync_status")
+    .select("last_run_at, source, summary")
+    .eq("id", 1)
+    .maybeSingle();
+
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -110,7 +117,14 @@ export default async function AdminPage({
           </p>
 
           <div className="mb-6 flex flex-wrap items-start gap-4">
-            <SyncSystemeButton />
+            <div className="flex flex-col gap-2">
+              <SyncSystemeButton />
+              <p className="max-w-xl text-xs leading-relaxed text-white/50">
+                {lastSync
+                  ? `Última sincronización (${lastSync.source}): ${new Date(lastSync.last_run_at).toLocaleString("es", { timeZone: "America/Bogota", dateStyle: "short", timeStyle: "short" })} (hora de Colombia) · ${lastSync.summary}`
+                  : "Todavía no se ha registrado ninguna sincronización."}
+              </p>
+            </div>
             <CreateAutomationButtons />
           </div>
 

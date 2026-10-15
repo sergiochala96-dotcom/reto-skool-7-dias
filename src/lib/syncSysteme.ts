@@ -70,7 +70,42 @@ const MAX_UPDATES_PER_RUN = 120;
 
 // Revisa a todos los usuarios y deja en Systeme.io las etiquetas que les corresponden.
 // Solo llama a la API para quien cambió de estado desde la última corrida.
-export async function syncSysteme(supabase: SupabaseClient): Promise<SyncResult> {
+export async function syncSysteme(
+  supabase: SupabaseClient,
+  source: "manual" | "automática" = "manual"
+): Promise<SyncResult> {
+  try {
+    const result = await runSync(supabase);
+    await recordRun(supabase, source, summarize(result));
+    return result;
+  } catch (e) {
+    await recordRun(supabase, source, `ERROR: ${e instanceof Error ? e.message : String(e)}`);
+    throw e;
+  }
+}
+
+function summarize(r: SyncResult) {
+  return (
+    (r.ok ? "OK" : "CON ERRORES") +
+    ` · revisados ${r.total} · actualizados ${r.updated} · sin cambios ${r.unchanged} · contactos creados ${r.contactsCreated}` +
+    (r.pending > 0 ? ` · pendientes ${r.pending}` : "") +
+    (r.errors.length > 0 ? ` · ${r.errors[0]}` : "")
+  ).slice(0, 500);
+}
+
+// Una sola fila con la última corrida (para verla en el panel de admin). Si falla al
+// guardarla no se interrumpe la sincronización.
+async function recordRun(supabase: SupabaseClient, source: string, summary: string) {
+  try {
+    await supabase
+      .from("sync_status")
+      .upsert({ id: 1, last_run_at: new Date().toISOString(), source, summary });
+  } catch {
+    // se ignora a propósito
+  }
+}
+
+async function runSync(supabase: SupabaseClient): Promise<SyncResult> {
   const result: SyncResult = {
     ok: true,
     total: 0,

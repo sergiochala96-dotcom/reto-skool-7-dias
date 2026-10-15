@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   try {
     const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
-    const result = await syncSysteme(supabase);
+    const result = await syncSysteme(supabase, "automática");
     return NextResponse.json(result, { status: result.ok ? 200 : 207 });
   } catch (e) {
     return NextResponse.json(
