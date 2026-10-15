@@ -5,6 +5,7 @@ import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 import ResetUserButton from "@/components/ResetUserButton";
 import Episode2AccessToggle from "@/components/Episode2AccessToggle";
+import { classifyTraffic, TRAFFIC_LABEL, TRAFFIC_STYLE } from "@/lib/traffic";
 
 const PAGE_SIZES = [15, 50, 100] as const;
 
@@ -37,6 +38,18 @@ export default async function AdminPage({
     .from("admin_users_overview")
     .select("*", { count: "exact" })
     .range(from, to);
+
+  // Origen del tráfico de cada usuario (si dejó su correo en /reto con etiquetas UTM).
+  const emails = (rows ?? []).map((r) => String(r.email ?? "").toLowerCase()).filter(Boolean);
+  const { data: leadRows } = emails.length
+    ? await supabase
+        .from("leads")
+        .select("email, utm_medium, utm_source, utm_campaign")
+        .in("email", emails)
+    : { data: [] };
+  const leadByEmail = new Map(
+    (leadRows ?? []).map((l) => [String(l.email).toLowerCase(), l])
+  );
 
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -93,6 +106,7 @@ export default async function AdminPage({
                 <tr className="border-b border-white/10 text-white/50">
                   <th className="px-4 py-3 font-medium">Nombre</th>
                   <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Origen</th>
                   <th className="px-4 py-3 font-medium">Progreso</th>
                   <th className="px-4 py-3 font-medium">Última actividad</th>
                   <th className="px-4 py-3 font-medium">Registrado</th>
@@ -109,6 +123,24 @@ export default async function AdminPage({
                   >
                     <td className="px-4 py-3">{row.display_name ?? "—"}</td>
                     <td className="px-4 py-3 text-white/60">{row.email}</td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const lead = leadByEmail.get(String(row.email ?? "").toLowerCase());
+                        const type = classifyTraffic(lead?.utm_medium);
+                        return (
+                          <span
+                            title={
+                              lead
+                                ? [lead.utm_source, lead.utm_campaign].filter(Boolean).join(" · ")
+                                : "No dejó su correo en /reto"
+                            }
+                            className={`whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold ${TRAFFIC_STYLE[type]}`}
+                          >
+                            {lead ? TRAFFIC_LABEL[type] : "Sin registro"}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${
@@ -153,7 +185,7 @@ export default async function AdminPage({
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={9} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>
