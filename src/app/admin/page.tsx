@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import ResetUserButton from "@/components/ResetUserButton";
 import Episode2AccessToggle from "@/components/Episode2AccessToggle";
 import SyncSystemeButton from "@/components/SyncSystemeButton";
-import CreatePilotButton from "@/components/CreatePilotButton";
+import CreateAutomationButtons from "@/components/CreateAutomationButtons";
 import { classifyTraffic, TRAFFIC_LABEL, TRAFFIC_STYLE } from "@/lib/traffic";
 
 // La sincronización con Systeme.io (botón de abajo) puede tardar si hay muchos cambios.
@@ -111,7 +111,7 @@ export default async function AdminPage({
 
           <div className="mb-6 flex flex-wrap items-start gap-4">
             <SyncSystemeButton />
-            <CreatePilotButton />
+            <CreateAutomationButtons />
           </div>
 
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">

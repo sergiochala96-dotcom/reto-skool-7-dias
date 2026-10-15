@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
-import { createPilotAutomation, type PilotResult } from "@/lib/systemePilot";
+import { createAutomation, type AutomationResult } from "@/lib/systemeAutomations";
 import {
   countRequiredFields,
   getFlatFields,
@@ -477,14 +477,14 @@ export async function adminSyncSysteme(): Promise<SyncResult> {
   }
 }
 
-// Piloto: crea en Systeme.io un correo de automatización y la regla
-// "etiqueta reto_completado agregada -> enviar ese correo". Solo crea cosas nuevas.
-export async function adminCreatePilotAutomation(): Promise<PilotResult> {
+// Crea en Systeme.io un correo de automatización y su regla
+// ("etiqueta agregada -> enviar ese correo"). Solo crea cosas nuevas.
+export async function adminCreateAutomation(key: string): Promise<AutomationResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
-  return createPilotAutomation();
+  return createAutomation(key);
 }

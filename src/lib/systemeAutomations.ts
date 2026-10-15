@@ -1,25 +1,47 @@
 import { createTag, listTags, systemeApi } from "@/lib/systeme";
 
-// PILOTO: crea en Systeme.io UN correo de automatización y UNA regla:
-//   cuando se agrega la etiqueta `reto_completado` -> se envía ese correo.
+// Crea en Systeme.io automatizaciones de UN solo correo:
+//   cuando se agrega la etiqueta X -> se envía el correo Y.
 // Solo CREA cosas nuevas (nunca edita ni borra nada existente) y es seguro repetirlo:
-// si el correo o la regla ya existen, los reutiliza en vez de duplicarlos.
+// si el correo (mismo asunto) o la regla ya existen, los reutiliza en vez de duplicarlos.
+// Personalización: {first_name} es el nombre de la persona (sintaxis de Systeme.io).
 
-const TAG = "reto_completado";
+type AutomationSpec = {
+  tag: string;
+  subject: string;
+  previewText: string;
+  bodyHtml: string;
+};
 
-const EMAIL = {
-  subject: "Lo lograste: tu Skool ya está armado",
-  previewText: "Y ahora viene lo mejor",
-  // Saludo neutro: la personalización con el nombre se agrega después desde el editor.
-  bodyHtml: `
+const BUTTON_STYLE =
+  "background:#fbbf24;color:#000000;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;";
+
+export const AUTOMATION_SPECS: Record<string, AutomationSpec> = {
+  completado: {
+    tag: "reto_completado",
+    subject: "Lo lograste: tu Skool ya está armado",
+    previewText: "Y ahora viene lo mejor",
+    bodyHtml: `
 <p>Hola,</p>
 <p>Terminaste los 7 días del reto. En serio, felicitaciones: la mayoría se queda en la intención y tú lo hiciste.</p>
 <p>Ya tienes tu comunidad armada. El siguiente paso es lanzarla y ponerla a vender, y de eso trata el <strong>workshop en vivo del 21 al 22 de octubre</strong>: crear y lanzar tu Skool conmigo, paso a paso. Hay 30 cupos.</p>
-<p style="text-align:center;margin:28px 0;">
-  <a href="https://pay.hotmart.com/M107993635C?checkoutMode=10" style="background:#fbbf24;color:#000000;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">Quiero unirme al workshop</a>
-</p>
+<p style="text-align:center;margin:28px 0;"><a href="https://pay.hotmart.com/M107993635C?checkoutMode=10" style="${BUTTON_STYLE}">Quiero unirme al workshop</a></p>
 <p>Sergio</p>
 `.trim(),
+  },
+  casi_listo: {
+    tag: "reto_casi_listo",
+    subject: "Te falta muy poco para terminar",
+    previewText: "Un par de misiones y tu Skool queda listo",
+    bodyHtml: `
+<p>Hola {first_name},</p>
+<p>Vi que ya vas por el final del reto. Y justo ese tramo es donde mucha gente se frena, aunque ya hizo lo más difícil.</p>
+<p><strong>Te faltan solo 1 o 2 misiones</strong>, unos 15 minutos cada una. Si las terminas antes del 21 de octubre, llegas con tu Skool listo al workshop en vivo.</p>
+<p style="text-align:center;margin:28px 0;"><a href="https://skool.neobrandclub.com/login" style="${BUTTON_STYLE}">Terminar mi reto</a></p>
+<p>Cualquier duda, escríbeme.</p>
+<p>Sergio</p>
+`.trim(),
+  },
 };
 
 type Page<T> = { items?: T[]; hasMore?: boolean };
@@ -46,7 +68,7 @@ async function listAll<T extends { id: number }>(path: string): Promise<T[]> {
   return all;
 }
 
-export type PilotResult = {
+export type AutomationResult = {
   ok: boolean;
   tagId?: number;
   emailId?: number;
@@ -57,7 +79,11 @@ export type PilotResult = {
   error?: string;
 };
 
-export async function createPilotAutomation(): Promise<PilotResult> {
+export async function createAutomation(key: string): Promise<AutomationResult> {
+  const spec = AUTOMATION_SPECS[key];
+  if (!spec) return { ok: false, error: "Automatización desconocida." };
+  const TAG = spec.tag;
+  const EMAIL = spec;
   try {
     // 1) La etiqueta (si no existiera, se crea).
     const tags = await listTags();
