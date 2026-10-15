@@ -9,6 +9,13 @@ import { trackEvent } from "@/lib/metaPixel";
 const INPUT =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-300/40";
 
+function readCookie(name: string): string | undefined {
+  return document.cookie
+    .split("; ")
+    .find((c) => c.startsWith(name + "="))
+    ?.split("=")[1];
+}
+
 export default function RetoForm() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -51,9 +58,17 @@ export default function RetoForm() {
     const email = String(data.get("email") ?? "");
     setError(null);
     startTransition(async () => {
-      const result = await registrarContacto(name, email, attributionRef.current);
+      // Mismo ID de evento en el píxel (navegador) y en la API de Conversiones (servidor)
+      // para que Meta cuente un solo Lead.
+      const eventId = crypto.randomUUID();
+      const result = await registrarContacto(name, email, attributionRef.current, {
+        eventId,
+        fbp: readCookie("_fbp"),
+        fbc: readCookie("_fbc"),
+        sourceUrl: window.location.href,
+      });
       if (result.ok) {
-        trackEvent("Lead", { content_name: "Reto Skool 7 dias" });
+        trackEvent("Lead", { content_name: "Reto Skool 7 dias" }, eventId);
         router.push("/gracias");
       } else {
         setError(result.error);

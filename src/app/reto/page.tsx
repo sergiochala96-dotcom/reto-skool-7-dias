@@ -102,6 +102,13 @@ export default function RetoPage() {
                 <p className="mt-4 text-center text-xs text-white/50">
                   Paso 1 de 2 · Sin contraseñas ni formularios largos
                 </p>
+                <p className="mt-2 text-center text-[11px] leading-snug text-white/40">
+                  Al continuar aceptas nuestra{" "}
+                  <Link href="/privacidad" className="underline hover:text-white/70">
+                    política de privacidad
+                  </Link>
+                  .
+                </p>
               </div>
               <Checkpoints className="mt-6 grid lg:hidden" />
               <p className="mt-5 text-center text-sm text-purple-950/60">

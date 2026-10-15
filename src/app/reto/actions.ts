@@ -3,6 +3,7 @@
 import { SYSTEME_OPTIN } from "@/lib/captacion";
 import { createClient } from "@/lib/supabase/server";
 import { cleanAttribution, type Attribution } from "@/lib/traffic";
+import { sendLeadToMeta, type CapiTracking } from "@/lib/metaCapi";
 
 export type RetoState = { ok: true } | { ok: false; error: string };
 
@@ -13,7 +14,8 @@ const GENERIC_ERROR = "No pudimos enviar tus datos. Intenta de nuevo en un momen
 export async function registrarContacto(
   name: string,
   email: string,
-  attribution?: Attribution
+  attribution?: Attribution,
+  tracking?: CapiTracking
 ): Promise<RetoState> {
   const firstName = name.trim().slice(0, 80);
   const cleanEmail = email.trim().toLowerCase().slice(0, 200);
@@ -46,6 +48,7 @@ export async function registrarContacto(
 
     if (res.ok) {
       await guardarLead(firstName, cleanEmail, attribution);
+      await sendLeadToMeta(firstName, cleanEmail, tracking);
       return { ok: true };
     }
 
