@@ -195,7 +195,7 @@ export default function WorkshopUnlock({ admin = false }: { admin?: boolean }) {
               </h2>
               <p className="mt-3 text-base leading-relaxed text-gray-700">
                 Segunda edición del reto de Skool del{" "}
-                <strong className="font-bold text-gray-900">21 al 22 de octubre</strong>. 30 cupos disponibles.
+                <strong className="font-bold text-gray-900">28 al 29 de octubre</strong>. 30 cupos disponibles.
               </p>
               <a
                 href={WORKSHOP_URL}

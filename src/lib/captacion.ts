@@ -21,8 +21,8 @@ export const GRACIAS_VIDEO_URL: string | null = "https://www.youtube.com/embed/j
 // Workshop EN VIVO (se ofrece en el Episodio 2 bloqueado del panel).
 export const WORKSHOP_URL = "https://pay.hotmart.com/M107993635C?checkoutMode=10";
 
-// Inicio del workshop: 21 de octubre de 2026, 8:00 pm (hora de Colombia, UTC-5).
-export const WORKSHOP_START = "2026-10-21T20:00:00-05:00";
+// Inicio del workshop: 28 de octubre de 2026, 8:00 pm (hora de Colombia, UTC-5).
+export const WORKSHOP_START = "2026-10-28T20:00:00-05:00";
 
 // Porcentaje de cupos vendidos del workshop que se muestra en la barra de avance.
 export const WORKSHOP_SOLD_PERCENT = 20;
