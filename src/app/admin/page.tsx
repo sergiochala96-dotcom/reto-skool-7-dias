@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
-import ResetUserButton from "@/components/ResetUserButton";
+import ResetUserButton, { ResetIcon } from "@/components/ResetUserButton";
 import Episode2AccessToggle from "@/components/Episode2AccessToggle";
 import SyncSystemeButton from "@/components/SyncSystemeButton";
 import ApplyEmailTextsButton from "@/components/ApplyEmailTextsButton";
@@ -169,7 +169,10 @@ export default async function AdminPage({
                   <th className="px-3 py-3 xl:px-4 font-medium">Registrado</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Nivel 2</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Respuestas</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Reiniciar usuario</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium" title="Reiniciar usuario">
+                    <ResetIcon className="h-4 w-4" />
+                    <span className="sr-only">Reiniciar usuario</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -250,7 +253,7 @@ export default async function AdminPage({
                         href={`/admin/${row.id}`}
                         className="font-medium text-fuchsia-300 hover:underline"
                       >
-                        Ver respuestas →
+                        Ver
                       </a>
                     </td>
                     <td className="px-3 py-3 xl:px-4">

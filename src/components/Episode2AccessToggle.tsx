@@ -35,7 +35,8 @@ export default function Episode2AccessToggle({
       aria-label={`Acceso al Episodio 2 para ${label}`}
       onClick={toggle}
       disabled={isPending}
-      className="flex items-center gap-2 disabled:opacity-60"
+      title={on ? "Episodio 2 activo" : "Episodio 2 bloqueado"}
+      className="flex items-center disabled:opacity-60"
     >
       <span
         className={`relative h-6 w-11 flex-shrink-0 rounded-full transition ${
@@ -47,9 +48,6 @@ export default function Episode2AccessToggle({
             on ? "left-[1.375rem]" : "left-0.5"
           }`}
         />
-      </span>
-      <span className={`text-xs font-semibold ${on ? "text-emerald-300" : "text-white/40"}`}>
-        {on ? "Activo" : "Bloqueado"}
       </span>
     </button>
   );
