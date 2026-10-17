@@ -189,8 +189,8 @@ export async function completeDay(day: number): Promise<void> {
   redirect("/dashboard");
 }
 
-// El Día 1 se abre al completar las dos misiones iniciales (unirse al Skool y a WhatsApp).
-// Quien ya tiene días completados no las necesita.
+// El Día 1 se abre cuando la persona toca el candado del Episodio 1, después de las dos
+// misiones iniciales (unirse a WhatsApp y al Skool). Quien ya tiene días completados lo tiene abierto.
 async function startUnlockedFor(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
@@ -199,10 +199,36 @@ async function startUnlockedFor(
   if (completedDays.size > 0) return true;
   const { data } = await supabase
     .from("profiles")
-    .select("joined_skool_at, joined_whatsapp_at")
+    .select("episode1_unlocked_at")
     .eq("id", userId)
     .single();
-  return !!(data?.joined_skool_at && data?.joined_whatsapp_at);
+  return !!data?.episode1_unlocked_at;
+}
+
+// El candado del Episodio 1: abre el Día 1. Solo se puede después de las dos misiones iniciales.
+// Devuelve false si faltan (por ejemplo, si se llama sin haberlas hecho).
+export async function unlockEpisode1(): Promise<boolean> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("joined_skool_at, joined_whatsapp_at")
+    .eq("id", user.id)
+    .single();
+  if (!data?.joined_skool_at || !data?.joined_whatsapp_at) return false;
+
+  await supabase
+    .from("profiles")
+    .update({ episode1_unlocked_at: new Date().toISOString() })
+    .eq("id", user.id)
+    .is("episode1_unlocked_at", null);
+
+  revalidatePath("/dashboard");
+  return true;
 }
 
 // Marca una misión inicial como hecha cuando la persona toca su botón (no se puede verificar
@@ -375,6 +401,7 @@ export async function adminResetUserProgress(targetUserId: string): Promise<void
       episode2_locked_override: null,
       joined_skool_at: null,
       joined_whatsapp_at: null,
+      episode1_unlocked_at: null,
     })
     .eq("id", targetUserId);
 

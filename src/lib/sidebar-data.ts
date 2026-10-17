@@ -43,7 +43,9 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, joined_skool_at, joined_whatsapp_at")
+    .select(
+      "avatar_url, welcome_video_seen, last_seen_date, joined_skool_at, joined_whatsapp_at, episode1_unlocked_at"
+    )
     .eq("id", user.id)
     .single();
 
@@ -82,9 +84,9 @@ export async function getSidebarData(): Promise<SidebarData> {
     skool: !!profile?.joined_skool_at,
     whatsapp: !!profile?.joined_whatsapp_at,
   };
-  // El Día 1 se abre con las dos misiones hechas; quien ya tiene días completados no las necesita.
-  const startUnlocked =
-    (startMissions.skool && startMissions.whatsapp) || (progress ?? []).length > 0;
+  // El Día 1 se abre al tocar el candado del Episodio 1 (después de las dos misiones);
+  // quien ya tiene días completados lo tiene abierto.
+  const startUnlocked = !!profile?.episode1_unlocked_at || (progress ?? []).length > 0;
 
   return {
     user,

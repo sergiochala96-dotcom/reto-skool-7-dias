@@ -86,7 +86,11 @@ export default async function DashboardPage() {
             <ChallengePath completedDays={completedList} startUnlocked={startUnlocked} />
           </div>
 
-          <Episode2Card locked={episode2Locked} admin={admin} />
+          {/* El Episodio 2 (workshop) aparece cuando se termina el Día 2. El admin siempre lo ve,
+              y también quien tenga el acceso abierto a mano desde el panel de admin. */}
+          {(admin || completedDays.has(2) || !episode2Locked) && (
+            <Episode2Card locked={episode2Locked} admin={admin} />
+          )}
         </div>
       </main>
     </div>

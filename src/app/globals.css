@@ -83,6 +83,32 @@ body {
   }
 }
 
+/* Brillo que respira alrededor de un icono. El color del halo sale de --glow. */
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--glow, rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    transform: scale(1.07);
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+/* Destello pequeño (✦) que titila junto a los pasos pendientes. */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(25deg);
+  }
+}
+
 @keyframes arrowFlow {
   0%,
   100% {
