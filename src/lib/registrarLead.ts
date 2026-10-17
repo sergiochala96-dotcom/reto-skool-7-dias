@@ -1,15 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createContact, createTag, ensureTag, findContactByEmail, listTags } from "@/lib/systeme";
-import { WELCOME_TAG, wantedTags } from "@/lib/syncSysteme";
+import { wantedTags } from "@/lib/syncSysteme";
 import { cleanAttribution, type Attribution } from "@/lib/traffic";
 import { sendLeadToMeta, type CapiTracking } from "@/lib/metaCapi";
 
 // Paso común "al crear la cuenta" en /reto (con contraseña o con Google). Hace tres cosas,
 // y un fallo en cualquiera NO debe frenar a la persona, que ya tiene su cuenta:
 //  1) la guarda en Systeme.io por la API (NO por el formulario de Systeme.io: así no sale el
-//     antiguo correo de "crea tu cuenta") y le pone las etiquetas "Skooly Leads",
-//     reto_sin_empezar y "bienvenida" (esta última dispara el correo de bienvenida),
+//     antiguo correo de "crea tu cuenta") y le pone las etiquetas "Skooly Leads" y
+//     reto_sin_empezar (esta última dispara el correo de bienvenida),
 //  2) guarda el lead con su origen de tráfico (UTM) para el panel de admin,
 //  3) avisa a Meta del Lead desde el servidor (API de Conversiones).
 //
@@ -45,11 +45,12 @@ async function guardarEnSysteme(firstName: string, email: string, account?: NewA
   if (!contact) contact = await createContact(email, firstName);
   if (!account) return;
 
-  // Etiqueta de origen + reto_sin_empezar (la persona acaba de registrarse: 0 días, recién entró)
-  // + "bienvenida", que dispara el correo de bienvenida (ver systemeCampaigns.ts).
+  // Etiqueta de origen + reto_sin_empezar (la persona acaba de registrarse: 0 días, recién entró).
+  // Agregar reto_sin_empezar es lo que dispara el correo de bienvenida y, un día después, el
+  // de activación (ver systemeCampaigns.ts).
   const wanted = wantedTags(0, 0);
   const tags = await listTags();
-  for (const name of [...wanted, WELCOME_TAG]) {
+  for (const name of wanted) {
     const tagId = tags.get(name) ?? (await createTag(name));
     await ensureTag(contact, tagId);
   }

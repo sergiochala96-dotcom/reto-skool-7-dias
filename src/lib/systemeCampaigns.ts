@@ -1,7 +1,7 @@
 import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import { createTag, listTags, systemeApi } from "@/lib/systeme";
 import { listAll, type AutomationRule } from "@/lib/systemeAutomations";
-import { WELCOME_TAG } from "@/lib/syncSysteme";
+import { progressTag } from "@/lib/syncSysteme";
 
 // Crea en Systeme.io una CAMPAÑA de correos con esperas entre pasos, y sus dos reglas:
 //   - etiqueta agregada  -> suscribir a la campaña
@@ -28,6 +28,8 @@ type CampaignSpec = {
   campaignName: string;
   description: string;
   steps: StepSpec[];
+  // Por defecto se crea también la regla "etiqueta eliminada → cancelar". Con false, solo la de suscribir.
+  cancelOnTagRemoved?: boolean;
 };
 
 export const CAMPAIGN_SPECS: Record<string, CampaignSpec> = {
@@ -103,12 +105,14 @@ export const CAMPAIGN_SPECS: Record<string, CampaignSpec> = {
     ],
   },
 
-  // Correo de bienvenida: llega 2 minutos después de que la persona se registra (la app le pone
-  // la etiqueta "bienvenida" en ese momento). Un solo correo; la etiqueta no se quita nunca.
+  // Correo de bienvenida: llega 2 minutos después de que la persona se registra. Usa la misma
+  // etiqueta que ya se pone al registrarse (reto_sin_empezar), así no hace falta otra etiqueta.
+  // Un solo correo y sin regla de cancelar: no hay nada que cancelar.
   bienvenida: {
-    tag: WELCOME_TAG,
+    tag: progressTag(0)!,
     campaignName: "[App] Bienvenida (2 minutos después del registro)",
-    description: "Se activa al agregar la etiqueta bienvenida, que la app pone al crear la cuenta.",
+    description: "Se activa al agregar la etiqueta reto_sin_empezar, que la app pone al crear la cuenta.",
+    cancelOnTagRemoved: false,
     steps: [
       {
         subject: "Bienvenido a Skooly, ya estás dentro",
@@ -214,10 +218,16 @@ export async function createCampaignAutomation(key: string): Promise<CampaignRes
           )
       );
 
-    for (const [trigger, action, label] of [
+    // La regla de cancelar solo tiene sentido en las campañas largas, donde la persona puede
+    // dejar de necesitarlas (por ejemplo, si vuelve a entrar). Un correo único, como el de
+    // bienvenida, no la necesita: spec.cancelOnTagRemoved = false evita crear esa regla.
+    const ruleKinds = [
       ["tag_added", "subscribe_to_campaign", "Regla: etiqueta agregada → suscribir"],
       ["tag_removed", "unsubscribe_from_campaign", "Regla: etiqueta eliminada → cancelar"],
-    ] as const) {
+    ] as const;
+    for (const [trigger, action, label] of ruleKinds.filter(
+      ([t]) => t === "tag_added" || spec.cancelOnTagRemoved !== false
+    )) {
       if (hasRule(trigger, action)) {
         lines.push(`${label} (ya existía)`);
         continue;

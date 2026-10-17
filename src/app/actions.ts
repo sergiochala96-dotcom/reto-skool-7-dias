@@ -606,8 +606,9 @@ export async function adminApplyEmailTexts(): Promise<UpdateResult> {
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
   const emails = await updateAutomationEmails(["completado", "casi_listo"]);
-  // La campaña de bienvenida se crea la primera vez (con su etiqueta y su regla); si ya existe,
-  // se reutiliza sin duplicar nada. Después se actualizan los textos de todas las campañas.
+  // La campaña de bienvenida se crea la primera vez (con una sola regla: suscribir al agregarse
+  // reto_sin_empezar); si ya existe, se reutiliza sin duplicar nada. Después se actualizan los
+  // textos de todas las campañas.
   const welcome = await createCampaignAutomation("bienvenida");
   const steps = await updateCampaignSteps(["sin_conexion", "sin_empezar", "bienvenida"]);
   return {
