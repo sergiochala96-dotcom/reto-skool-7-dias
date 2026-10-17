@@ -510,9 +510,9 @@ export async function updateAvatar(
 
 function traducirError(message: string): string {
   if (message.includes("Invalid login credentials"))
-    return "Email o contraseña incorrectos.";
+    return 'Email o contraseña incorrectos. Si te registraste con Google, entra con el botón "Continuar con Google". Si no recuerdas tu contraseña o nunca creaste una, usa "¿Olvidaste tu contraseña?".';
   if (message.includes("already registered") || message.includes("already exists"))
-    return "Ese email ya tiene una cuenta. Inicia sesión.";
+    return 'Ese email ya tiene una cuenta. Inicia sesión; si la creaste con Google, usa el botón "Continuar con Google".';
   if (message.includes("Password should be"))
     return "La contraseña es muy corta (mínimo 6 caracteres).";
   if (message.toLowerCase().includes("rate limit"))

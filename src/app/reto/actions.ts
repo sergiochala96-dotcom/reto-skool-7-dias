@@ -58,7 +58,11 @@ export async function crearCuentaReto(
         };
       }
       if (msg.includes("already registered") || msg.includes("already exists")) {
-        return { ok: false, error: "Ese correo ya tiene una cuenta.", exists: true };
+        return {
+          ok: false,
+          error: "Ese correo ya tiene una cuenta. Si la creaste con Google, entra con ese botón.",
+          exists: true,
+        };
       }
       if (msg.includes("password")) {
         return { ok: false, error: "La contraseña es muy corta (mínimo 6 caracteres)." };
