@@ -293,7 +293,7 @@ export default function Sidebar({
               }}
               title={effectiveCollapsed ? "Unirme al WhatsApp" : undefined}
               aria-label="Unirme al WhatsApp"
-              className={`flex items-center justify-center gap-2 bg-[#25D366] font-bold text-white shadow-md shadow-[#25D366]/20 transition hover:brightness-110 ${
+              className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
                 effectiveCollapsed
                   ? "h-10 w-10 rounded-full"
                   : "rounded-xl px-3 py-2 text-sm md:text-base"
@@ -314,7 +314,7 @@ export default function Sidebar({
               }}
               title={effectiveCollapsed ? "Unirme al curso en Skool" : undefined}
               aria-label="Unirme al curso en Skool"
-              className={`flex items-center justify-center gap-2 bg-amber-400 font-bold text-black shadow-md shadow-amber-400/20 transition hover:bg-amber-300 ${
+              className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
                 effectiveCollapsed
                   ? "h-10 w-10 rounded-full"
                   : "rounded-xl px-3 py-2 text-sm md:text-base"

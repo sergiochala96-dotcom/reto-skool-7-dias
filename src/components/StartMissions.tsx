@@ -117,7 +117,7 @@ export default function StartMissions({ initial }: { initial: Done }) {
                 done.whatsapp ? "text-emerald-300" : "text-amber-300"
               }`}
             >
-              {done.whatsapp ? "Ya estás dentro ✓" : "Unirme →"}
+              {done.whatsapp ? "Ya estás dentro ✓" : "Unirme gratis →"}
             </span>
           </span>
         </a>
@@ -148,7 +148,7 @@ export default function StartMissions({ initial }: { initial: Done }) {
                 done.skool ? "text-emerald-300" : "text-amber-300"
               }`}
             >
-              {done.skool ? "Ya estás dentro ✓" : "Unirme →"}
+              {done.skool ? "Ya estás dentro ✓" : "Unirme gratis →"}
             </span>
           </span>
         </a>
