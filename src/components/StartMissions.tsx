@@ -3,6 +3,7 @@
 import { useState, useTransition, type CSSProperties } from "react";
 import confetti from "canvas-confetti";
 import { completeStartMission } from "@/app/actions";
+import CourseIcon from "@/components/CourseIcon";
 import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import { playVictoryFanfare } from "@/lib/successSound";
@@ -21,26 +22,6 @@ function celebrate() {
   });
 }
 
-// Icono de reproductor de curso: pantalla con el botón de play.
-function CourseIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <rect x="2" y="4" width="20" height="14" rx="3" />
-      <path d="M10 8.2v5.6l4.8-2.8z" fill="currentColor" />
-      <path d="M8 21h8" />
-    </svg>
-  );
-}
-
 // Destello que titila en la esquina de una misión pendiente.
 function Sparkle({ className, delay }: { className: string; delay: string }) {
   return (
@@ -54,28 +35,36 @@ function Sparkle({ className, delay }: { className: string; delay: string }) {
   );
 }
 
+// En celular cada misión es una columna (icono arriba, texto abajo); desde pantallas medianas
+// es una fila (icono a la izquierda, texto a la derecha) para que la tarjeta quede alargada.
 const TILE =
-  "group flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center transition hover:bg-white/5";
+  "group flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center transition hover:bg-white/5 md:flex-row md:gap-4 md:px-4 md:text-left";
 const CIRCLE =
-  "relative flex h-16 w-16 items-center justify-center rounded-full transition duration-300 group-hover:scale-105 sm:h-[4.5rem] sm:w-[4.5rem]";
+  "relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full transition duration-300 group-hover:scale-105 sm:h-[4.5rem] sm:w-[4.5rem]";
 
 // Las dos misiones de inicio del dashboard: unirse al boletín de WhatsApp y al curso en Skool.
 // Las ve TODO el mundo y no desaparecen al completarlas (ni siquiera al terminar el reto): la
 // idea es que cualquiera pueda entrar a las comunidades cuando quiera. No cierran ningún día.
 // Cada botón abre el enlace en otra pestaña y marca la misión como hecha (desde aquí no se
 // puede comprobar que la persona haya entrado, así que es de avance, no de prueba).
+// Lo que ya venga marcado del servidor (por ejemplo, desde los botones del menú lateral)
+// también cuenta.
 export default function StartMissions({ initial }: { initial: Done }) {
-  const [done, setDone] = useState(initial);
+  const [local, setLocal] = useState<Done>({ skool: false, whatsapp: false });
   const [, startTransition] = useTransition();
 
+  const done: Done = {
+    skool: initial.skool || local.skool,
+    whatsapp: initial.whatsapp || local.whatsapp,
+  };
   const both = done.skool && done.whatsapp;
 
   function mark(kind: Kind) {
     if (done[kind]) return;
-    const next = { ...done, [kind]: true };
-    setDone(next);
+    setLocal((l) => ({ ...l, [kind]: true }));
     startTransition(() => completeStartMission(kind));
-    if (next.skool && next.whatsapp) celebrate();
+    const other: Kind = kind === "skool" ? "whatsapp" : "skool";
+    if (done[other]) celebrate();
   }
 
   const glow = (rgba: string) => ({ "--glow": rgba }) as CSSProperties;
@@ -91,7 +80,7 @@ export default function StartMissions({ initial }: { initial: Done }) {
   );
 
   return (
-    <section className="mx-auto mb-5 w-full max-w-md rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 py-4 text-center shadow-2xl shadow-fuchsia-900/40 md:mb-6">
+    <section className="mx-auto mb-5 w-full max-w-md rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 py-4 text-center shadow-2xl shadow-fuchsia-900/40 md:mb-6 md:max-w-4xl md:px-6 md:py-5">
       <p className="text-[11px] font-bold uppercase tracking-wide text-amber-300">
         Primeras misiones
       </p>
@@ -99,7 +88,7 @@ export default function StartMissions({ initial }: { initial: Done }) {
         Únete a nuestras comunidades y no te pierdas nada del reto
       </p>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 md:mt-4 md:gap-4">
         {/* Misión 1: boletín de WhatsApp */}
         <a
           href={WHATSAPP_COMMUNITY_URL}
@@ -119,13 +108,17 @@ export default function StartMissions({ initial }: { initial: Done }) {
             </svg>
             {done.whatsapp ? badge : <Sparkle className="-right-1 -top-1" delay="0s" />}
           </span>
-          <span className="text-sm font-bold leading-tight text-white">
-            Únete al boletín en WhatsApp
-          </span>
-          <span
-            className={`text-xs font-bold ${done.whatsapp ? "text-emerald-300" : "text-amber-300"}`}
-          >
-            {done.whatsapp ? "Ya estás dentro ✓" : "Unirme →"}
+          <span className="flex flex-col gap-1">
+            <span className="text-sm font-bold leading-tight text-white md:text-base">
+              Únete al boletín en WhatsApp
+            </span>
+            <span
+              className={`text-xs font-bold md:text-sm ${
+                done.whatsapp ? "text-emerald-300" : "text-amber-300"
+              }`}
+            >
+              {done.whatsapp ? "Ya estás dentro ✓" : "Unirme →"}
+            </span>
           </span>
         </a>
 
@@ -146,17 +139,23 @@ export default function StartMissions({ initial }: { initial: Done }) {
             <CourseIcon className="h-9 w-9" />
             {done.skool ? badge : <Sparkle className="-left-1 -top-1" delay="0.5s" />}
           </span>
-          <span className="text-sm font-bold leading-tight text-white">
-            Únete al curso en Skool
-          </span>
-          <span className={`text-xs font-bold ${done.skool ? "text-emerald-300" : "text-amber-300"}`}>
-            {done.skool ? "Ya estás dentro ✓" : "Unirme →"}
+          <span className="flex flex-col gap-1">
+            <span className="text-sm font-bold leading-tight text-white md:text-base">
+              Únete al curso en Skool
+            </span>
+            <span
+              className={`text-xs font-bold md:text-sm ${
+                done.skool ? "text-emerald-300" : "text-amber-300"
+              }`}
+            >
+              {done.skool ? "Ya estás dentro ✓" : "Unirme →"}
+            </span>
           </span>
         </a>
       </div>
 
       {both && (
-        <p className="mt-2 text-xs font-semibold text-emerald-300">
+        <p className="mt-2 text-xs font-semibold text-emerald-300 md:text-sm">
           🎉 ¡Listo! Ya estás en las dos comunidades
         </p>
       )}

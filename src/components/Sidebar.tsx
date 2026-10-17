@@ -6,9 +6,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isDayUnlocked, MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import type { SidebarNotification } from "@/lib/sidebar-data";
-import { adminResetProgress, adminUnlockAll, signOut } from "@/app/actions";
+import { adminResetProgress, adminUnlockAll, completeStartMission, signOut } from "@/app/actions";
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
+import CourseIcon from "@/components/CourseIcon";
+import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
+import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
@@ -274,6 +277,53 @@ export default function Sidebar({
             </li>
           </ul>
 
+          {/* Acceso permanente a las dos comunidades (para todos). Marcan las misiones de inicio. */}
+          <div
+            className={`mt-3 flex flex-col pb-2 ${
+              effectiveCollapsed ? "items-center gap-2" : "gap-2"
+            }`}
+          >
+            <a
+              href={WHATSAPP_COMMUNITY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                setMobileOpen(false);
+                void completeStartMission("whatsapp");
+              }}
+              title={effectiveCollapsed ? "Unirme al WhatsApp" : undefined}
+              aria-label="Unirme al WhatsApp"
+              className={`flex items-center justify-center gap-2 bg-[#25D366] font-bold text-white shadow-md shadow-[#25D366]/20 transition hover:brightness-110 ${
+                effectiveCollapsed
+                  ? "h-10 w-10 rounded-full"
+                  : "rounded-xl px-3 py-2 text-sm md:text-base"
+              }`}
+            >
+              <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0" aria-hidden="true">
+                <path d={WHATSAPP_PATH} />
+              </svg>
+              {!effectiveCollapsed && <span>Unirme al WhatsApp</span>}
+            </a>
+            <a
+              href={SKOOL_COMMUNITY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                setMobileOpen(false);
+                void completeStartMission("skool");
+              }}
+              title={effectiveCollapsed ? "Unirme al curso en Skool" : undefined}
+              aria-label="Unirme al curso en Skool"
+              className={`flex items-center justify-center gap-2 bg-amber-400 font-bold text-black shadow-md shadow-amber-400/20 transition hover:bg-amber-300 ${
+                effectiveCollapsed
+                  ? "h-10 w-10 rounded-full"
+                  : "rounded-xl px-3 py-2 text-sm md:text-base"
+              }`}
+            >
+              <CourseIcon className="h-5 w-5 shrink-0" />
+              {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
+            </a>
+          </div>
         </nav>
 
         <div className="border-t border-white/10 pt-2">
