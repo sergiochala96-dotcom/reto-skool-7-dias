@@ -276,9 +276,17 @@ export async function updateCampaignSteps(keys: string[]): Promise<CampaignResul
         `/api/mailing/campaigns/${campaign.id}/steps`
       );
       for (const s of spec.steps) {
-        const step = steps.find((e) => e.comment === s.comment) ?? steps.find((e) => e.content?.subject === s.subject);
+        // Primero por el nombre interno del paso, luego por el asunto. Si la campaña tiene un
+        // único correo (como la de activación y la de bienvenida) y el texto esperado también es
+        // uno solo, ese es el paso, aunque se le haya cambiado el nombre o el asunto a mano.
+        const step =
+          steps.find((e) => e.comment === s.comment) ??
+          steps.find((e) => e.content?.subject === s.subject) ??
+          (steps.length === 1 && spec.steps.length === 1 ? steps[0] : undefined);
         if (!step) {
-          lines.push(`${s.comment}: no se encontró el paso "${s.subject}"`);
+          lines.push(
+            `${s.comment}: no se encontró el paso "${s.subject}" en la campaña "${spec.campaignName}" (revísala en Systeme.io: debe tener su correo)`
+          );
           continue;
         }
         await systemeApi(`/api/mailing/campaign-steps/${step.id}`, {
