@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ActivateAccessLink from "@/components/ActivateAccessLink";
 import CaptacionFooter from "@/components/CaptacionFooter";
 import GraciasCheckpoints, {
   WHATSAPP_PATH,
@@ -47,10 +48,10 @@ export default function GraciasPage() {
             />
 
             <h1 className="mt-4 text-2xl font-extrabold leading-[1.12] tracking-tight sm:text-3xl lg:mt-6 lg:text-4xl">
-              Tu acceso a <span className="text-fuchsia-600">Skooly</span> va en
-              camino a tu correo.{" "}
+              Tu acceso a <span className="text-fuchsia-600">Skooly</span> ya
+              está listo.{" "}
               <span className="text-purple-700">
-                Pero te hace falta un paso.
+                Actívalo y empieza hoy tu Día 1.
               </span>
             </h1>
           </div>
@@ -61,21 +62,31 @@ export default function GraciasPage() {
 
           <div className="mx-auto w-full max-w-md lg:col-start-1 lg:row-start-2 lg:mx-0 lg:self-start">
             <ArrowsDown />
+            <ActivateAccessLink
+              source="pagina"
+              className="page-anim inline-flex w-full animate-[ctaPulseAmber_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-4 text-base font-extrabold text-black shadow-lg shadow-amber-400/40 transition hover:bg-amber-300 motion-reduce:animate-none sm:px-8 sm:text-xl"
+            >
+              Activar mi acceso y empezar el Día 1 →
+            </ActivateAccessLink>
             <a
               href={WHATSAPP_COMMUNITY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="page-anim inline-flex w-full animate-[ctaPulse_1.8s_ease-in-out_infinite] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-[#25D366]/40 transition hover:brightness-105 motion-reduce:animate-none sm:px-8 sm:py-4 sm:text-xl"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-extrabold text-white shadow-md shadow-[#25D366]/30 transition hover:brightness-105 sm:text-base"
             >
               <svg
                 viewBox="0 0 32 32"
                 fill="currentColor"
-                className="h-6 w-6 shrink-0 sm:h-7 sm:w-7"
+                className="h-5 w-5 shrink-0 sm:h-6 sm:w-6"
               >
                 <path d={WHATSAPP_PATH} />
               </svg>
               Unirme al boletín de Skool en WhatsApp
             </a>
+            <p className="mt-3 text-xs leading-snug text-purple-950/60 sm:text-sm">
+              También te enviamos tu acceso por correo. Si no lo ves, revisa
+              Promociones o Spam.
+            </p>
           </div>
         </div>
       </main>

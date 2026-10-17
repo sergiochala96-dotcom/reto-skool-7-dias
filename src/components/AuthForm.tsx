@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import type { AuthState } from "@/app/actions";
 
 type Props = {
@@ -13,6 +13,23 @@ export default function AuthForm({ action, mode }: Props) {
     action,
     undefined
   );
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+
+  // Registro: si la persona viene de dejar sus datos en /reto, el nombre y el correo
+  // aparecen ya escritos (así no se equivoca de correo y la cuenta queda ligada a su contacto).
+  useEffect(() => {
+    if (mode !== "registro") return;
+    try {
+      const saved = sessionStorage.getItem("reto_prefill");
+      if (!saved) return;
+      const { name, email } = JSON.parse(saved) as { name?: string; email?: string };
+      if (emailRef.current && !emailRef.current.value && email) emailRef.current.value = email;
+      if (nameRef.current && !nameRef.current.value && name) nameRef.current.value = name;
+    } catch {
+      // sin datos guardados: los campos quedan vacíos
+    }
+  }, [mode]);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -22,6 +39,7 @@ export default function AuthForm({ action, mode }: Props) {
             Nombre
           </label>
           <input
+            ref={nameRef}
             name="nombre"
             type="text"
             placeholder="Tu nombre"
@@ -35,6 +53,7 @@ export default function AuthForm({ action, mode }: Props) {
           Email
         </label>
         <input
+          ref={emailRef}
           name="email"
           type="email"
           required

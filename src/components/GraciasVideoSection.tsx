@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import ActivateAccessLink from "@/components/ActivateAccessLink";
 import GraciasPopup from "@/components/GraciasPopup";
 import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
@@ -62,10 +63,16 @@ function PlayOverlay({ onPlay }: { onPlay: () => void }) {
 function EndOverlay({ onReplay }: { onReplay: () => void }) {
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/70 px-5">
+      <ActivateAccessLink
+        source="video"
+        className="flex w-full items-center justify-center whitespace-nowrap rounded-xl bg-amber-400 px-3 py-3.5 text-sm font-extrabold text-black shadow-lg transition hover:bg-amber-300 active:scale-[0.99]"
+      >
+        Activar mi acceso →
+      </ActivateAccessLink>
       <button
         type="button"
         onClick={onReplay}
-        className="w-full whitespace-nowrap rounded-xl bg-amber-400 px-3 py-3.5 text-sm font-extrabold text-black shadow-lg transition hover:bg-amber-300 active:scale-[0.99]"
+        className="w-full whitespace-nowrap rounded-xl bg-white/15 px-3 py-3 text-sm font-bold text-white transition hover:bg-white/25 active:scale-[0.99]"
       >
         ↺ Volver a ver
       </button>

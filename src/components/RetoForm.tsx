@@ -69,6 +69,12 @@ export default function RetoForm() {
       });
       if (result.ok) {
         trackEvent("Lead", { content_name: "Reto Skool 7 dias" }, eventId);
+        // Para que /registro se abra con el nombre y el correo ya escritos (solo en este navegador).
+        try {
+          sessionStorage.setItem("reto_prefill", JSON.stringify({ name, email }));
+        } catch {
+          // sin sessionStorage: la persona escribe sus datos en el registro
+        }
         router.push("/gracias");
       } else {
         setError(result.error);

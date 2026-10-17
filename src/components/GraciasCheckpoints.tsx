@@ -21,7 +21,7 @@ const SIZES: Record<
   },
 };
 
-// Los 3 checkpoints (listo, correo, WhatsApp). Con labels muestra "Paso 1/2/3" debajo.
+// Los 3 checkpoints (listo, activar acceso [llave], WhatsApp). Con labels muestra "Paso 1/2/3" debajo.
 export default function GraciasCheckpoints({
   size = "md",
   labels = false,
@@ -64,8 +64,9 @@ export default function GraciasCheckpoints({
             className={s.icon}
             aria-hidden="true"
           >
-            <rect x="3" y="5" width="18" height="14" rx="2" />
-            <path d="m3 7 9 6 9-6" />
+            <circle cx="8" cy="15" r="4" />
+            <path d="m11 12 8-8" />
+            <path d="m16 7 3 3" />
           </svg>
         </span>
         {labels && <span className={label}>Paso 2</span>}
