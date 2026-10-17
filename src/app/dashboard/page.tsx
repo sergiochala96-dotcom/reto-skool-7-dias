@@ -9,10 +9,20 @@ import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import DayIntroVideo from "@/components/DayIntroVideo";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
+import StartMissions from "@/components/StartMissions";
 
 export default async function DashboardPage() {
-  const { nombre, user, avatarUrl, admin, completedDays, welcomeVideoSeen, notifications } =
-    await getSidebarData();
+  const {
+    nombre,
+    user,
+    avatarUrl,
+    admin,
+    completedDays,
+    welcomeVideoSeen,
+    notifications,
+    startMissions,
+    startUnlocked,
+  } = await getSidebarData();
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
 
@@ -51,6 +61,7 @@ export default async function DashboardPage() {
         admin={admin}
         completedDays={completedList}
         notifications={notifications}
+        startUnlocked={startUnlocked}
       />
 
       <main className="flex-1 px-4 py-10 md:py-5">
@@ -82,9 +93,11 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <ChallengePathHorizontal completedDays={completedList} />
+          <StartMissions initial={startMissions} startUnlocked={startUnlocked} />
+
+          <ChallengePathHorizontal completedDays={completedList} startUnlocked={startUnlocked} />
           <div className="md:hidden">
-            <ChallengePath completedDays={completedList} />
+            <ChallengePath completedDays={completedList} startUnlocked={startUnlocked} />
           </div>
 
           <Episode2Card locked={episode2Locked} admin={admin} />

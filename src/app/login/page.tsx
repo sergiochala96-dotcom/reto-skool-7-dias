@@ -5,7 +5,13 @@ import GoogleButton from "@/components/GoogleButton";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import { signInWithEmail } from "@/app/actions";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
   return (
     <main className="flex min-h-screen">
       <div className="flex w-full items-center justify-center bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-12 md:w-1/2">
@@ -26,6 +32,14 @@ export default function LoginPage() {
               Entra con el mismo correo con el que reservaste tu lugar
             </p>
           </div>
+
+          {error === "auth" && (
+            <p className="mb-4 rounded-lg bg-amber-500/20 px-3 py-2 text-sm text-amber-100">
+              No pudimos iniciar tu sesión con ese enlace. Si venías de &quot;olvidé mi
+              contraseña&quot;, pide un enlace nuevo y ábrelo en el mismo navegador donde lo
+              pediste.
+            </p>
+          )}
 
           <GoogleButton />
 

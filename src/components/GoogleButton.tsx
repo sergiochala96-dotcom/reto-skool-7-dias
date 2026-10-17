@@ -2,8 +2,10 @@
 
 import { createClient } from "@/lib/supabase/client";
 
-export default function GoogleButton() {
+export default function GoogleButton({ beforeRedirect }: { beforeRedirect?: () => void }) {
   const handleClick = async () => {
+    // /reto guarda aquí el origen del tráfico antes de salir hacia Google.
+    beforeRedirect?.();
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",

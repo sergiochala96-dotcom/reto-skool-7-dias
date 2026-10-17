@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { registrarContacto } from "@/app/reto/actions";
+import { crearCuentaReto } from "@/app/reto/actions";
+import GoogleButton from "@/components/GoogleButton";
 import type { Attribution } from "@/lib/traffic";
 import { trackEvent } from "@/lib/metaPixel";
+import { CAPTURE_COOKIE, type Capture } from "@/lib/retoCapture";
 
 const INPUT =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-300/40";
@@ -16,10 +19,15 @@ function readCookie(name: string): string | undefined {
     ?.split("=")[1];
 }
 
-export default function RetoForm() {
+// showGoogle: la página lo apaga cuando se abre dentro de Facebook/Instagram, donde Google
+// bloquea el inicio de sesión.
+export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; exists?: boolean } | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  // Si Supabase pide confirmar el correo, se muestra este aviso en vez de entrar al panel.
+  const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const attributionRef = useRef<Attribution>({});
 
   // Origen del tráfico: etiquetas UTM del enlace (y la página de la que viene). Se
@@ -56,12 +64,13 @@ export default function RetoForm() {
     const data = new FormData(e.currentTarget);
     const name = String(data.get("name") ?? "");
     const email = String(data.get("email") ?? "");
+    const password = String(data.get("password") ?? "");
     setError(null);
     startTransition(async () => {
       // Mismo ID de evento en el píxel (navegador) y en la API de Conversiones (servidor)
       // para que Meta cuente un solo Lead.
       const eventId = crypto.randomUUID();
-      const result = await registrarContacto(name, email, attributionRef.current, {
+      const result = await crearCuentaReto(name, email, password, attributionRef.current, {
         eventId,
         fbp: readCookie("_fbp"),
         fbc: readCookie("_fbc"),
@@ -69,66 +78,147 @@ export default function RetoForm() {
       });
       if (result.ok) {
         trackEvent("Lead", { content_name: "Reto Skool 7 dias" }, eventId);
-        // Para que /registro se abra con el nombre y el correo ya escritos (solo en este navegador).
-        try {
-          sessionStorage.setItem("reto_prefill", JSON.stringify({ name, email }));
-        } catch {
-          // sin sessionStorage: la persona escribe sus datos en el registro
-        }
-        router.push("/gracias");
+        if (result.needsConfirmation) setConfirmEmail(email.trim());
+        else router.push("/dashboard");
       } else {
-        setError(result.error);
+        setError({ text: result.error, exists: result.exists });
       }
     });
   }
 
-  return (
-    <form onSubmit={onSubmit} className="space-y-3" noValidate>
-      <div>
-        <label htmlFor="reto-name" className="mb-1 block text-sm font-semibold text-white/90">
-          Tu nombre
-        </label>
-        <input
-          id="reto-name"
-          name="name"
-          type="text"
-          autoComplete="given-name"
-          placeholder="Ej: María"
-          required
-          maxLength={80}
-          className={INPUT}
-        />
-      </div>
-      <div>
-        <label htmlFor="reto-email" className="mb-1 block text-sm font-semibold text-white/90">
-          Tu correo (mejor si es Gmail)
-        </label>
-        <input
-          id="reto-email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          placeholder="tucorreo@gmail.com"
-          required
-          maxLength={200}
-          className={INPUT}
-        />
-      </div>
+  // Con Google se sale de la página y se pierden los UTM y las cookies de Meta: se guardan
+  // en una cookie de corta vida que /auth/callback lee al volver (ver lib/retoCapture.ts).
+  function saveCaptureForGoogle() {
+    try {
+      const capture: Capture = {
+        attribution: attributionRef.current,
+        tracking: {
+          eventId: crypto.randomUUID(),
+          fbp: readCookie("_fbp"),
+          fbc: readCookie("_fbc"),
+          sourceUrl: window.location.href,
+        },
+      };
+      document.cookie = `${CAPTURE_COOKIE}=${encodeURIComponent(JSON.stringify(capture))}; path=/; max-age=1800; SameSite=Lax; Secure`;
+    } catch {
+      // sin cookies: el lead se registra igual, solo sin origen
+    }
+  }
 
-      {error && (
-        <p role="alert" className="rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-100">
-          {error}
+  if (confirmEmail) {
+    return (
+      <div className="rounded-2xl bg-emerald-500/15 px-4 py-5 text-center text-white">
+        <p className="text-3xl">📬</p>
+        <p className="mt-2 text-lg font-extrabold">¡Casi listo! Confirma tu correo</p>
+        <p className="mt-2 text-sm leading-relaxed text-white/80">
+          Te enviamos un correo a <strong>{confirmEmail}</strong>. Ábrelo y toca el botón para
+          activar tu cuenta y entrar a Skooly.
         </p>
+        <p className="mt-2 text-xs text-white/60">
+          Si no lo ves, revisa Promociones o Spam.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {showGoogle && (
+        <>
+          <GoogleButton beforeRedirect={saveCaptureForGoogle} />
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/15" />
+            <span className="text-xs uppercase tracking-wide text-white/50">o con tu correo</span>
+            <div className="h-px flex-1 bg-white/15" />
+          </div>
+        </>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-1 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {pending ? "Enviando..." : "Quiero mi acceso"}
-      </button>
-    </form>
+      <form onSubmit={onSubmit} className="space-y-3" noValidate>
+        <div>
+          <label htmlFor="reto-name" className="mb-1 block text-sm font-semibold text-white/90">
+            Tu nombre
+          </label>
+          <input
+            id="reto-name"
+            name="name"
+            type="text"
+            autoComplete="given-name"
+            placeholder="Ej: María"
+            required
+            maxLength={80}
+            className={INPUT}
+          />
+        </div>
+        <div>
+          <label htmlFor="reto-email" className="mb-1 block text-sm font-semibold text-white/90">
+            Tu correo (mejor si es Gmail)
+          </label>
+          <input
+            id="reto-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            placeholder="tucorreo@gmail.com"
+            required
+            maxLength={200}
+            className={INPUT}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="reto-password"
+            className="mb-1 flex items-center justify-between text-sm font-semibold text-white/90"
+          >
+            <span>Crea tu contraseña</span>
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="text-xs font-medium text-white/60 underline hover:text-white"
+            >
+              {showPassword ? "Ocultar" : "Mostrar"}
+            </button>
+          </label>
+          <input
+            id="reto-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            placeholder="Mínimo 6 caracteres"
+            required
+            minLength={6}
+            maxLength={72}
+            className={INPUT}
+          />
+        </div>
+
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-100"
+          >
+            {error.text}
+            {error.exists && (
+              <>
+                {" "}
+                <Link href="/login" className="underline">
+                  Inicia sesión aquí
+                </Link>
+                .
+              </>
+            )}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={pending}
+          className="mt-1 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {pending ? "Creando tu cuenta..." : "Crear mi cuenta gratis"}
+        </button>
+      </form>
+    </div>
   );
 }

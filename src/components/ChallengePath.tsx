@@ -16,14 +16,15 @@ const OFFSETS = [0, 1, 1.4, 1, 0, -1, -1.4]; // patrón zigzag por día
 
 export default function ChallengePath({
   completedDays,
+  startUnlocked = true,
 }: {
   completedDays: number[];
+  startUnlocked?: boolean; // el Día 1 se abre al completar las misiones iniciales
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const firstAvailable = MISSIONS.find(
-    (m) => !done.has(m.day) && (m.day === 1 || done.has(m.day - 1))
-  )?.day;
+  const isUnlocked = (day: number) => (day === 1 ? startUnlocked : done.has(day - 1));
+  const firstAvailable = MISSIONS.find((m) => !done.has(m.day) && isUnlocked(m.day))?.day;
 
   const points = MISSIONS.map((m, i) => ({
     x: OFFSETS[i] * AMPLITUDE,
@@ -117,7 +118,7 @@ export default function ChallengePath({
 
         {points.map((p) => {
           const isDone = done.has(p.mission.day);
-          const unlocked = p.mission.day === 1 || done.has(p.mission.day - 1);
+          const unlocked = isUnlocked(p.mission.day);
           const isCurrent = p.mission.day === firstAvailable;
 
           const node = (

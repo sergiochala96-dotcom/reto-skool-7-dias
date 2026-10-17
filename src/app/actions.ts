@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TOTAL_DAYS } from "@/lib/challenge";
@@ -30,14 +31,30 @@ export async function signUpWithEmail(
   if (password.length < 6)
     return { error: "La contraseña debe tener al menos 6 caracteres." };
 
+  const h = await headers();
+  const origin = h.get("origin") ?? `https://${h.get("host")}`;
+
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: nombre || email.split("@")[0] } },
+    options: {
+      data: { display_name: nombre || email.split("@")[0] },
+      // Si Supabase pide confirmar el correo, el enlace del correo lo deja dentro del panel.
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
   });
 
   if (error) return { error: traducirError(error.message) };
+
+  // Sin sesión = hay que confirmar el correo primero. Antes se mandaba igual al panel y la
+  // persona terminaba en el login sin saber por qué.
+  if (!data.session) {
+    return {
+      error:
+        "Te enviamos un correo para confirmar tu cuenta. Ábrelo y toca el botón; si no lo ves, revisa Promociones o Spam.",
+    };
+  }
 
   redirect("/dashboard");
 }
@@ -65,6 +82,78 @@ export async function signOut() {
   redirect("/login");
 }
 
+// ---------------------------------------------------------------------------
+// Recuperar contraseña
+// ---------------------------------------------------------------------------
+
+export type ResetState = { error?: string; sent?: boolean } | undefined;
+
+// Paso 1: la persona escribe su correo y recibe un enlace. La respuesta es siempre la misma
+// (exista o no la cuenta) para no revelar qué correos están registrados.
+export async function requestPasswordReset(
+  _prevState: ResetState,
+  formData: FormData
+): Promise<ResetState> {
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Escribe un correo válido." };
+
+  const h = await headers();
+  const origin = h.get("origin") ?? `https://${h.get("host")}`;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    // Misma dirección que usa el inicio de sesión con Google, que ya está autorizada en Supabase.
+    redirectTo: `${origin}/auth/callback`,
+  });
+  if (error) {
+    return {
+      error: error.message.toLowerCase().includes("rate")
+        ? "Pediste muchos enlaces seguidos. Espera unos minutos e intenta de nuevo."
+        : "No pudimos enviar el correo. Intenta de nuevo en un momento.",
+    };
+  }
+
+  // Marca que el próximo regreso por /auth/callback es una recuperación: así el enlace del
+  // correo lleva a elegir la contraseña nueva (ver auth/callback/route.ts).
+  (await cookies()).set("pw_reset", "1", {
+    maxAge: 60 * 60,
+    path: "/",
+    sameSite: "lax",
+    secure: true,
+    httpOnly: true,
+  });
+
+  return { sent: true };
+}
+
+// Paso 2: con la sesión que abre el enlace del correo, la persona elige su contraseña nueva.
+export async function updatePassword(
+  _prevState: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const password = String(formData.get("password") || "");
+  const confirm = String(formData.get("confirm") || "");
+  if (password.length < 6) return { error: "La contraseña debe tener al menos 6 caracteres." };
+  if (password !== confirm) return { error: "Las contraseñas no coinciden." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return {
+      error: error.message.includes("different from the old password")
+        ? "Elige una contraseña distinta a la anterior."
+        : "No pudimos cambiar la contraseña. Pide un enlace nuevo e intenta de nuevo.",
+    };
+  }
+
+  redirect("/dashboard");
+}
+
 export async function completeDay(day: number): Promise<void> {
   const supabase = await createClient();
   const {
@@ -80,7 +169,8 @@ export async function completeDay(day: number): Promise<void> {
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked = day === 1 || completedDays.has(day - 1);
+  const unlocked =
+    day === 1 ? await startUnlockedFor(supabase, user.id, completedDays) : completedDays.has(day - 1);
 
   if (!unlocked || day < 1 || day > TOTAL_DAYS) {
     redirect("/dashboard");
@@ -97,6 +187,41 @@ export async function completeDay(day: number): Promise<void> {
 
   if (day === TOTAL_DAYS) redirect("/cofre");
   redirect("/dashboard");
+}
+
+// El Día 1 se abre al completar las dos misiones iniciales (unirse al Skool y a WhatsApp).
+// Quien ya tiene días completados no las necesita.
+async function startUnlockedFor(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  completedDays: Set<number>
+): Promise<boolean> {
+  if (completedDays.size > 0) return true;
+  const { data } = await supabase
+    .from("profiles")
+    .select("joined_skool_at, joined_whatsapp_at")
+    .eq("id", userId)
+    .single();
+  return !!(data?.joined_skool_at && data?.joined_whatsapp_at);
+}
+
+// Marca una misión inicial como hecha cuando la persona toca su botón (no se puede verificar
+// desde aquí que haya entrado a Skool o a WhatsApp, por eso es de avance, no de prueba).
+export async function completeStartMission(kind: "skool" | "whatsapp"): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const column = kind === "skool" ? "joined_skool_at" : "joined_whatsapp_at";
+  await supabase
+    .from("profiles")
+    .update({ [column]: new Date().toISOString() })
+    .eq("id", user.id)
+    .is(column, null);
+
+  revalidatePath("/dashboard");
 }
 
 export async function uncompleteDay(day: number): Promise<void> {
@@ -142,7 +267,8 @@ export async function saveMissionAnswers(
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked = day === 1 || completedDays.has(day - 1);
+  const unlocked =
+    day === 1 ? await startUnlockedFor(supabase, user.id, completedDays) : completedDays.has(day - 1);
   if (!unlocked || day < 1 || day > TOTAL_DAYS) redirect("/dashboard");
 
   const multiValueIds = new Set(
@@ -244,7 +370,12 @@ export async function adminResetUserProgress(targetUserId: string): Promise<void
   await supabase.from("mission_answers").delete().eq("user_id", targetUserId);
   await supabase
     .from("profiles")
-    .update({ welcome_video_seen: false, episode2_locked_override: null })
+    .update({
+      welcome_video_seen: false,
+      episode2_locked_override: null,
+      joined_skool_at: null,
+      joined_whatsapp_at: null,
+    })
     .eq("id", targetUserId);
 
   revalidatePath("/admin");
@@ -384,6 +515,10 @@ function traducirError(message: string): string {
     return "Ese email ya tiene una cuenta. Inicia sesión.";
   if (message.includes("Password should be"))
     return "La contraseña es muy corta (mínimo 6 caracteres).";
+  if (message.toLowerCase().includes("rate limit"))
+    return "Hay muchas solicitudes en este momento. Intenta de nuevo en unos minutos.";
+  if (message.includes("Email not confirmed"))
+    return "Aún no confirmas tu correo. Revisa tu bandeja (y Promociones o Spam) y toca el enlace.";
   return message;
 }
 

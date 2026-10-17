@@ -19,10 +19,10 @@ export default async function DiaPage({
   const mission = getMission(day);
   if (!mission) notFound();
 
-  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, startUnlocked } =
     await getSidebarData();
 
-  const unlocked = day === 1 || completedDays.has(day - 1);
+  const unlocked = day === 1 ? startUnlocked : completedDays.has(day - 1);
   if (!unlocked) redirect("/dashboard");
 
   const done = completedDays.has(day);
@@ -56,6 +56,7 @@ export default async function DiaPage({
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
+        startUnlocked={startUnlocked}
       />
 
       <main className="flex-1 px-4 py-10 lg:px-10">

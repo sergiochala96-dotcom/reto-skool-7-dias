@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import CaptacionFooter from "@/components/CaptacionFooter";
@@ -7,9 +8,9 @@ import RetoForm from "@/components/RetoForm";
 import SkoolyLogo from "@/components/SkoolyLogo";
 
 export const metadata: Metadata = {
-  title: "Reto de Skool en 7 Días | Accede gratis a Skooly",
+  title: "Reto de Skool en 7 Días | Crea tu cuenta gratis en Skooly",
   description:
-    "Regístrate gratis y recibe acceso a Skooly, la app con misiones diarias que te guía para crear tu Skool en 7 días.",
+    "Crea tu cuenta gratis y entra a Skooly, la app con misiones diarias que te guía para crear tu Skool en 7 días.",
 };
 
 const BENEFITS = [
@@ -38,7 +39,14 @@ function Checkpoints({ className }: { className?: string }) {
   );
 }
 
-export default function RetoPage() {
+// Navegadores internos de Facebook, Instagram, Messenger y TikTok: Google bloquea ahí su
+// inicio de sesión (error disallowed_useragent), así que en ellos no se muestra el botón.
+const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|musical_ly|BytedanceWebview|TikTok/i;
+
+export default async function RetoPage() {
+  const userAgent = (await headers()).get("user-agent") ?? "";
+  const showGoogle = !IN_APP_BROWSER.test(userAgent);
+
   return (
     <div className="flex min-h-screen flex-col">
       <CountdownBanner />
@@ -68,7 +76,7 @@ export default function RetoPage() {
             </h1>
 
             <p className="mt-4 hidden text-lg text-purple-950/70 lg:block">
-              Reserva tu lugar y recibe acceso gratis a la app con misiones
+              Crea tu cuenta gratis y entra al instante a la app con misiones
               diarias que te lleva de la mano, paso a paso, hasta tener tu
               comunidad lista para lanzar.
             </p>
@@ -93,14 +101,14 @@ export default function RetoPage() {
             >
               <div className="rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#1e0a3c] p-6 pt-[4.5rem] text-white shadow-2xl shadow-purple-900/30 sm:p-7 sm:pt-[4.5rem]">
                 <h2 className="text-center text-2xl font-extrabold">
-                  Solicitar Acceso a la App + Reto de Skool
+                  Crea tu cuenta y empieza el Reto de Skool
                 </h2>
                 <p className="mb-5 mt-1 text-center text-sm text-white/70">
-                  Te enviamos el acceso a tu correo electrónico en menos de 3 minutos
+                  Entras directo a la app y empiezas hoy mismo
                 </p>
-                <RetoForm />
+                <RetoForm showGoogle={showGoogle} />
                 <p className="mt-4 text-center text-xs text-white/50">
-                  Paso 1 de 2 · Sin contraseñas ni formularios largos
+                  100% gratis · Sin tarjeta · Entras al instante
                 </p>
                 <p className="mt-2 text-center text-[11px] leading-snug text-white/40">
                   Al continuar aceptas nuestra{" "}

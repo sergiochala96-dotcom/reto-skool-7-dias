@@ -10,14 +10,15 @@ import MascotCashButton from "@/components/MascotCashButton";
 
 export default function ChallengePathHorizontal({
   completedDays,
+  startUnlocked = true,
 }: {
   completedDays: number[];
+  startUnlocked?: boolean; // el Día 1 se abre al completar las misiones iniciales
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const firstAvailable = MISSIONS.find(
-    (m) => !done.has(m.day) && (m.day === 1 || done.has(m.day - 1))
-  )?.day;
+  const isUnlocked = (day: number) => (day === 1 ? startUnlocked : done.has(day - 1));
+  const firstAvailable = MISSIONS.find((m) => !done.has(m.day) && isUnlocked(m.day))?.day;
 
   return (
     <div className="mx-auto mb-5 hidden md:block lg:mb-8">
@@ -33,7 +34,7 @@ export default function ChallengePathHorizontal({
           <div className="flex items-start">
             {MISSIONS.map((mission, i) => {
               const isDone = done.has(mission.day);
-              const unlocked = mission.day === 1 || done.has(mission.day - 1);
+              const unlocked = isUnlocked(mission.day);
               const isCurrent = mission.day === firstAvailable;
 
               const node = (

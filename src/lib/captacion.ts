@@ -13,6 +13,9 @@ export const SYSTEME_OPTIN = {
 // Comunidad/boletín de WhatsApp "Universo Skool".
 export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/CmjqJnIevwW6V7wv03p3FQ";
 
+// Comunidad gratuita en Skool (misión inicial 1 del panel).
+export const SKOOL_COMMUNITY_URL = "https://www.skool.com/the-creators-community-4018/about";
+
 // Video de la página de gracias. Mientras sea null, la página muestra un espacio
 // reservado para el video. Acepta un .mp4 directo o un enlace de YouTube con
 // formato https://www.youtube.com/embed/ID

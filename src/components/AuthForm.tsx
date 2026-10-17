@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { useActionState } from "react";
 import type { AuthState } from "@/app/actions";
 
 type Props = {
@@ -13,23 +14,6 @@ export default function AuthForm({ action, mode }: Props) {
     action,
     undefined
   );
-  const nameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-
-  // Registro: si la persona viene de dejar sus datos en /reto, el nombre y el correo
-  // aparecen ya escritos (así no se equivoca de correo y la cuenta queda ligada a su contacto).
-  useEffect(() => {
-    if (mode !== "registro") return;
-    try {
-      const saved = sessionStorage.getItem("reto_prefill");
-      if (!saved) return;
-      const { name, email } = JSON.parse(saved) as { name?: string; email?: string };
-      if (emailRef.current && !emailRef.current.value && email) emailRef.current.value = email;
-      if (nameRef.current && !nameRef.current.value && name) nameRef.current.value = name;
-    } catch {
-      // sin datos guardados: los campos quedan vacíos
-    }
-  }, [mode]);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -39,7 +23,6 @@ export default function AuthForm({ action, mode }: Props) {
             Nombre
           </label>
           <input
-            ref={nameRef}
             name="nombre"
             type="text"
             placeholder="Tu nombre"
@@ -53,7 +36,6 @@ export default function AuthForm({ action, mode }: Props) {
           Email
         </label>
         <input
-          ref={emailRef}
           name="email"
           type="email"
           required
@@ -74,6 +56,16 @@ export default function AuthForm({ action, mode }: Props) {
           placeholder="••••••••"
           className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400"
         />
+        {mode === "login" && (
+          <div className="mt-2 text-right">
+            <Link
+              href="/olvide-contrasena"
+              className="text-sm font-medium text-fuchsia-400 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+        )}
       </div>
 
       {state?.error && (
