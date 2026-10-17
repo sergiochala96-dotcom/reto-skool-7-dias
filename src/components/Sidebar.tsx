@@ -20,7 +20,6 @@ export default function Sidebar({
   admin,
   completedDays,
   notifications,
-  missionsUnlocked = true,
 }: {
   nombre: string;
   email: string;
@@ -28,7 +27,6 @@ export default function Sidebar({
   admin: boolean;
   completedDays: number[];
   notifications: SidebarNotification[];
-  missionsUnlocked?: boolean; // el Día 2 en adelante se abre al hacer las misiones de inicio
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -202,7 +200,7 @@ export default function Sidebar({
           <ul className="flex flex-col gap-0.5">
             {MISSIONS.map((mission) => {
               const isDone = done.has(mission.day);
-              const unlocked = isDayUnlocked(mission.day, done, missionsUnlocked);
+              const unlocked = isDayUnlocked(mission.day, done);
               const href = `/dia/${mission.day}`;
               const active = pathname === href;
 

@@ -169,7 +169,7 @@ export async function completeDay(day: number): Promise<void> {
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked = await canOpenDay(supabase, user.id, day, completedDays);
+  const unlocked = isDayUnlocked(day, completedDays);
 
   if (!unlocked || day < 1 || day > TOTAL_DAYS) {
     redirect("/dashboard");
@@ -186,53 +186,6 @@ export async function completeDay(day: number): Promise<void> {
 
   if (day === TOTAL_DAYS) redirect("/cofre");
   redirect("/dashboard");
-}
-
-// ¿Puede la persona trabajar este día? El Día 1 es para todos; el Día 2 exige haber hecho las 3
-// misiones de inicio (tocar el candado). La regla está en isDayUnlocked (lib/challenge.ts).
-async function canOpenDay(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-  day: number,
-  completedDays: Set<number>
-): Promise<boolean> {
-  // Solo el Día 2 depende de las misiones: no se consulta el perfil para los demás días.
-  let missionsUnlocked = false;
-  if (day === 2 && completedDays.has(1) && !completedDays.has(2)) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("episode1_unlocked_at")
-      .eq("id", userId)
-      .single();
-    missionsUnlocked = !!data?.episode1_unlocked_at;
-  }
-  return isDayUnlocked(day, completedDays, missionsUnlocked);
-}
-
-// El candado del checklist: abre el Día 2 en adelante. Solo se puede después de las dos misiones
-// iniciales (WhatsApp y Skool). Devuelve false si faltan (por ejemplo, si se llama sin haberlas hecho).
-export async function unlockEpisode1(): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data } = await supabase
-    .from("profiles")
-    .select("joined_skool_at, joined_whatsapp_at")
-    .eq("id", user.id)
-    .single();
-  if (!data?.joined_skool_at || !data?.joined_whatsapp_at) return false;
-
-  await supabase
-    .from("profiles")
-    .update({ episode1_unlocked_at: new Date().toISOString() })
-    .eq("id", user.id)
-    .is("episode1_unlocked_at", null);
-
-  revalidatePath("/dashboard");
-  return true;
 }
 
 // Marca una misión inicial como hecha cuando la persona toca su botón (no se puede verificar
@@ -297,7 +250,7 @@ export async function saveMissionAnswers(
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked = await canOpenDay(supabase, user.id, day, completedDays);
+  const unlocked = isDayUnlocked(day, completedDays);
   if (!unlocked || day < 1 || day > TOTAL_DAYS) redirect("/dashboard");
 
   const multiValueIds = new Set(
@@ -404,7 +357,6 @@ export async function adminResetUserProgress(targetUserId: string): Promise<void
       episode2_locked_override: null,
       joined_skool_at: null,
       joined_whatsapp_at: null,
-      episode1_unlocked_at: null,
     })
     .eq("id", targetUserId);
 

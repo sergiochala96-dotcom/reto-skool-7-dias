@@ -19,9 +19,8 @@ export type SidebarData = {
   admin: boolean;
   welcomeVideoSeen: boolean;
   notifications: SidebarNotification[];
-  // Misiones iniciales (WhatsApp, Skool) y si ya tocó el candado que abre el Día 2 en adelante.
+  // Misiones de inicio: si ya tocó los botones de unirse a WhatsApp y a Skool.
   startMissions: { skool: boolean; whatsapp: boolean };
-  missionsUnlocked: boolean;
 };
 
 export async function getSidebarData(): Promise<SidebarData> {
@@ -43,9 +42,7 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select(
-      "avatar_url, welcome_video_seen, last_seen_date, joined_skool_at, joined_whatsapp_at, episode1_unlocked_at"
-    )
+    .select("avatar_url, welcome_video_seen, last_seen_date, joined_skool_at, joined_whatsapp_at")
     .eq("id", user.id)
     .single();
 
@@ -84,16 +81,11 @@ export async function getSidebarData(): Promise<SidebarData> {
     skool: !!profile?.joined_skool_at,
     whatsapp: !!profile?.joined_whatsapp_at,
   };
-  // El Día 1 es para todos. Del Día 2 en adelante hace falta haber tocado el candado del
-  // checklist (que exige WhatsApp y Skool antes). Ver isDayUnlocked en lib/challenge.ts.
-  const missionsUnlocked = !!profile?.episode1_unlocked_at;
-
   return {
     user,
     nombre,
     avatarUrl,
     startMissions,
-    missionsUnlocked,
     completedDays: new Set((progress ?? []).map((p) => p.day)),
     admin: isAdmin(user.email),
     welcomeVideoSeen: profile?.welcome_video_seen ?? false,
