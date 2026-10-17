@@ -27,6 +27,11 @@ export const MANAGED_TAGS: string[] = [...PROGRESS_TAGS, ...INACTIVITY_TAGS];
 // sirve para segmentar envíos puntuales (por ejemplo, el aviso del workshop).
 export const BASE_TAG = "Skooly Leads";
 
+// Etiqueta que SOLO se pone en el momento de registrarse (nunca la pone la sincronización diaria,
+// por eso no entra en wantedTags): dispara el correo de bienvenida. Así las cuentas que ya
+// existían no reciben ese correo.
+export const WELCOME_TAG = "bienvenida";
+
 // Todas las etiquetas que la app deja puestas a una persona según su avance e inactividad.
 export function wantedTags(completedDays: number, daysAway: number): string[] {
   const progress = progressTag(completedDays);

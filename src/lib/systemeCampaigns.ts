@@ -1,5 +1,7 @@
+import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import { createTag, listTags, systemeApi } from "@/lib/systeme";
 import { listAll, type AutomationRule } from "@/lib/systemeAutomations";
+import { WELCOME_TAG } from "@/lib/syncSysteme";
 
 // Crea en Systeme.io una CAMPAÑA de correos con esperas entre pasos, y sus dos reglas:
 //   - etiqueta agregada  -> suscribir a la campaña
@@ -9,6 +11,9 @@ import { listAll, type AutomationRule } from "@/lib/systemeAutomations";
 // Los saludos van sin nombre a propósito: en reactivación suena más natural.
 
 const LOGIN_URL = "https://skool.neobrandclub.com/login";
+// Enlace del correo de bienvenida: si la persona ya tiene la sesión abierta entra directo a su
+// panel, y si no, el sistema la manda al inicio de sesión.
+const DASHBOARD_URL = "https://skool.neobrandclub.com/dashboard";
 
 type StepSpec = {
   subject: string;
@@ -93,6 +98,35 @@ export const CAMPAIGN_SPECS: Record<string, CampaignSpec> = {
 <p><strong><a href="${LOGIN_URL}">Entrar y empezar</a></strong></p>
 <p>Y si algo te frenó, respóndeme este correo. Lo leo yo.</p>
 <p>Sergio</p>
+`.trim(),
+      },
+    ],
+  },
+
+  // Correo de bienvenida: llega 2 minutos después de que la persona se registra (la app le pone
+  // la etiqueta "bienvenida" en ese momento). Un solo correo; la etiqueta no se quita nunca.
+  bienvenida: {
+    tag: WELCOME_TAG,
+    campaignName: "[App] Bienvenida (2 minutos después del registro)",
+    description: "Se activa al agregar la etiqueta bienvenida, que la app pone al crear la cuenta.",
+    steps: [
+      {
+        subject: "Bienvenido a Skooly, ya estás dentro",
+        previewText: "Guarda este enlace para entrar cuando quieras",
+        comment: "Bienvenida",
+        delay: { value: 2, unit: "minute" },
+        bodyHtml: `
+<p>Hola {first_name}, ¿cómo vas?</p>
+<p>Gracias por registrarte. Ya estás dentro de <strong>Skooly</strong>, la app con la que vas a crear tu comunidad de Skool paso a paso.</p>
+<p>Guarda este enlace para entrar cuando quieras. Si ya tienes la sesión abierta, te lleva directo a tu panel:</p>
+<p><strong><a href="${DASHBOARD_URL}">Entrar a mi panel de Skooly</a></strong></p>
+<p>Esto es lo que te espera:</p>
+<p>✅ 7 misiones diarias, paso a paso<br>✅ Prompts de IA listos para copiar y pegar<br>✅ Una comunidad lista para lanzar al terminar el reto</p>
+<p>Tu primera misión es el Día 1 y te toma unos 10 minutos.</p>
+<p>Una cosa más: para no perderte ningún aviso del reto ni las novedades de Skool, únete también a nuestras comunidades:</p>
+<p>👉 <a href="${WHATSAPP_COMMUNITY_URL}">Unirme al boletín de Skool en WhatsApp</a><br>👉 <a href="${SKOOL_COMMUNITY_URL}">Unirme gratis al curso en Skool</a></p>
+<p>Nos vemos dentro,</p>
+<p>Sergio Chala<br>Skooly · Neobrand Academy</p>
 `.trim(),
       },
     ],

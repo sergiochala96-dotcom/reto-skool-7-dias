@@ -14,7 +14,7 @@ export default function ApplyEmailTextsButton() {
   const run = () => {
     if (
       !window.confirm(
-        "Esto REEMPLAZA el asunto, la vista previa y el texto de los 6 correos automáticos en Systeme.io (2 correos sueltos y 4 pasos de campañas) por los que están en la app.\n\nSi cambiaste algo a mano en Systeme.io, se perderá.\n\nLas reglas, las esperas y las etiquetas NO cambian. ¿Continuar?"
+        "Esto REEMPLAZA el asunto, la vista previa y el texto de los 7 correos automáticos en Systeme.io (2 correos sueltos y 5 pasos de campañas) por los que están en la app.\n\nSi cambiaste algo a mano en Systeme.io, se perderá.\n\nAdemás, si todavía no existe, CREA la campaña de bienvenida (un correo 2 minutos después del registro) con su regla: desde ese momento se enviará a quien se registre.\n\nLas demás reglas, las esperas y las etiquetas NO cambian. ¿Continuar?"
       )
     )
       return;

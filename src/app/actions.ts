@@ -8,7 +8,7 @@ import { isDayUnlocked, TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
-import { updateCampaignSteps } from "@/lib/systemeCampaigns";
+import { createCampaignAutomation, updateCampaignSteps } from "@/lib/systemeCampaigns";
 import {
   countRequiredFields,
   getFlatFields,
@@ -606,10 +606,18 @@ export async function adminApplyEmailTexts(): Promise<UpdateResult> {
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
   const emails = await updateAutomationEmails(["completado", "casi_listo"]);
-  const steps = await updateCampaignSteps(["sin_conexion", "sin_empezar"]);
+  // La campaña de bienvenida se crea la primera vez (con su etiqueta y su regla); si ya existe,
+  // se reutiliza sin duplicar nada. Después se actualizan los textos de todas las campañas.
+  const welcome = await createCampaignAutomation("bienvenida");
+  const steps = await updateCampaignSteps(["sin_conexion", "sin_empezar", "bienvenida"]);
   return {
-    ok: emails.ok && steps.ok,
-    lines: [...emails.lines, ...(steps.lines ?? [])],
-    error: [emails.error, steps.error].filter(Boolean).join(" | ") || undefined,
+    ok: emails.ok && welcome.ok && steps.ok,
+    lines: [
+      ...emails.lines,
+      ...(welcome.lines ?? []).map((l) => `Bienvenida · ${l}`),
+      ...(steps.lines ?? []),
+    ],
+    error:
+      [emails.error, welcome.error, steps.error].filter(Boolean).join(" | ") || undefined,
   };
 }
