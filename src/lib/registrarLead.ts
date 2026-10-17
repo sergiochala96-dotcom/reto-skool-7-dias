@@ -1,14 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { addTag, createContact, createTag, findContactByEmail, listTags } from "@/lib/systeme";
-import { progressTag } from "@/lib/syncSysteme";
+import { createContact, createTag, ensureTag, findContactByEmail, listTags } from "@/lib/systeme";
+import { wantedTags } from "@/lib/syncSysteme";
 import { cleanAttribution, type Attribution } from "@/lib/traffic";
 import { sendLeadToMeta, type CapiTracking } from "@/lib/metaCapi";
 
 // Paso común "al crear la cuenta" en /reto (con contraseña o con Google). Hace tres cosas,
 // y un fallo en cualquiera NO debe frenar a la persona, que ya tiene su cuenta:
 //  1) la guarda en Systeme.io por la API (NO por el formulario de Systeme.io: así no sale el
-//     antiguo correo de "crea tu cuenta") y le pone la etiqueta reto_sin_empezar,
+//     antiguo correo de "crea tu cuenta") y le pone las etiquetas "Skooly Leads" y
+//     reto_sin_empezar,
 //  2) guarda el lead con su origen de tráfico (UTM) para el panel de admin,
 //  3) avisa a Meta del Lead desde el servidor (API de Conversiones).
 //
@@ -44,13 +45,19 @@ async function guardarEnSysteme(firstName: string, email: string, account?: NewA
   if (!contact) contact = await createContact(email, firstName);
   if (!account) return;
 
-  const tag = progressTag(0)!; // reto_sin_empezar
+  // Etiqueta de origen + reto_sin_empezar (la persona acaba de registrarse: 0 días, recién entró).
+  const wanted = wantedTags(0, 0);
   const tags = await listTags();
-  const tagId = tags.get(tag) ?? (await createTag(tag));
-  await addTag(contact.id, tagId);
+  for (const name of wanted) {
+    const tagId = tags.get(name) ?? (await createTag(name));
+    await ensureTag(contact, tagId);
+  }
 
   // Se anota igual que lo hace la sincronización diaria, para que no repita el trabajo.
-  await account.supabase.from("profiles").update({ systeme_tags: tag }).eq("id", account.userId);
+  await account.supabase
+    .from("profiles")
+    .update({ systeme_tags: wanted.join("|") })
+    .eq("id", account.userId);
 }
 
 // Insert simple: si el correo ya existe, la base lo rechaza y se conserva el primer origen.

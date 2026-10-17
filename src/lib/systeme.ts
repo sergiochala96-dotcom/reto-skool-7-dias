@@ -41,7 +41,7 @@ export const systemeApi = api;
 type Page<T> = { items?: T[]; hasMore?: boolean };
 
 export type SystemeTag = { id: number; name: string };
-export type SystemeContact = { id: number; email?: string };
+export type SystemeContact = { id: number; email?: string; tags?: { id: number }[] };
 
 // Todas las etiquetas de la cuenta (nombre → id).
 export async function listTags(): Promise<Map<string, number>> {
@@ -100,6 +100,19 @@ export async function addTag(contactId: number, tagId: number): Promise<void> {
     method: "POST",
     body: JSON.stringify({ tagId }),
   });
+}
+
+// Agrega una etiqueta sin fallar si el contacto ya la tenía (por ejemplo, un contacto viejo
+// que la recibió por una regla de Systeme.io).
+export async function ensureTag(contact: SystemeContact, tagId: number): Promise<void> {
+  if (contact.tags?.some((t) => t.id === tagId)) return;
+  try {
+    await addTag(contact.id, tagId);
+  } catch (e) {
+    // 409/422 = la etiqueta ya estaba puesta.
+    if (e instanceof SystemeError && /→ (409|422)\b/.test(e.message)) return;
+    throw e;
+  }
 }
 
 export async function removeTag(contactId: number, tagId: number): Promise<void> {

@@ -1,16 +1,17 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { TOTAL_DAYS } from "@/lib/challenge";
 import {
-  addTag,
   createContact,
   createTag,
+  ensureTag,
   findContactByEmail,
   listTags,
   deleteTag,
   removeTag,
 } from "@/lib/systeme";
 
-// Etiquetas que maneja la app en Systeme.io (solo estas 4; el resto de tu cuenta no se toca).
+// Etiquetas que maneja la app en Systeme.io (estas 4 más la de origen "Skooly Leads"; el resto
+// de tu cuenta no se toca).
 //
 // Avance (a lo sumo una): reto_sin_empezar (0 días) | reto_casi_listo (5 o 6 días) | reto_completado (7)
 //   Quien va entre 1 y 4 días no lleva etiqueta de avance.
@@ -20,6 +21,18 @@ import {
 export const PROGRESS_TAGS = ["reto_sin_empezar", "reto_casi_listo", "reto_completado"] as const;
 export const INACTIVITY_TAGS = ["sin_conexion"] as const;
 export const MANAGED_TAGS: string[] = [...PROGRESS_TAGS, ...INACTIVITY_TAGS];
+
+// Etiqueta de origen: la llevan TODAS las personas de Skooly (se pone al registrarse y la
+// sincronización se la pone a quien aún no la tenga). Ya no dispara ninguna automatización:
+// sirve para segmentar envíos puntuales (por ejemplo, el aviso del workshop).
+export const BASE_TAG = "Skooly Leads";
+
+// Todas las etiquetas que la app deja puestas a una persona según su avance e inactividad.
+export function wantedTags(completedDays: number, daysAway: number): string[] {
+  const progress = progressTag(completedDays);
+  const inactivity = inactivityTag(completedDays, daysAway);
+  return [BASE_TAG, ...(progress ? [progress] : []), ...(inactivity ? [inactivity] : [])];
+}
 
 // Etiquetas de versiones anteriores de este esquema. Cuando ya no queda nadie por migrar,
 // la sincronización las borra de Systeme.io (solo estas, por su nombre exacto) para liberar
@@ -151,9 +164,7 @@ async function runSync(supabase: SupabaseClient): Promise<SyncResult> {
     .filter((u) => u.email)
     .map((u) => {
       const completed = Number(u.completed_days ?? 0);
-      const progress = progressTag(completed);
-      const inactivity = inactivityTag(completed, daysSince(u.last_seen_date, today));
-      const wanted = [...(progress ? [progress] : []), ...(inactivity ? [inactivity] : [])];
+      const wanted = wantedTags(completed, daysSince(u.last_seen_date, today));
       return { user: u, wanted, key: wanted.join("|") };
     })
     .filter((t) => t.key !== (t.user.systeme_tags ?? ""));
@@ -163,9 +174,9 @@ async function runSync(supabase: SupabaseClient): Promise<SyncResult> {
     return result;
   }
 
-  // 3) Las 4 etiquetas deben existir en Systeme.io (si faltan se crean).
+  // 3) Las etiquetas deben existir en Systeme.io (si faltan se crean).
   const tagIds = await listTags();
-  for (const name of MANAGED_TAGS) {
+  for (const name of [BASE_TAG, ...MANAGED_TAGS]) {
     if (!tagIds.has(name)) {
       tagIds.set(name, await createTag(name));
       result.tagsCreated.push(name);
@@ -190,7 +201,7 @@ async function runSync(supabase: SupabaseClient): Promise<SyncResult> {
         if (!wanted.includes(name) && tagIds.has(name)) await removeTag(contact.id, tagIds.get(name)!);
       }
       for (const name of wanted) {
-        if (!previous.includes(name)) await addTag(contact.id, tagIds.get(name)!);
+        if (!previous.includes(name)) await ensureTag(contact, tagIds.get(name)!);
       }
 
       const { error } = await supabase.from("profiles").update({ systeme_tags: key }).eq("id", user.id);
