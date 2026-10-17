@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { CAPTURE_COOKIE, LEAD_PENDING_COOKIE, parseCapture } from "@/lib/retoCapture";
 import { registrarLead } from "@/lib/registrarLead";
@@ -36,10 +36,18 @@ export async function GET(request: Request) {
         const meta = user.user_metadata as { full_name?: string; name?: string };
         const name = meta.full_name || meta.name || user.email.split("@")[0];
 
-        await registrarLead(name, user.email, capture?.attribution, {
-          ...capture?.tracking,
-          eventId,
-        });
+        // En segundo plano: la persona llega al panel sin esperar a Systeme.io ni a Meta.
+        const userEmail = user.email;
+        const userId = user.id;
+        after(() =>
+          registrarLead(
+            name,
+            userEmail,
+            capture?.attribution,
+            { ...capture?.tracking, eventId },
+            { supabase, userId }
+          )
+        );
 
         cookieStore.delete(CAPTURE_COOKIE);
         // El panel dispara el Lead en el píxel con este mismo ID y lo borra (una sola vez).

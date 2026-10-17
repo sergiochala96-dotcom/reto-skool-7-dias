@@ -1,50 +1,56 @@
-import { SYSTEME_OPTIN } from "@/lib/captacion";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { addTag, createContact, createTag, findContactByEmail, listTags } from "@/lib/systeme";
+import { progressTag } from "@/lib/syncSysteme";
 import { cleanAttribution, type Attribution } from "@/lib/traffic";
 import { sendLeadToMeta, type CapiTracking } from "@/lib/metaCapi";
 
 // Paso común "al crear la cuenta" en /reto (con contraseña o con Google). Hace tres cosas,
 // y un fallo en cualquiera NO debe frenar a la persona, que ya tiene su cuenta:
-//  1) la guarda en Systeme.io con el mismo formulario de siempre (así se dispara su automatización),
+//  1) la guarda en Systeme.io por la API (NO por el formulario de Systeme.io: así no sale el
+//     antiguo correo de "crea tu cuenta") y le pone la etiqueta reto_sin_empezar,
 //  2) guarda el lead con su origen de tráfico (UTM) para el panel de admin,
 //  3) avisa a Meta del Lead desde el servidor (API de Conversiones).
+//
+// account: la cuenta recién creada con su sesión. Solo con sesión se puede dejar anotado en
+// el perfil qué etiqueta se puso; sin ella (si Supabase pide confirmar el correo) la etiqueta
+// la pone la sincronización diaria.
+export type NewAccount = { supabase: SupabaseClient; userId: string };
+
 export async function registrarLead(
   name: string,
   email: string,
   attribution?: Attribution,
-  tracking?: CapiTracking
+  tracking?: CapiTracking,
+  account?: NewAccount
 ): Promise<void> {
   const firstName = name.trim().split(/\s+/)[0]?.slice(0, 80) || email.split("@")[0];
   const cleanEmail = email.trim().toLowerCase();
 
-  await Promise.allSettled([
-    guardarEnSysteme(firstName, cleanEmail),
+  const results = await Promise.allSettled([
+    guardarEnSysteme(firstName, cleanEmail, account),
     guardarLead(firstName, cleanEmail, attribution),
     sendLeadToMeta(firstName, cleanEmail, tracking),
   ]);
+  results.forEach((r, i) => {
+    if (r.status === "rejected") {
+      console.error(`registrarLead (${["Systeme.io", "leads", "Meta"][i]}):`, r.reason);
+    }
+  });
 }
 
-async function guardarEnSysteme(firstName: string, email: string) {
-  await fetch(SYSTEME_OPTIN.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    body: JSON.stringify({
-      optin: {
-        fields: { first_name: firstName, email },
-        timeZone: "UTC",
-        isDesktop: true,
-        entityId: SYSTEME_OPTIN.entityId,
-        checkBoxIds: [],
-        surveysResults: {},
-      },
-    }),
-    cache: "no-store",
-    signal: AbortSignal.timeout(8000),
-  });
+async function guardarEnSysteme(firstName: string, email: string, account?: NewAccount) {
+  let contact = await findContactByEmail(email);
+  if (!contact) contact = await createContact(email, firstName);
+  if (!account) return;
+
+  const tag = progressTag(0)!; // reto_sin_empezar
+  const tags = await listTags();
+  const tagId = tags.get(tag) ?? (await createTag(tag));
+  await addTag(contact.id, tagId);
+
+  // Se anota igual que lo hace la sincronización diaria, para que no repita el trabajo.
+  await account.supabase.from("profiles").update({ systeme_tags: tag }).eq("id", account.userId);
 }
 
 // Insert simple: si el correo ya existe, la base lo rechaza y se conserva el primer origen.

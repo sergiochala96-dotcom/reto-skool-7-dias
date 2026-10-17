@@ -82,15 +82,15 @@ export const CAMPAIGN_SPECS: Record<string, CampaignSpec> = {
     description: "Se activa al agregar la etiqueta reto_sin_empezar. Se cancela si la persona empieza.",
     steps: [
       {
-        subject: "¿Qué te frenó en el Día 1?",
-        previewText: "Son unas preguntas y toma unos 10 minutos",
+        subject: "¿Qué te frenó para empezar?",
+        previewText: "Son dos misiones rápidas y se abre tu Día 1",
         comment: "1 día después",
         delay: { value: 1, unit: "day" },
         bodyHtml: `
 <p>Hola, ¿cómo vas?</p>
-<p>Vi que te registraste en Skooly pero todavía no empezaste tu primera misión. Es normal: uno se apunta con ilusión y la semana se complica.</p>
-<p>Te cuento algo: <strong>el Día 1 no es largo.</strong> Son unas preguntas sobre tu nicho y a quién quieres ayudar, y con eso ya queda armada la base de tu Skool.</p>
-<p><strong><a href="${LOGIN_URL}">Empezar mi Día 1 aquí</a></strong></p>
+<p>Vi que creaste tu cuenta en Skooly pero todavía no empezaste. Es normal: uno se apunta con ilusión y la semana se complica.</p>
+<p>Te cuento algo: <strong>empezar toma pocos minutos.</strong> Primero van dos misiones rápidas (unirte a la comunidad en Skool y a la de WhatsApp) y con eso se abre tu Día 1: unas preguntas sobre tu nicho y a quién quieres ayudar.</p>
+<p><strong><a href="${LOGIN_URL}">Entrar y empezar</a></strong></p>
 <p>Y si algo te frenó, respóndeme este correo. Lo leo yo.</p>
 <p>Sergio</p>
 `.trim(),

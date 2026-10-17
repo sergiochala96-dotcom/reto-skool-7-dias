@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Attribution } from "@/lib/traffic";
 import type { CapiTracking } from "@/lib/metaCapi";
@@ -68,8 +69,10 @@ export async function crearCuentaReto(
       return { ok: false, error: GENERIC_ERROR };
     }
 
-    // El lead se registra igual: la persona ya dejó sus datos, aunque aún deba confirmar el correo.
-    await registrarLead(cleanName, cleanEmail, attribution, tracking);
+    // El lead se registra igual (aunque aún deba confirmar el correo), pero en segundo plano
+    // para que la persona entre al panel al instante sin esperar a Systeme.io ni a Meta.
+    const account = data.session && data.user ? { supabase, userId: data.user.id } : undefined;
+    after(() => registrarLead(cleanName, cleanEmail, attribution, tracking, account));
 
     // Sin sesión = Supabase pidió confirmar el correo antes de dejarla entrar.
     return { ok: true, needsConfirmation: !data.session };
