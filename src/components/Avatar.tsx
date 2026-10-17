@@ -21,6 +21,8 @@ export default function Avatar({
     undefined
   );
   const inputRef = useRef<HTMLInputElement>(null);
+  // Tamaño del icono de la cámara: proporcional al avatar, pero nunca demasiado pequeño.
+  const cameraSize = Math.max(22, Math.round(size * 0.36));
 
   const circle = (
     <span
@@ -70,6 +72,25 @@ export default function Avatar({
           {circle}
           <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-center text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
             {pending ? "..." : "📷 Cambiar"}
+          </span>
+          {/* Cámara en la esquina inferior derecha: sugiere que la foto se puede cambiar. */}
+          <span
+            aria-hidden="true"
+            className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-[#1f0d3d] bg-purple-100 text-purple-950 shadow-md transition group-hover:bg-white"
+            style={{ width: cameraSize, height: cameraSize }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: cameraSize * 0.55, height: cameraSize * 0.55 }}
+            >
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+              <circle cx="12" cy="13" r="3" />
+            </svg>
           </span>
         </button>
       </form>
