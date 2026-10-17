@@ -9,21 +9,10 @@ import { playVictoryFanfare } from "@/lib/successSound";
 
 type Kind = "skool" | "whatsapp";
 
-const MISSIONS: { kind: Kind; title: string; text: string; button: string; href: string }[] = [
-  {
-    kind: "skool",
-    title: "Únete gratis a nuestra comunidad en Skool",
-    text: "Entra a la comunidad gratuita para seguir el reto desde ahí.",
-    button: "Unirme a Skool",
-    href: SKOOL_COMMUNITY_URL,
-  },
-  {
-    kind: "whatsapp",
-    title: "Únete a la comunidad de WhatsApp",
-    text: "Recibe los avisos y novedades del reto.",
-    button: "Unirme a WhatsApp",
-    href: WHATSAPP_COMMUNITY_URL,
-  },
+// En celular solo se muestra el nombre corto; desde pantallas medianas se antepone "Únete a".
+const MISSIONS: { kind: Kind; name: string; extra?: string; href: string }[] = [
+  { kind: "whatsapp", name: "WhatsApp", href: WHATSAPP_COMMUNITY_URL },
+  { kind: "skool", name: "Skool", extra: " gratis", href: SKOOL_COMMUNITY_URL },
 ];
 
 function celebrate() {
@@ -32,12 +21,13 @@ function celebrate() {
   confetti({
     particleCount: 90,
     spread: 80,
-    origin: { y: 0.4 },
+    origin: { y: 0.3 },
     colors: ["#7e22ce", "#c026d3", "#f59e0b", "#facc15", "#10b981"],
   });
 }
 
-// Misiones iniciales: unirse al Skool y a WhatsApp. Al completar las dos se abre el Día 1.
+// Misiones iniciales (franja discreta): unirse a WhatsApp y al Skool. A quien aún no empieza
+// el reto, al completar las dos se le abre el Día 1; a quien ya lo empezó solo se le invita.
 // Cada botón abre el enlace en otra pestaña y marca la misión como hecha (desde aquí no se
 // puede comprobar que la persona haya entrado, así que es de avance, no de prueba).
 export default function StartMissions({
@@ -47,9 +37,10 @@ export default function StartMissions({
   initial: { skool: boolean; whatsapp: boolean };
   startUnlocked: boolean;
 }) {
-  // Solo se muestra a quien llegó con el Día 1 aún bloqueado. Se queda visible en esta
-  // sesión aunque el servidor ya lo desbloquee, para que se vea la celebración.
-  const [visible, setVisible] = useState(!startUnlocked);
+  // Se recuerda cómo llegó la persona: aunque el servidor desbloquee el Día 1 mientras tanto,
+  // la franja sigue en pantalla para mostrar la celebración.
+  const [gatesDay1] = useState(!startUnlocked);
+  const [visible, setVisible] = useState(!(initial.skool && initial.whatsapp));
   const [done, setDone] = useState(initial);
   const [, startTransition] = useTransition();
 
@@ -66,106 +57,106 @@ export default function StartMissions({
     if (next.skool && next.whatsapp) celebrate();
   }
 
-  return (
-    <section className="mx-auto mb-6 w-full max-w-2xl rounded-3xl border-2 border-amber-300/40 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] p-5 shadow-2xl shadow-fuchsia-900/30 md:mb-8 md:max-w-3xl md:p-7">
-      {allDone ? (
-        <div className="text-center">
-          <p className="text-4xl">🎉</p>
-          <h2 className="mt-2 text-xl font-extrabold text-white md:text-2xl">
-            ¡Listo! Desbloqueaste el Día 1
-          </h2>
-          <p className="mt-1 text-sm text-white/60 md:text-base">
-            Ya estás dentro de las dos comunidades. Ahora sí, a crear tu Skool.
-          </p>
-          <Link
-            href="/dia/1"
-            className="mt-4 inline-block rounded-xl bg-amber-400 px-6 py-3 text-base font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300"
-          >
-            Empezar el Día 1 →
-          </Link>
-          <div>
-            <button
-              type="button"
-              onClick={() => setVisible(false)}
-              className="mt-3 text-xs text-white/40 underline hover:text-white/70"
+  const box =
+    "mx-auto mb-4 w-full max-w-2xl rounded-2xl border border-amber-300/30 bg-white/5 px-3 py-2 md:mb-5 md:max-w-3xl";
+
+  if (allDone) {
+    return (
+      <section className={`${box} flex flex-wrap items-center justify-between gap-2`}>
+        <p className="text-sm font-bold text-white">
+          {gatesDay1 ? "🎉 ¡Día 1 desbloqueado!" : "🎉 ¡Gracias por unirte!"}
+        </p>
+        <div className="flex items-center gap-2">
+          {gatesDay1 && (
+            <Link
+              href="/dia/1"
+              className="rounded-lg bg-amber-400 px-4 py-1.5 text-sm font-extrabold text-black transition hover:bg-amber-300"
             >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-amber-300">
-                Antes del Día 1
-              </p>
-              <h2 className="text-lg font-extrabold text-white md:text-2xl">
-                Completa estas 2 misiones para empezar el reto
-              </h2>
-            </div>
-            <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-white">
-              {count}/2
-            </span>
-          </div>
-
-          <div
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={2}
-            aria-valuenow={count}
-            className="mb-4 h-2 overflow-hidden rounded-full bg-white/10"
+              Empezar el Día 1 →
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setVisible(false)}
+            aria-label="Cerrar"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-sm text-white/40 transition hover:bg-white/10 hover:text-white"
           >
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 transition-all duration-500"
-              style={{ width: `${(count / 2) * 100}%` }}
-            />
-          </div>
+            ✕
+          </button>
+        </div>
+      </section>
+    );
+  }
 
-          <ul className="flex flex-col gap-3">
-            {MISSIONS.map((m, i) => {
-              const isDone = done[m.kind];
-              return (
-                <li
-                  key={m.kind}
-                  className={`flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
-                    isDone
-                      ? "border-emerald-400/40 bg-emerald-400/10"
-                      : "border-white/10 bg-white/5"
+  return (
+    <section className={box}>
+      <div className="flex items-center gap-2">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-amber-300">
+          {gatesDay1 ? "Antes del Día 1" : "Únete a nuestras comunidades"}
+        </p>
+        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white">
+          {count}/2
+        </span>
+        <div
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={2}
+          aria-valuenow={count}
+          className="h-1 flex-1 overflow-hidden rounded-full bg-white/10"
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 transition-all duration-500"
+            style={{ width: `${(count / 2) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <ul className="mt-2 grid grid-cols-2 gap-2">
+        {MISSIONS.map((m, i) => {
+          const isDone = done[m.kind];
+          return (
+            <li key={m.kind}>
+              <a
+                href={m.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => mark(m.kind)}
+                className={`flex items-center gap-2 rounded-xl border px-2.5 py-1.5 transition sm:px-3 ${
+                  isDone
+                    ? "border-emerald-400/40 bg-emerald-400/10"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${
+                    isDone ? "bg-emerald-500 text-white" : "bg-fuchsia-500/30 text-fuchsia-100"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
-                        isDone ? "bg-emerald-500 text-white" : "bg-fuchsia-500/30 text-fuchsia-100"
-                      }`}
-                    >
-                      {isDone ? "✓" : i + 1}
-                    </span>
-                    <div>
-                      <p className="font-bold text-white md:text-lg">{m.title}</p>
-                      <p className="text-sm text-white/60">{m.text}</p>
-                    </div>
-                  </div>
-                  <a
-                    href={m.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => mark(m.kind)}
-                    className={`whitespace-nowrap rounded-xl px-5 py-2.5 text-center text-sm font-extrabold transition sm:shrink-0 md:text-base ${
-                      isDone
-                        ? "border border-white/20 text-white/70 hover:bg-white/10"
-                        : "bg-amber-400 text-black shadow-lg shadow-amber-400/30 hover:bg-amber-300"
-                    }`}
-                  >
-                    {isDone ? "Abrir de nuevo" : m.button}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      )}
+                  {isDone ? "✓" : i + 1}
+                </span>
+                <span className="flex-1 text-[13px] font-semibold leading-tight text-white sm:text-sm">
+                  <span className="hidden sm:inline">Únete a </span>
+                  {m.name}
+                  {m.extra && <span className="hidden sm:inline">{m.extra}</span>}
+                </span>
+                <span
+                  className={`shrink-0 text-xs font-bold ${
+                    isDone ? "text-emerald-300" : "text-amber-300"
+                  }`}
+                >
+                  {isDone ? (
+                    <span className="hidden sm:inline">Listo</span>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Unirme </span>→
+                    </>
+                  )}
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { crearCuentaReto } from "@/app/reto/actions";
+import AccountExistsDialog from "@/components/AccountExistsDialog";
 import GoogleButton from "@/components/GoogleButton";
 import type { Attribution } from "@/lib/traffic";
 import { trackEvent } from "@/lib/metaPixel";
@@ -24,7 +24,8 @@ function readCookie(name: string): string | undefined {
 export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<{ text: string; exists?: boolean } | null>(null);
+  const [error, setError] = useState<{ text: string } | null>(null);
+  const [existsOpen, setExistsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   // Si Supabase pide confirmar el correo, se muestra este aviso en vez de entrar al panel.
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
@@ -80,8 +81,11 @@ export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }
         trackEvent("Lead", { content_name: "Reto Skool 7 dias" }, eventId);
         if (result.needsConfirmation) setConfirmEmail(email.trim());
         else router.push("/dashboard");
+      } else if (result.exists) {
+        // Correo ya registrado: se avisa en una ventana emergente, más visible que una línea roja.
+        setExistsOpen(true);
       } else {
-        setError({ text: result.error, exists: result.exists });
+        setError({ text: result.error });
       }
     });
   }
@@ -123,6 +127,7 @@ export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }
 
   return (
     <div>
+      {existsOpen && <AccountExistsDialog onClose={() => setExistsOpen(false)} />}
       {showGoogle && (
         <>
           <GoogleButton beforeRedirect={saveCaptureForGoogle} />
@@ -167,30 +172,54 @@ export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }
           />
         </div>
         <div>
-          <label
-            htmlFor="reto-password"
-            className="mb-1 flex items-center justify-between text-sm font-semibold text-white/90"
-          >
-            <span>Crea tu contraseña</span>
+          <label htmlFor="reto-password" className="mb-1 block text-sm font-semibold text-white/90">
+            Crea tu contraseña
+          </label>
+          <div className="relative">
+            <input
+              id="reto-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder="Mínimo 6 caracteres"
+              required
+              minLength={6}
+              maxLength={72}
+              className={`${INPUT} pr-12`}
+            />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="text-xs font-medium text-white/60 underline hover:text-white"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              aria-pressed={showPassword}
+              className="absolute right-1.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-500 transition hover:text-gray-800"
             >
-              {showPassword ? "Ocultar" : "Mostrar"}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+                aria-hidden="true"
+              >
+                {showPassword ? (
+                  <>
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+                    <path d="m1 1 22 22" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </>
+                )}
+              </svg>
             </button>
-          </label>
-          <input
-            id="reto-password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder="Mínimo 6 caracteres"
-            required
-            minLength={6}
-            maxLength={72}
-            className={INPUT}
-          />
+          </div>
         </div>
 
         {error && (
@@ -199,15 +228,6 @@ export default function RetoForm({ showGoogle = true }: { showGoogle?: boolean }
             className="rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-100"
           >
             {error.text}
-            {error.exists && (
-              <>
-                {" "}
-                <Link href="/login" className="underline">
-                  Inicia sesión aquí
-                </Link>
-                .
-              </>
-            )}
           </p>
         )}
 
