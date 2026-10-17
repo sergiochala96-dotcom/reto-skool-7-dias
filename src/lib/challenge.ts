@@ -52,6 +52,30 @@ export const MISSIONS: Mission[] = [
 
 export const TOTAL_DAYS = MISSIONS.length;
 
+// ¿Está abierto este día para la persona?
+//  - Día 1: abierto para todos, sin condiciones.
+//  - Día 2: además de terminar el Día 1, exige haber hecho las 3 misiones de inicio
+//    (missionsUnlocked = tocó el candado). Quien ya completó el Día 2 lo conserva abierto.
+//  - Día 3 en adelante: basta con terminar el día anterior.
+export function isDayUnlocked(
+  day: number,
+  completedDays: Set<number>,
+  missionsUnlocked: boolean
+): boolean {
+  if (day === 1) return true;
+  if (!completedDays.has(day - 1)) return false;
+  if (day === 2 && !missionsUnlocked && !completedDays.has(2)) return false;
+  return true;
+}
+
+// ¿El Día 2 está cerrado SOLO por faltar las 3 misiones? (el Día 1 ya está hecho)
+export function day2BlockedByMissions(
+  completedDays: Set<number>,
+  missionsUnlocked: boolean
+): boolean {
+  return completedDays.has(1) && !completedDays.has(2) && !missionsUnlocked;
+}
+
 // El reto de 7 días + el cofre es el "Episodio 1". Cuando se agreguen más
 // días más adelante (Episodio 2, etc.), esto pasará a ser una lista.
 export const CURRENT_EPISODE_LABEL = "Episodio 1:";

@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   CURRENT_EPISODE_LABEL,
   CURRENT_EPISODE_NAME,
+  isDayUnlocked,
   MISSIONS,
   TOTAL_DAYS,
 } from "@/lib/challenge";
@@ -10,14 +11,14 @@ import MascotCashButton from "@/components/MascotCashButton";
 
 export default function ChallengePathHorizontal({
   completedDays,
-  startUnlocked = true,
+  missionsUnlocked = true,
 }: {
   completedDays: number[];
-  startUnlocked?: boolean; // el Día 1 se abre al completar las misiones iniciales
+  missionsUnlocked?: boolean; // el Día 2 en adelante se abre al hacer las misiones de inicio
 }) {
   const done = new Set(completedDays);
   const allDone = done.size >= TOTAL_DAYS;
-  const isUnlocked = (day: number) => (day === 1 ? startUnlocked : done.has(day - 1));
+  const isUnlocked = (day: number) => isDayUnlocked(day, done, missionsUnlocked);
   const firstAvailable = MISSIONS.find((m) => !done.has(m.day) && isUnlocked(m.day))?.day;
 
   return (

@@ -1,5 +1,10 @@
 import { getSidebarData } from "@/lib/sidebar-data";
-import { TOTAL_DAYS, WELCOME_VIDEO_URL } from "@/lib/challenge";
+import {
+  day2BlockedByMissions,
+  MISSIONS,
+  TOTAL_DAYS,
+  WELCOME_VIDEO_URL,
+} from "@/lib/challenge";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
@@ -11,7 +16,12 @@ import DayIntroVideo from "@/components/DayIntroVideo";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import StartMissions from "@/components/StartMissions";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ falta?: string }>;
+}) {
+  const { falta } = await searchParams;
   const {
     nombre,
     user,
@@ -21,10 +31,18 @@ export default async function DashboardPage() {
     welcomeVideoSeen,
     notifications,
     startMissions,
-    startUnlocked,
+    missionsUnlocked,
   } = await getSidebarData();
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
+
+  // El checklist de 3 pasos es para quien aún no abrió el Día 2 en adelante; quien ya pasó
+  // el Día 2 sin él solo recibe la franja discreta que invita a unirse a las comunidades.
+  const showChecklist = !missionsUnlocked && !completedDays.has(2);
+  // Siguiente día por hacer (al terminar el checklist se le ofrece ir directo ahí).
+  const nextDay = MISSIONS.find((m) => !completedDays.has(m.day))?.day ?? 1;
+  // Llegó aquí por intentar abrir el Día 2 sin haber hecho las 3 misiones.
+  const showMissingNotice = falta === "misiones" && day2BlockedByMissions(completedDays, missionsUnlocked);
 
   const supabase = await createClient();
 
@@ -61,7 +79,7 @@ export default async function DashboardPage() {
         admin={admin}
         completedDays={completedList}
         notifications={notifications}
-        startUnlocked={startUnlocked}
+        missionsUnlocked={missionsUnlocked}
       />
 
       <main className="flex-1 px-4 py-10 md:py-5">
@@ -79,11 +97,20 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <StartMissions initial={startMissions} startUnlocked={startUnlocked} />
+          {showMissingNotice && (
+            <p
+              role="status"
+              className="mx-auto mb-4 w-full max-w-2xl rounded-2xl border border-amber-300/40 bg-amber-400/10 px-4 py-3 text-center text-sm font-semibold text-amber-100 md:max-w-3xl"
+            >
+              🔒 Para pasar al Día 2 primero completa las 3 misiones de inicio.
+            </p>
+          )}
 
-          <ChallengePathHorizontal completedDays={completedList} startUnlocked={startUnlocked} />
+          <StartMissions initial={startMissions} showChecklist={showChecklist} nextDay={nextDay} />
+
+          <ChallengePathHorizontal completedDays={completedList} missionsUnlocked={missionsUnlocked} />
           <div className="md:hidden">
-            <ChallengePath completedDays={completedList} startUnlocked={startUnlocked} />
+            <ChallengePath completedDays={completedList} missionsUnlocked={missionsUnlocked} />
           </div>
 
           {/* El Episodio 2 (workshop) aparece cuando se termina el Día 2. El admin siempre lo ve,

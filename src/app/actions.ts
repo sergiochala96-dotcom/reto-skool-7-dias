@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { TOTAL_DAYS } from "@/lib/challenge";
+import { isDayUnlocked, TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
@@ -169,8 +169,7 @@ export async function completeDay(day: number): Promise<void> {
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked =
-    day === 1 ? await startUnlockedFor(supabase, user.id, completedDays) : completedDays.has(day - 1);
+  const unlocked = await canOpenDay(supabase, user.id, day, completedDays);
 
   if (!unlocked || day < 1 || day > TOTAL_DAYS) {
     redirect("/dashboard");
@@ -189,24 +188,29 @@ export async function completeDay(day: number): Promise<void> {
   redirect("/dashboard");
 }
 
-// El Día 1 se abre cuando la persona toca el candado del Episodio 1, después de las dos
-// misiones iniciales (unirse a WhatsApp y al Skool). Quien ya tiene días completados lo tiene abierto.
-async function startUnlockedFor(
+// ¿Puede la persona trabajar este día? El Día 1 es para todos; el Día 2 exige haber hecho las 3
+// misiones de inicio (tocar el candado). La regla está en isDayUnlocked (lib/challenge.ts).
+async function canOpenDay(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
+  day: number,
   completedDays: Set<number>
 ): Promise<boolean> {
-  if (completedDays.size > 0) return true;
-  const { data } = await supabase
-    .from("profiles")
-    .select("episode1_unlocked_at")
-    .eq("id", userId)
-    .single();
-  return !!data?.episode1_unlocked_at;
+  // Solo el Día 2 depende de las misiones: no se consulta el perfil para los demás días.
+  let missionsUnlocked = false;
+  if (day === 2 && completedDays.has(1) && !completedDays.has(2)) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("episode1_unlocked_at")
+      .eq("id", userId)
+      .single();
+    missionsUnlocked = !!data?.episode1_unlocked_at;
+  }
+  return isDayUnlocked(day, completedDays, missionsUnlocked);
 }
 
-// El candado del Episodio 1: abre el Día 1. Solo se puede después de las dos misiones iniciales.
-// Devuelve false si faltan (por ejemplo, si se llama sin haberlas hecho).
+// El candado del checklist: abre el Día 2 en adelante. Solo se puede después de las dos misiones
+// iniciales (WhatsApp y Skool). Devuelve false si faltan (por ejemplo, si se llama sin haberlas hecho).
 export async function unlockEpisode1(): Promise<boolean> {
   const supabase = await createClient();
   const {
@@ -293,8 +297,7 @@ export async function saveMissionAnswers(
     .eq("user_id", user.id);
 
   const completedDays = new Set((progress ?? []).map((p) => p.day));
-  const unlocked =
-    day === 1 ? await startUnlockedFor(supabase, user.id, completedDays) : completedDays.has(day - 1);
+  const unlocked = await canOpenDay(supabase, user.id, day, completedDays);
   if (!unlocked || day < 1 || day > TOTAL_DAYS) redirect("/dashboard");
 
   const multiValueIds = new Set(

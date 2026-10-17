@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getDayIntroVideo, getMission, TOTAL_DAYS } from "@/lib/challenge";
+import {
+  day2BlockedByMissions,
+  getDayIntroVideo,
+  getMission,
+  isDayUnlocked,
+  TOTAL_DAYS,
+} from "@/lib/challenge";
 import { getMissionSections, type Answers } from "@/lib/missionFields";
 import { saveMissionAnswers } from "@/app/actions";
 import { getSidebarData } from "@/lib/sidebar-data";
@@ -19,11 +25,17 @@ export default async function DiaPage({
   const mission = getMission(day);
   if (!mission) notFound();
 
-  const { nombre, user, avatarUrl, admin, completedDays, notifications, startUnlocked } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, missionsUnlocked } =
     await getSidebarData();
 
-  const unlocked = day === 1 ? startUnlocked : completedDays.has(day - 1);
-  if (!unlocked) redirect("/dashboard");
+  if (!isDayUnlocked(day, completedDays, missionsUnlocked)) {
+    // Si solo faltan las 3 misiones de inicio, el panel se lo explica a la persona.
+    redirect(
+      day === 2 && day2BlockedByMissions(completedDays, missionsUnlocked)
+        ? "/dashboard?falta=misiones"
+        : "/dashboard"
+    );
+  }
 
   const done = completedDays.has(day);
   const saveAction = saveMissionAnswers.bind(null, day);
@@ -56,7 +68,7 @@ export default async function DiaPage({
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
-        startUnlocked={startUnlocked}
+        missionsUnlocked={missionsUnlocked}
       />
 
       <main className="flex-1 px-4 py-10 lg:px-10">

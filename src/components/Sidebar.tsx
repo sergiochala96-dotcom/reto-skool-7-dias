@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
+import { isDayUnlocked, MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import type { SidebarNotification } from "@/lib/sidebar-data";
 import { adminResetProgress, adminUnlockAll, signOut } from "@/app/actions";
 import AccountModal from "@/components/AccountModal";
@@ -20,7 +20,7 @@ export default function Sidebar({
   admin,
   completedDays,
   notifications,
-  startUnlocked = true,
+  missionsUnlocked = true,
 }: {
   nombre: string;
   email: string;
@@ -28,7 +28,7 @@ export default function Sidebar({
   admin: boolean;
   completedDays: number[];
   notifications: SidebarNotification[];
-  startUnlocked?: boolean; // el Día 1 se abre al completar las misiones iniciales
+  missionsUnlocked?: boolean; // el Día 2 en adelante se abre al hacer las misiones de inicio
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -202,8 +202,7 @@ export default function Sidebar({
           <ul className="flex flex-col gap-0.5">
             {MISSIONS.map((mission) => {
               const isDone = done.has(mission.day);
-              const unlocked =
-                mission.day === 1 ? startUnlocked : done.has(mission.day - 1);
+              const unlocked = isDayUnlocked(mission.day, done, missionsUnlocked);
               const href = `/dia/${mission.day}`;
               const active = pathname === href;
 

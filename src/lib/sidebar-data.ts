@@ -19,9 +19,9 @@ export type SidebarData = {
   admin: boolean;
   welcomeVideoSeen: boolean;
   notifications: SidebarNotification[];
-  // Misiones iniciales (unirse al Skool y a WhatsApp) y si ya se abrió el Día 1.
+  // Misiones iniciales (WhatsApp, Skool) y si ya tocó el candado que abre el Día 2 en adelante.
   startMissions: { skool: boolean; whatsapp: boolean };
-  startUnlocked: boolean;
+  missionsUnlocked: boolean;
 };
 
 export async function getSidebarData(): Promise<SidebarData> {
@@ -84,16 +84,16 @@ export async function getSidebarData(): Promise<SidebarData> {
     skool: !!profile?.joined_skool_at,
     whatsapp: !!profile?.joined_whatsapp_at,
   };
-  // El Día 1 se abre al tocar el candado del Episodio 1 (después de las dos misiones);
-  // quien ya tiene días completados lo tiene abierto.
-  const startUnlocked = !!profile?.episode1_unlocked_at || (progress ?? []).length > 0;
+  // El Día 1 es para todos. Del Día 2 en adelante hace falta haber tocado el candado del
+  // checklist (que exige WhatsApp y Skool antes). Ver isDayUnlocked en lib/challenge.ts.
+  const missionsUnlocked = !!profile?.episode1_unlocked_at;
 
   return {
     user,
     nombre,
     avatarUrl,
     startMissions,
-    startUnlocked,
+    missionsUnlocked,
     completedDays: new Set((progress ?? []).map((p) => p.day)),
     admin: isAdmin(user.email),
     welcomeVideoSeen: profile?.welcome_video_seen ?? false,
