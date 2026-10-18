@@ -1044,7 +1044,7 @@ export default function MissionForm({
   title,
   intro,
   completed,
-  sections,
+  sections: allSections,
   initialAnswers,
   saveAction,
 }: {
@@ -1058,6 +1058,10 @@ export default function MissionForm({
   initialAnswers: Answers;
   saveAction: (state: MissionState, formData: FormData) => Promise<MissionState>;
 }) {
+  // Las secciones "collapsible" no son pasos del recorrido: salen como desplegables al final
+  // (cerrados al inicio) y no cuentan para completar el día.
+  const sections = allSections.filter((s) => !s.collapsible);
+  const extraSections = allSections.filter((s) => s.collapsible);
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [state, formAction, pending] = useActionState<MissionState, FormData>(
     saveAction,
@@ -1323,6 +1327,41 @@ export default function MissionForm({
           </section>
         );
       })}
+
+      {/* Desplegables opcionales: siguen dentro del formulario aunque estén cerrados, así que lo
+          que se escriba en ellos también se guarda. Aparecen en el último paso. */}
+      {extraSections.length > 0 && (
+        <div
+          className={`flex flex-col gap-3 ${showAllExpanded || isLastStep ? "" : "hidden"}`}
+        >
+          {extraSections.map((section) => (
+            <details key={section.id} className="group rounded-2xl border border-gray-200 bg-white">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-5 py-4 text-sm font-bold text-gray-800 transition hover:bg-gray-50 [&::-webkit-details-marker]:hidden">
+                <span>{section.heading}</span>
+                <span
+                  aria-hidden="true"
+                  className="text-lg leading-none text-fuchsia-600 transition-transform group-open:rotate-180"
+                >
+                  ⌄
+                </span>
+              </summary>
+              <div className="flex flex-col gap-5 border-t border-gray-100 p-5">
+                {section.fields
+                  .filter((f) => !f.showIf || answers[f.showIf.field] === f.showIf.equals)
+                  .map((field) => (
+                    <FieldInput
+                      key={field.id}
+                      field={field}
+                      value={answers[field.id]}
+                      answers={answers}
+                      onChange={handleChange}
+                    />
+                  ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      )}
 
       {state?.saved && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700">

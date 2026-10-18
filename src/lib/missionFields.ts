@@ -84,6 +84,11 @@ export type MissionSection = {
   mascotAfterField?: string;
   /** Si es true, toda la sección (título + campos) se muestra dentro de una sola tarjeta morada oscura con título en H1. */
   emphasis?: boolean;
+  /**
+   * Si es true, la sección no es un paso del recorrido: se muestra como un desplegable al final
+   * de la misión (cerrado al inicio). Sus campos deberían llevar required: false.
+   */
+  collapsible?: boolean;
 };
 
 const SI_NO = [
@@ -126,21 +131,6 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             { value: "email", label: "Email", icon: "email" },
             { value: "otra", label: "Otra", icon: "otra" },
           ],
-        },
-      ],
-    },
-    {
-      id: "usuario",
-      heading: "Tu usuario",
-      mascot: "/mascota-usuario.png",
-      fields: [
-        {
-          id: "canal_usuario",
-          type: "text",
-          label: "Tu usuario en tu canal preferido",
-          placeholder: "@tu_usuario",
-          inlineBadge: true,
-          badgeLabel: "Tu Usuario:",
         },
       ],
     },
@@ -233,10 +223,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "problemas_avatar",
           type: "list",
-          label: "Problemas de tu avatar",
-          helper: "Escribe mínimo 3",
-          minItems: 3,
-          addLabel: "+ Añadir problema",
+          label: "Problema principal de tu avatar",
+          helper: "Escribe solo 1: el que más le duele",
+          minItems: 1,
+          maxItems: 1,
           itemPlaceholder: "Ej: no sabe por dónde empezar",
           badgeLabel: "Problema",
           emphasis: true,
@@ -265,10 +255,10 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         {
           id: "deseos_avatar",
           type: "list",
-          label: "Deseos de tu avatar",
-          helper: "Escribe mínimo 3",
-          minItems: 3,
-          addLabel: "+ Añadir deseo",
+          label: "Deseo principal de tu avatar",
+          helper: "Escribe solo 1: lo que más quiere lograr",
+          minItems: 1,
+          maxItems: 1,
           itemPlaceholder: "Ej: quiere generar ingresos extra",
           badgeLabel: "Deseo",
           emphasis: true,
@@ -279,51 +269,49 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
         },
       ],
     },
+    // Desde aquí, desplegables al final del Día 1: no cuentan para completarlo (required: false).
     {
-      id: "diferenciacion",
-      heading: "Diferenciación",
-      mascot: "/mascota-diferenciacion-bonos.png",
+      id: "diferenciacion-opcional",
+      heading: "Opcional: ¿Qué te diferencia?",
+      collapsible: true,
       fields: [
         {
-          id: "diferenciacion",
-          type: "list",
+          id: "diferencial",
+          type: "textarea",
           label: "¿Qué te diferencia?",
-          helper: "Escribe mínimo 3",
-          minItems: 3,
-          addLabel: "+ Añadir diferencial",
-          badgeLabel: "Diferencia",
-          emphasis: true,
-          examples: [
-            "Acompañamiento personalizado, no solo contenido grabado",
-            "Resultados comprobados con casos reales de otros alumnos",
-          ],
+          helper: "En una frase: qué te hace distinto a otros en tu nicho",
+          placeholder: "Ej: acompañamiento personalizado, no solo contenido grabado",
+          maxLength: 200,
+          required: false,
         },
       ],
     },
     {
-      id: "bonos",
-      heading: "Bonos",
-      mascot: "/mascota-diferenciacion-bonos.png",
+      id: "tareas-adicionales",
+      heading: "Tareas adicionales (opcional)",
+      collapsible: true,
       fields: [
+        {
+          id: "tareas_adicionales_info",
+          type: "info",
+          label: "Para dejar tu oferta más completa",
+          infoText:
+            "Estas tareas son opcionales: no hace falta que las hagas para completar el Día 1. Hazlas si quieres dejar tu oferta más armada.",
+        },
         {
           id: "oferta_bonos",
           type: "bonos",
           label: "Bonos de tu Oferta Grand Slam",
           helper: "Describe la oferta irresistible de tu comunidad",
           emphasis: true,
+          required: false,
         },
-      ],
-    },
-    {
-      id: "garantia-escasez-urgencia",
-      heading: "Garantía, Escasez y Urgencia",
-      mascot: "/mascota-garantia-escasez-urgencia.png",
-      fields: [
         {
           id: "oferta_terminos",
           type: "terminos",
           label: "Garantía, escasez y urgencia de tu oferta",
           helper: "Termina de armar tu Oferta Grand Slam",
+          required: false,
         },
       ],
     },
