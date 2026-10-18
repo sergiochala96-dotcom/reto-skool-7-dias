@@ -89,6 +89,8 @@ export type MissionSection = {
    * de la misión (cerrado al inicio). Sus campos deberían llevar required: false.
    */
   collapsible?: boolean;
+  /** Etiqueta morada con letra blanca que se muestra junto al título del desplegable (ej: "Opcional"). */
+  badge?: string;
 };
 
 const SI_NO = [
@@ -271,24 +273,9 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
     },
     // Desde aquí, desplegables al final del Día 1: no cuentan para completarlo (required: false).
     {
-      id: "diferenciacion-opcional",
-      heading: "Opcional: ¿Qué te diferencia?",
-      collapsible: true,
-      fields: [
-        {
-          id: "diferencial",
-          type: "textarea",
-          label: "¿Qué te diferencia?",
-          helper: "En una frase: qué te hace distinto a otros en tu nicho",
-          placeholder: "Ej: acompañamiento personalizado, no solo contenido grabado",
-          maxLength: 200,
-          required: false,
-        },
-      ],
-    },
-    {
       id: "tareas-adicionales",
-      heading: "Tareas adicionales (opcional)",
+      heading: "Tareas adicionales",
+      badge: "Opcional",
       collapsible: true,
       fields: [
         {
@@ -297,6 +284,15 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
           label: "Para dejar tu oferta más completa",
           infoText:
             "Estas tareas son opcionales: no hace falta que las hagas para completar el Día 1. Hazlas si quieres dejar tu oferta más armada.",
+        },
+        {
+          id: "diferencial",
+          type: "textarea",
+          label: "¿Qué te diferencia?",
+          helper: "En una frase: qué te hace distinto a otros en tu nicho",
+          placeholder: "Ej: acompañamiento personalizado, no solo contenido grabado",
+          maxLength: 200,
+          required: false,
         },
         {
           id: "oferta_bonos",

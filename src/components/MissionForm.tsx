@@ -1337,7 +1337,14 @@ export default function MissionForm({
           {extraSections.map((section) => (
             <details key={section.id} className="group rounded-2xl border border-gray-200 bg-white">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-5 py-4 text-sm font-bold text-gray-800 transition hover:bg-gray-50 [&::-webkit-details-marker]:hidden">
-                <span>{section.heading}</span>
+                <span className="flex items-center gap-2.5">
+                  {section.badge && (
+                    <span className="rounded-full bg-purple-700 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+                      {section.badge}
+                    </span>
+                  )}
+                  <span>{section.heading}</span>
+                </span>
                 <span
                   aria-hidden="true"
                   className="text-lg leading-none text-fuchsia-600 transition-transform group-open:rotate-180"
