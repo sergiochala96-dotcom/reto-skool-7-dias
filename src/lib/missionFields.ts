@@ -131,16 +131,8 @@ export const MISSION_SECTIONS: Record<number, MissionSection[]> = {
             { value: "tiktok", label: "TikTok", icon: "tiktok" },
             { value: "facebook", label: "Facebook", icon: "facebook" },
             { value: "email", label: "Email", icon: "email" },
-            { value: "otra", label: "Otra", icon: "otra" },
           ],
         },
-      ],
-    },
-    {
-      id: "seguidores",
-      heading: "Tus seguidores",
-      mascot: "/mascota-seguidores.png",
-      fields: [
         {
           id: "canal_seguidores",
           type: "select",
