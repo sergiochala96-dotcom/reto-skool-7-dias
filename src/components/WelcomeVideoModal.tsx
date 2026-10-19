@@ -215,8 +215,8 @@ export default function WelcomeVideoModal({
         </div>
 
         {/* Solo en computadora: título y botón a la derecha del video */}
-        <div className="hidden max-w-md flex-col items-start gap-7 text-left md:flex">
-          <h2 className="text-3xl font-extrabold leading-tight text-white lg:text-4xl xl:text-5xl">
+        <div className="hidden max-w-sm flex-col items-start gap-6 text-left md:flex lg:max-w-md">
+          <h2 className="text-2xl font-extrabold leading-snug text-white lg:text-3xl">
             Únete al grupo de WhatsApp, donde te enviamos noticias y recursos de Skool todas las
             semanas
           </h2>
