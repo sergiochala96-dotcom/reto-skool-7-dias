@@ -7,7 +7,7 @@ import ChallengePathHorizontal from "@/components/ChallengePathHorizontal";
 import Episode2Card from "@/components/Episode2Card";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
-import DayIntroVideo from "@/components/DayIntroVideo";
+import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import StartMissions from "@/components/StartMissions";
 
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
       {!welcomeVideoSeen && (
-        <DayIntroVideo src={WELCOME_VIDEO_URL} closable={false} large />
+        <WelcomeVideoModal src={WELCOME_VIDEO_URL} />
       )}
       <MetaRegistrationEvent
         userId={user.id}

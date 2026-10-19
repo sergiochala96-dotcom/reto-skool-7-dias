@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import DayIntroVideo from "@/components/DayIntroVideo";
+import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import { WELCOME_VIDEO_URL } from "@/lib/challenge";
 
 export default function WelcomeVideoReplayButton() {
@@ -21,13 +21,7 @@ export default function WelcomeVideoReplayButton() {
         </svg>
       </button>
 
-      {open && (
-        <DayIntroVideo
-          src={WELCOME_VIDEO_URL}
-          large
-          onClose={() => setOpen(false)}
-        />
-      )}
+      {open && <WelcomeVideoModal src={WELCOME_VIDEO_URL} onClose={() => setOpen(false)} />}
     </>
   );
 }

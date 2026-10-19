@@ -107,4 +107,7 @@ export function getDayIntroVideo(day: number): string | undefined {
 
 // Video de bienvenida que se muestra una única vez, la primera vez que un
 // usuario entra al dashboard tras crear su cuenta (ver profiles.welcome_video_seen).
-export const WELCOME_VIDEO_URL = `${SUPABASE_STORAGE_BASE}/welcome-intro.mp4`;
+// Es un Short de YouTube (formato vertical) incrustado sin los controles ni el logo de
+// YouTube; ver components/WelcomeVideoModal.tsx. (El video horizontal anterior era
+// `${SUPABASE_STORAGE_BASE}/welcome-intro.mp4`.)
+export const WELCOME_VIDEO_URL = "https://www.youtube.com/embed/_XPbP80v2NQ";
