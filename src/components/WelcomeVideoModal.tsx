@@ -225,7 +225,7 @@ export default function WelcomeVideoModal({
         type="button"
         onClick={close}
         aria-label="Cerrar video"
-        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-lg font-bold text-white transition hover:bg-white/30"
+        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-lg font-bold text-white transition hover:bg-white/30 md:hidden"
       >
         ✕
       </button>
@@ -233,6 +233,17 @@ export default function WelcomeVideoModal({
       <div className="flex w-full max-w-5xl flex-col items-center gap-6 md:flex-row md:justify-center md:gap-14">
         {/* Video vertical */}
         <div className="relative aspect-[9/16] w-[min(20rem,calc(82dvh*0.5625))] shrink-0 overflow-hidden rounded-2xl bg-black shadow-2xl shadow-purple-950/50 md:w-[min(24rem,calc(86dvh*0.5625))]">
+          {/* Computadora: X para cerrar dentro del video, arriba a la derecha, también mientras
+              se reproduce (en celular la X va en la esquina de la pantalla). */}
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Cerrar video"
+            className="absolute right-3 top-3 z-30 hidden h-9 w-9 items-center justify-center rounded-full bg-black/55 text-base font-bold text-white shadow-lg backdrop-blur transition hover:bg-black/80 md:flex"
+          >
+            ✕
+          </button>
+
           {/* Portada: se ve al instante y se desvanece cuando el video ya corre */}
           <Image
             src="/welcome-poster.jpg"
