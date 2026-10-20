@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { completeStartMission } from "@/app/actions";
 import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
@@ -40,6 +41,9 @@ export default function WelcomeVideoModal({
   const [started, setStarted] = useState(false); // celular: ya tocó "Reproducir"
   const [needsSound, setNeedsSound] = useState(false);
   const [ended, setEnded] = useState(false);
+  // El reproductor de YouTube tarda un par de segundos en cargar: mientras tanto se muestra la
+  // portada (el primer cuadro del video), y se quita con un fundido apenas el video corre.
+  const [videoReady, setVideoReady] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const playingRef = useRef(false);
   const endedRef = useRef(false);
@@ -104,6 +108,7 @@ export default function WelcomeVideoModal({
         const state = data.event === "onStateChange" ? info : info?.playerState;
         if (state === 1) {
           playingRef.current = true;
+          setVideoReady(true);
           // Si ya terminó, el "reproduciendo" que avisa el reproductor al volver al inicio
           // (lo hacemos arriba) no debe quitar el botón: solo "Volver a ver" lo quita.
           if (!endedRef.current) setEnded(false);
@@ -212,6 +217,10 @@ export default function WelcomeVideoModal({
       aria-label="Video de bienvenida"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/85 p-4"
     >
+      {/* Abre las conexiones a YouTube desde ya, para que el reproductor cargue más rápido. */}
+      <link rel="preconnect" href="https://www.youtube.com" />
+      <link rel="preconnect" href="https://s.ytimg.com" />
+      <link rel="preconnect" href="https://i.ytimg.com" />
       <button
         type="button"
         onClick={close}
@@ -224,6 +233,18 @@ export default function WelcomeVideoModal({
       <div className="flex w-full max-w-5xl flex-col items-center gap-6 md:flex-row md:justify-center md:gap-14">
         {/* Video vertical */}
         <div className="relative aspect-[9/16] w-[min(20rem,calc(82dvh*0.5625))] shrink-0 overflow-hidden rounded-2xl bg-black shadow-2xl shadow-purple-950/50 md:w-[min(24rem,calc(86dvh*0.5625))]">
+          {/* Portada: se ve al instante y se desvanece cuando el video ya corre */}
+          <Image
+            src="/welcome-poster.jpg"
+            alt=""
+            fill
+            sizes="(min-width: 768px) 384px, 320px"
+            priority
+            className={`pointer-events-none z-[5] object-cover transition-opacity duration-500 ${
+              videoReady ? "opacity-0" : "opacity-100"
+            }`}
+          />
+
           {url && (
             <iframe
               ref={iframeRef}
