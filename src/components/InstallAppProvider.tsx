@@ -57,10 +57,22 @@ function detectPlatform(): InstallPlatform | null {
   return isIOS ? "ios" : "android";
 }
 
+// En iPhone el botón Compartir está en un lugar distinto según el navegador.
+type IosBrowser = "safari" | "chrome" | "other";
+
+function iosBrowser(): IosBrowser {
+  const ua = navigator.userAgent;
+  if (/CriOS/.test(ua)) return "chrome"; // Chrome: Compartir arriba a la derecha, junto a la dirección
+  if (/FxiOS|EdgiOS|OPiOS|DuckDuckGo|GSA\//.test(ua)) return "other";
+  return "safari"; // Safari: Compartir en la barra de abajo
+}
+
 export default function InstallAppProvider({ children }: { children: ReactNode }) {
   const [platform, setPlatform] = useState<InstallPlatform | null>(null);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [modal, setModal] = useState<InstallPlatform | null>(null);
+  // Flecha que señala dónde está el botón Compartir del navegador (solo iPhone).
+  const [arrow, setArrow] = useState<"top" | "bottom" | null>(null);
 
   useEffect(() => {
     const detected = detectPlatform();
@@ -112,8 +124,93 @@ export default function InstallAppProvider({ children }: { children: ReactNode }
   return (
     <InstallContext.Provider value={value}>
       {children}
-      {modal && <InstallInstructions kind={modal} onClose={() => setModal(null)} />}
+      {modal && (
+        <InstallInstructions
+          kind={modal}
+          onClose={() => setModal(null)}
+          onGuide={
+            modal === "ios"
+              ? () => {
+                  setModal(null);
+                  setArrow(iosBrowser() === "chrome" ? "top" : "bottom");
+                }
+              : undefined
+          }
+        />
+      )}
+      {arrow && <ShareArrow position={arrow} onDone={() => setArrow(null)} />}
     </InstallContext.Provider>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Flecha que señala el botón Compartir del navegador (iPhone)
+// ---------------------------------------------------------------------------
+
+// Chrome tiene Compartir arriba a la derecha; Safari, en la barra de abajo. La flecha rebota
+// en ese borde de la pantalla y se va sola a los 14 segundos (o con su X).
+export function ShareArrow({ position, onDone }: { position: "top" | "bottom"; onDone: () => void }) {
+  useEffect(() => {
+    const t = window.setTimeout(onDone, 14000);
+    return () => window.clearTimeout(t);
+  }, [onDone]);
+
+  const top = position === "top";
+  const arrow = (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`h-9 w-9 animate-bounce text-amber-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] motion-reduce:animate-none ${
+        top ? "" : "rotate-180"
+      }`}
+      aria-hidden="true"
+    >
+      <path d="M12 20V5" />
+      <path d="m5 12 7-7 7 7" />
+    </svg>
+  );
+  const bubble = (
+    <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-amber-400 py-1.5 pl-4 pr-2 text-sm font-extrabold text-black shadow-xl">
+      <span className="whitespace-nowrap">
+        {top ? "Toca Compartir aquí arriba" : "Toca Compartir aquí abajo"}
+      </span>
+      <button
+        type="button"
+        onClick={onDone}
+        aria-label="Cerrar la flecha"
+        className="flex h-6 w-6 items-center justify-center rounded-full bg-black/15 text-xs font-bold"
+      >
+        ✕
+      </button>
+    </div>
+  );
+
+  return createPortal(
+    <div
+      role="status"
+      className={`pointer-events-none fixed z-[70] flex flex-col gap-1 ${
+        top
+          ? "right-3 top-[max(0.25rem,env(safe-area-inset-top))] items-end"
+          : "bottom-[max(0.25rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 items-center"
+      }`}
+    >
+      {top ? (
+        <>
+          <span className="mr-6">{arrow}</span>
+          {bubble}
+        </>
+      ) : (
+        <>
+          {bubble}
+          {arrow}
+        </>
+      )}
+    </div>,
+    document.body
   );
 }
 
@@ -183,11 +280,18 @@ function Step({ n, children }: { n: number; children: ReactNode }) {
 export function InstallInstructions({
   kind,
   onClose,
+  onGuide,
+  browser,
 }: {
   kind: InstallPlatform;
   onClose: () => void;
+  /** iPhone: cierra la ventana y muestra la flecha que señala el botón Compartir. */
+  onGuide?: () => void;
+  /** Solo para pruebas: fuerza el navegador de iPhone en vez de detectarlo. */
+  browser?: IosBrowser;
 }) {
   const [copied, setCopied] = useState(false);
+  const iosBrowserKind: IosBrowser = kind === "ios" ? (browser ?? iosBrowser()) : "safari";
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -250,25 +354,33 @@ export function InstallInstructions({
         </div>
 
         <ol className="mt-5 flex flex-col gap-3.5">
+          {/* iPhone: solo 2 pasos; el botón Compartir está en un lugar distinto según el navegador */}
           {kind === "ios" && (
             <>
               <Step n={1}>
-                En <strong>Safari</strong>, toca el botón <strong>Compartir</strong>{" "}
+                Toca el botón <strong>Compartir</strong>{" "}
                 <Chip>
                   <ShareIcon />
                 </Chip>{" "}
-                (en la barra de abajo; en iPad, arriba).
+                {iosBrowserKind === "chrome" && (
+                  <>
+                    <strong>arriba a la derecha</strong>, junto a la dirección de la página.
+                  </>
+                )}
+                {iosBrowserKind === "safari" && (
+                  <>
+                    en la <strong>barra de abajo</strong> de Safari. Si no lo ves, toca{" "}
+                    <strong>···</strong> y luego <strong>Compartir</strong>.
+                  </>
+                )}
+                {iosBrowserKind === "other" && <>de tu navegador (en el menú o junto a la dirección).</>}
               </Step>
               <Step n={2}>
-                Desliza y toca <strong>&quot;Añadir a pantalla de inicio&quot;</strong>{" "}
+                Elige <strong>&quot;Añadir a pantalla de inicio&quot;</strong>{" "}
                 <Chip>
                   <PlusSquareIcon />
-                </Chip>
-                .
-              </Step>
-              <Step n={3}>
-                Toca <strong>&quot;Añadir&quot;</strong> arriba a la derecha. ¡Listo! Verás Skooly
-                en tu pantalla.
+                </Chip>{" "}
+                y toca <strong>&quot;Añadir&quot;</strong>. ¡Listo!
               </Step>
             </>
           )}
@@ -317,16 +429,17 @@ export function InstallInstructions({
 
         {kind === "ios" && (
           <p className="mt-4 text-center text-xs text-purple-950/50">
-            ¿No ves la opción? Abre esta página en Safari e inténtalo de nuevo.
+            Al tocar el botón, una flecha te mostrará dónde está. ¿No ves la opción? Prueba abriendo
+            esta página en Safari.
           </p>
         )}
 
         <button
           type="button"
-          onClick={onClose}
+          onClick={onGuide ?? onClose}
           className="mt-5 w-full rounded-xl bg-amber-400 px-6 py-3.5 text-base font-extrabold text-black shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 active:scale-[0.99]"
         >
-          Entendido
+          {onGuide ? "Mostrarme dónde tocar" : "Entendido"}
         </button>
       </div>
     </div>,
