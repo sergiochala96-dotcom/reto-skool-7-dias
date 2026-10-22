@@ -10,6 +10,9 @@ const PUBLIC_PATHS = [
   "/privacidad",
   "/olvide-contrasena",
   "/api/cron",
+  // Para poder instalar la app en el celular: el navegador los pide sin sesión.
+  "/manifest.webmanifest",
+  "/sw.js",
 ];
 
 export async function updateSession(request: NextRequest) {

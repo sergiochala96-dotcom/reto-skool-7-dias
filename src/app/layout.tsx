@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import InstallAppProvider from "@/components/InstallAppProvider";
 import MetaPixel from "@/components/MetaPixel";
 
 const geistSans = Geist({
@@ -16,6 +17,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Skooly: Reto de Skool en 7 Días",
   description: "Completa las 7 misiones diarias y desbloquea el Cofre del Tesoro.",
+  // iPhone: al agregarla a la pantalla de inicio se abre como aplicación, con el nombre "Skooly".
+  appleWebApp: { capable: true, title: "Skooly", statusBarStyle: "black" },
+};
+
+export const viewport: Viewport = {
+  // Color de la barra del sistema en el celular (el mismo morado oscuro de la app).
+  themeColor: "#150826",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -25,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <InstallAppProvider>{children}</InstallAppProvider>
         <MetaPixel />
       </body>
     </html>

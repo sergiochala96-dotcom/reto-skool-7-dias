@@ -10,6 +10,8 @@ import { adminResetProgress, adminUnlockAll, completeStartMission, signOut } fro
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
 import CourseIcon from "@/components/CourseIcon";
+import InstallIcon from "@/components/InstallIcon";
+import { useInstallApp } from "@/components/InstallAppProvider";
 import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import NotificationsMenu from "@/components/NotificationsMenu";
@@ -32,6 +34,7 @@ export default function Sidebar({
   notifications: SidebarNotification[];
 }) {
   const pathname = usePathname();
+  const { platform: installPlatform, openInstall } = useInstallApp();
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -323,6 +326,27 @@ export default function Sidebar({
               <CourseIcon className="h-5 w-5 shrink-0" />
               {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
             </a>
+
+            {/* Solo en celulares y tablets (y si la app aún no está instalada). */}
+            {installPlatform && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  openInstall();
+                }}
+                title={effectiveCollapsed ? "Instalar la app en mi celular" : undefined}
+                aria-label="Instalar la app en mi celular"
+                className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
+                  effectiveCollapsed
+                    ? "h-10 w-10 rounded-full"
+                    : "rounded-xl px-3 py-2 text-sm md:text-base"
+                }`}
+              >
+                <InstallIcon className="h-5 w-5 shrink-0" />
+                {!effectiveCollapsed && <span>Instalar la app en mi celular</span>}
+              </button>
+            )}
           </div>
         </nav>
 
