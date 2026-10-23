@@ -32,7 +32,8 @@ function isSupported() {
   );
 }
 
-export function usePush() {
+// userKey identifica a la cuenta que está usando el dispositivo (email o id).
+export function usePush(userKey: string) {
   const [state, setState] = useState<PushState>("checking");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,9 +47,9 @@ export function usePush() {
       if (sub && Notification.permission === "granted") {
         setState("on");
         // Si en este dispositivo entra otra cuenta, el aviso pasa a ser de quien lo usa ahora.
-        // Una vez por sesión del navegador es suficiente.
-        if (!sessionStorage.getItem(SAVED_KEY)) {
-          sessionStorage.setItem(SAVED_KEY, "1");
+        // Se guarda una vez por cuenta y sesión del navegador.
+        if (sessionStorage.getItem(SAVED_KEY) !== userKey) {
+          sessionStorage.setItem(SAVED_KEY, userKey);
           void savePushSubscription(sub.toJSON());
         }
       } else {
@@ -57,7 +58,7 @@ export function usePush() {
     } catch {
       setState("off");
     }
-  }, []);
+  }, [userKey]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- lee APIs del navegador
@@ -82,7 +83,7 @@ export function usePush() {
           }));
         const { ok } = await savePushSubscription(sub.toJSON());
         if (!ok) throw new Error("save");
-        sessionStorage.setItem(SAVED_KEY, "1");
+        sessionStorage.setItem(SAVED_KEY, userKey);
         trackCustomEvent("ActivoAvisos");
       }
     } catch {
@@ -91,20 +92,22 @@ export function usePush() {
       setBusy(false);
       window.dispatchEvent(new Event(CHANGE_EVENT));
     }
-  }, []);
+  }, [userKey]);
 
   return { state, busy, error, enable };
 }
 
 // Botón del menú lateral. Solo aparece si el dispositivo puede recibir avisos y aún no los activó.
 export function PushSidebarButton({
+  userKey,
   collapsed,
   onActivated,
 }: {
+  userKey: string;
   collapsed: boolean;
   onActivated?: () => void;
 }) {
-  const { state, busy, enable } = usePush();
+  const { state, busy, enable } = usePush(userKey);
   if (state !== "off") return null;
   return (
     <button
@@ -126,8 +129,8 @@ export function PushSidebarButton({
 }
 
 // Tarjeta del panel que invita a activar los avisos (se muestra tras completar el Día 1).
-export function PushPromptCard() {
-  const { state, busy, error, enable } = usePush();
+export function PushPromptCard({ userKey }: { userKey: string }) {
+  const { state, busy, error, enable } = usePush(userKey);
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {

@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           <StartMissions initial={startMissions} />
 
           {/* Invitación a activar los avisos: llega tras el primer día completado. */}
-          {completedDays.size >= 1 && <PushPromptCard />}
+          {completedDays.size >= 1 && <PushPromptCard userKey={user.email ?? user.id} />}
 
           <ChallengePathHorizontal completedDays={completedList} />
           <div className="md:hidden">

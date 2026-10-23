@@ -351,6 +351,7 @@ export default function Sidebar({
 
             {/* Solo si el dispositivo puede recibir avisos y aún no los activó. */}
             <PushSidebarButton
+              userKey={email}
               collapsed={effectiveCollapsed}
               onActivated={() => setMobileOpen(false)}
             />
