@@ -11,6 +11,7 @@ import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
 import CourseIcon from "@/components/CourseIcon";
 import InstallIcon from "@/components/InstallIcon";
+import { PushSidebarButton } from "@/components/PushNotifications";
 import { useInstallApp } from "@/components/InstallAppProvider";
 import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
@@ -347,6 +348,12 @@ export default function Sidebar({
                 {!effectiveCollapsed && <span>Instalar la app en mi celular</span>}
               </button>
             )}
+
+            {/* Solo si el dispositivo puede recibir avisos y aún no los activó. */}
+            <PushSidebarButton
+              collapsed={effectiveCollapsed}
+              onActivated={() => setMobileOpen(false)}
+            />
           </div>
         </nav>
 

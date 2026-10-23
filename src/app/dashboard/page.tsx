@@ -10,6 +10,7 @@ import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import StartMissions from "@/components/StartMissions";
+import { PushPromptCard } from "@/components/PushNotifications";
 
 export default async function DashboardPage() {
   const {
@@ -79,6 +80,9 @@ export default async function DashboardPage() {
 
           {/* Las dos misiones de inicio (WhatsApp y Skool) las ve todo el mundo, siempre. */}
           <StartMissions initial={startMissions} />
+
+          {/* Invitación a activar los avisos: llega tras el primer día completado. */}
+          {completedDays.size >= 1 && <PushPromptCard />}
 
           <ChallengePathHorizontal completedDays={completedList} />
           <div className="md:hidden">

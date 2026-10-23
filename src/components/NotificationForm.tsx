@@ -53,12 +53,28 @@ export default function NotificationForm() {
         Los enlaces (https://...) se convierten en clicables automáticamente.
       </p>
 
+      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl bg-white/5 px-3 py-3 text-sm text-white/80">
+        <input
+          type="checkbox"
+          name="push"
+          defaultChecked
+          className="mt-0.5 h-4 w-4 shrink-0 accent-amber-400"
+        />
+        <span>
+          Enviar también a la <strong>pantalla de bloqueo</strong> de quienes activaron los avisos
+          <span className="block text-xs text-white/40">
+            Se muestra el título y el inicio del mensaje; al tocarlo abren la app.
+          </span>
+        </span>
+      </label>
+
       {state?.error && (
         <p className="mt-4 rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-200">{state.error}</p>
       )}
       {state?.ok && (
         <p className="mt-4 rounded-lg bg-emerald-500/20 px-3 py-2 text-sm text-emerald-200">
-          ✅ Notificación enviada. Ya aparece en la campanita de todos los usuarios.
+          ✅ Notificación enviada. Ya aparece en la campanita de todos los usuarios
+          {state.pushed ? " y salió a la pantalla de bloqueo de quienes activaron los avisos." : "."}
         </p>
       )}
 

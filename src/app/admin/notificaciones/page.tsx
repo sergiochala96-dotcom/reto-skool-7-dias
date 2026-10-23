@@ -4,6 +4,8 @@ import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 import NotificationForm from "@/components/NotificationForm";
 import DeleteNotificationButton from "@/components/DeleteNotificationButton";
+import TestPushButton from "@/components/TestPushButton";
+import { pushConfigured } from "@/lib/push";
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("es", {
@@ -22,14 +24,17 @@ export default async function AdminNotificationsPage() {
 
   const supabase = await createClient();
 
-  const [{ data: sent }, { data: reads }, { count: totalUsers }] = await Promise.all([
+  const [{ data: sent }, { data: reads }, { count: totalUsers }, { data: pushRows }] = await Promise.all([
     supabase
       .from("notifications")
       .select("id, title, body, created_at")
       .order("created_at", { ascending: false }),
     supabase.from("notification_reads").select("notification_id"),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("push_subscriptions").select("user_id"),
   ]);
+  const pushUsers = new Set((pushRows ?? []).map((r) => r.user_id as string)).size;
+  const pushReady = pushConfigured();
 
   const readCount = new Map<string, number>();
   for (const r of reads ?? []) {
@@ -57,6 +62,22 @@ export default async function AdminNotificationsPage() {
               Lo que envíes le aparece a todos los usuarios en la campanita 🔔 del menú.
             </p>
           </header>
+
+          <div className="mb-5 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+            <p className="text-sm font-semibold text-white">🔔 Avisos en la pantalla de bloqueo</p>
+            {pushReady ? (
+              <p className="mt-1 text-sm text-white/70">
+                {pushUsers} de {totalUsers ?? 0} usuarios los tienen activados. Además, cada día se
+                avisa a quien lleva 5 días sin entrar.
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-amber-200">
+                Aún faltan las claves en Vercel (NEXT_PUBLIC_VAPID_PUBLIC_KEY y VAPID_PRIVATE_KEY).
+                Mientras tanto, los comunicados solo salen en la campanita.
+              </p>
+            )}
+            {pushReady && <TestPushButton />}
+          </div>
 
           <NotificationForm />
 

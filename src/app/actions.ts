@@ -3,9 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isDayUnlocked, TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
+import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
+import { createServiceClient } from "@/lib/supabase/service";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
 import { createCampaignAutomation, updateCampaignSteps } from "@/lib/systemeCampaigns";
@@ -524,7 +527,7 @@ export async function markNotificationRead(notificationId: string): Promise<void
     );
 }
 
-export type NotificationState = { error?: string; ok?: boolean } | undefined;
+export type NotificationState = { error?: string; ok?: boolean; pushed?: boolean } | undefined;
 
 // El admin escribe un comunicado que le aparece a todos los usuarios en la campanita.
 export async function adminCreateNotification(
@@ -549,8 +552,23 @@ export async function adminCreateNotification(
     .insert({ title, body, created_by: user.id });
   if (error) return { error: "No se pudo enviar la notificación. Intenta de nuevo." };
 
+  // Además de la campanita, el aviso puede salir en la pantalla de bloqueo de quienes lo activaron.
+  const alsoPush = formData.get("push") === "on" && pushConfigured();
+  if (alsoPush) {
+    const preview = body.replace(/s+/g, " ");
+    after(async () => {
+      const service = createServiceClient();
+      if (!service) return;
+      await sendPush(service, await loadSubscriptions(service), {
+        title,
+        body: preview.length > 140 ? `${preview.slice(0, 137)}...` : preview,
+        tag: "comunicado",
+      });
+    });
+  }
+
   revalidatePath("/", "layout");
-  return { ok: true };
+  return { ok: true, pushed: alsoPush };
 }
 
 export async function adminDeleteNotification(notificationId: string): Promise<void> {
@@ -621,4 +639,55 @@ export async function adminApplyEmailTexts(): Promise<UpdateResult> {
     error:
       [emails.error, welcome.error, steps.error].filter(Boolean).join(" | ") || undefined,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Notificaciones push (pantalla de bloqueo)
+// ---------------------------------------------------------------------------
+
+type PushSubscriptionJSON = { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
+
+// Guarda el dispositivo de quien acaba de aceptar los avisos. Se usa la service role porque un
+// mismo dispositivo puede pasar de una cuenta a otra (el endpoint es único).
+export async function savePushSubscription(sub: PushSubscriptionJSON): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const endpoint = sub.endpoint;
+  const p256dh = sub.keys?.p256dh;
+  const auth = sub.keys?.auth;
+  if (!user || !endpoint || !p256dh || !auth || !endpoint.startsWith("https://")) return { ok: false };
+
+  const service = createServiceClient();
+  if (!service) return { ok: false };
+  const h = await headers();
+  const { error } = await service.from("push_subscriptions").upsert(
+    { user_id: user.id, endpoint, p256dh, auth, user_agent: h.get("user-agent")?.slice(0, 300) ?? null },
+    { onConflict: "endpoint" }
+  );
+  return { ok: !error };
+}
+
+// Solo el admin: manda un aviso de prueba a sus propios dispositivos.
+export async function adminSendTestPush(): Promise<PushResult & { error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+  if (!pushConfigured()) {
+    return { sent: 0, removed: 0, failed: 0, error: "Faltan las claves VAPID en Vercel." };
+  }
+  const service = createServiceClient();
+  if (!service) return { sent: 0, removed: 0, failed: 0, error: "Falta SUPABASE_SERVICE_ROLE_KEY." };
+  const subs = await loadSubscriptions(service, user.id);
+  if (subs.length === 0) {
+    return { sent: 0, removed: 0, failed: 0, error: "Aún no activaste los avisos en ningún dispositivo." };
+  }
+  return sendPush(service, subs, {
+    title: "Prueba de Skooly 🔔",
+    body: "Si ves esto en la pantalla de bloqueo, las notificaciones funcionan.",
+    tag: "prueba",
+  });
 }
