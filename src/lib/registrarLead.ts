@@ -1,4 +1,6 @@
+import { headers } from "next/headers";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { detectDevice } from "@/lib/device";
 import { createClient } from "@/lib/supabase/server";
 import { createContact, createTag, ensureTag, findContactByEmail, listTags } from "@/lib/systeme";
 import { wantedTags } from "@/lib/syncSysteme";
@@ -65,5 +67,6 @@ async function guardarEnSysteme(firstName: string, email: string, account?: NewA
 // Insert simple: si el correo ya existe, la base lo rechaza y se conserva el primer origen.
 async function guardarLead(name: string, email: string, attribution?: Attribution) {
   const supabase = await createClient();
-  await supabase.from("leads").insert({ name, email, ...cleanAttribution(attribution) });
+  const device = detectDevice((await headers()).get("user-agent"));
+  await supabase.from("leads").insert({ name, email, device, ...cleanAttribution(attribution) });
 }

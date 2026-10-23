@@ -1,4 +1,6 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { detectDevice } from "@/lib/device";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
 import type { User } from "@supabase/supabase-js";
@@ -42,15 +44,20 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, joined_skool_at, joined_whatsapp_at")
+    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at")
     .eq("id", user.id)
     .single();
 
   // Última visita: solo se guarda la FECHA y únicamente cuando cambia el día, así que es
   // como máximo una escritura pequeña por persona al día (no se acumula ningún historial).
+  // El dispositivo (computadora, Android, iPhone) se actualiza solo cuando cambia.
   const today = new Date().toISOString().slice(0, 10);
-  if (profile && profile.last_seen_date !== today) {
-    await supabase.from("profiles").update({ last_seen_date: today }).eq("id", user.id);
+  const device = detectDevice((await headers()).get("user-agent"));
+  if (profile && (profile.last_seen_date !== today || profile.last_device !== device)) {
+    await supabase
+      .from("profiles")
+      .update({ last_seen_date: today, last_device: device })
+      .eq("id", user.id);
   }
 
   // Notificaciones del admin (más recientes primero) y cuáles ya leyó este usuario.

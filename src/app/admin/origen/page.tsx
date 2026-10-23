@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
+import { DEVICES, DEVICE_ICON, DEVICE_LABEL, isDevice, type Device } from "@/lib/device";
 import {
   classifyTraffic,
   TRAFFIC_LABEL,
@@ -18,6 +19,7 @@ type Lead = {
   utm_campaign: string | null;
   utm_content: string | null;
   referrer: string | null;
+  device: string | null;
   created_at: string;
 };
 
@@ -44,14 +46,26 @@ export default async function OrigenPage({
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("leads")
-    .select("id, name, email, utm_source, utm_medium, utm_campaign, utm_content, referrer, created_at")
+    .select("id, name, email, utm_source, utm_medium, utm_campaign, utm_content, referrer, device, created_at")
     .order("created_at", { ascending: false })
     .limit(5000);
+  const { data: profileDevices } = await supabase.from("profiles").select("last_device").limit(10000);
 
   const leads = ((data ?? []) as Lead[]).map((l) => ({ ...l, type: classifyTraffic(l.utm_medium) }));
 
   const counts: Record<TrafficType, number> = { pagado: 0, organico: 0, otro: 0, sin_etiqueta: 0 };
   for (const l of leads) counts[l.type]++;
+
+  // Dispositivos: con cuál se registró cada correo y con cuál entró por última vez cada usuario.
+  // Lo anterior a esta función (o sin dato) cuenta como "Sin dato".
+  const leadDevices: Record<Device | "sin_dato", number> = { computadora: 0, android: 0, iphone: 0, otro: 0, sin_dato: 0 };
+  for (const l of leads) leadDevices[isDevice(l.device) ? l.device : "sin_dato"]++;
+  const userDevices: Record<Device | "sin_dato", number> = { computadora: 0, android: 0, iphone: 0, otro: 0, sin_dato: 0 };
+  for (const p of profileDevices ?? []) userDevices[isDevice(p.last_device) ? p.last_device : "sin_dato"]++;
+  const deviceGroups = [
+    { title: "Con qué dispositivo se registran", counts: leadDevices, total: leads.length },
+    { title: "Con qué dispositivo entran (última visita)", counts: userDevices, total: (profileDevices ?? []).length },
+  ];
 
   // Correos por campaña (con su tipo de tráfico y fuente).
   const byCampaign = new Map<string, { type: TrafficType; source: string; campaign: string; count: number }>();
@@ -122,6 +136,34 @@ export default async function OrigenPage({
             ))}
           </div>
 
+          <h2 className="mb-3 text-lg font-bold text-white">Dispositivos</h2>
+          <div className="mb-10 grid gap-4 lg:grid-cols-2">
+            {deviceGroups.map((g) => (
+              <div key={g.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="mb-3 text-sm font-semibold text-white/80">{g.title}</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {[...DEVICES, "sin_dato" as const].map((d) => (
+                    <div key={d} className="rounded-xl bg-white/5 px-2 py-3 text-center">
+                      <p className="text-lg">{d === "sin_dato" ? "…" : DEVICE_ICON[d]}</p>
+                      <p className="text-2xl font-extrabold text-white">{g.counts[d]}</p>
+                      <p className="text-[11px] text-white/40">
+                        {g.total ? Math.round((g.counts[d] / g.total) * 100) : 0}%
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-medium leading-tight text-white/60">
+                        {d === "sin_dato" ? "Sin dato" : DEVICE_LABEL[d]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <p className="text-xs text-white/40 lg:col-span-2">
+              Se detecta por el navegador de cada persona. Quien se registró antes de hoy aparece
+              como “Sin dato” hasta que vuelva a entrar; las visitas nuevas se van sumando solas.
+              Un iPad en modo escritorio se cuenta como computadora.
+            </p>
+          </div>
+
           <h2 className="mb-3 text-lg font-bold text-white">Por campaña</h2>
           <div className="mb-10 overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
             <table className="w-full whitespace-nowrap text-left text-sm">
@@ -188,6 +230,7 @@ export default async function OrigenPage({
                   <th className="px-3 py-3 xl:px-4 font-medium">Fuente</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Campaña</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Contenido</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Dispositivo</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Fecha</th>
                 </tr>
               </thead>
@@ -207,13 +250,16 @@ export default async function OrigenPage({
                     <td className="px-3 py-3 xl:px-4 text-white/60">{l.utm_campaign ?? "—"}</td>
                     <td className="px-3 py-3 xl:px-4 text-white/60">{l.utm_content ?? "—"}</td>
                     <td className="px-3 py-3 xl:px-4 text-white/60">
+                      {isDevice(l.device) ? `${DEVICE_ICON[l.device]} ${DEVICE_LABEL[l.device]}` : "—"}
+                    </td>
+                    <td className="px-3 py-3 xl:px-4 text-white/60">
                       {new Date(l.created_at).toLocaleDateString("es")}
                     </td>
                   </tr>
                 ))}
                 {shown.length === 0 && !error && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={8} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay correos captados con este filtro.
                     </td>
                   </tr>
