@@ -6,6 +6,7 @@ import NotificationForm from "@/components/NotificationForm";
 import DeleteNotificationButton from "@/components/DeleteNotificationButton";
 import TestPushButton from "@/components/TestPushButton";
 import { pushConfigured } from "@/lib/push";
+import { DEVICE_ICON, DEVICE_LABEL, detectDevice } from "@/lib/device";
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("es", {
@@ -31,9 +32,19 @@ export default async function AdminNotificationsPage() {
       .order("created_at", { ascending: false }),
     supabase.from("notification_reads").select("notification_id"),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("push_subscriptions").select("user_id"),
+    supabase
+      .from("push_subscriptions")
+      .select("id, user_id, user_agent, created_at")
+      .order("created_at", { ascending: false }),
   ]);
   const pushUsers = new Set((pushRows ?? []).map((r) => r.user_id as string)).size;
+  const { data: pushProfiles } = pushUsers
+    ? await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("id", [...new Set((pushRows ?? []).map((r) => r.user_id as string))])
+    : { data: [] };
+  const emailById = new Map((pushProfiles ?? []).map((p) => [p.id as string, p.email as string]));
   const pushReady = pushConfigured();
 
   const readCount = new Map<string, number>();
@@ -76,7 +87,30 @@ export default async function AdminNotificationsPage() {
                 Mientras tanto, los comunicados solo salen en la campanita.
               </p>
             )}
-            {pushReady && <TestPushButton />}
+            {pushReady && (pushRows ?? []).length > 0 && (
+              <ul className="mt-3 flex flex-col gap-2">
+                {(pushRows ?? []).map((r) => {
+                  const device = detectDevice(r.user_agent as string | null);
+                  return (
+                    <li
+                      key={r.id as string}
+                      className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-white">
+                          {DEVICE_ICON[device]} {DEVICE_LABEL[device]} ·{" "}
+                          {emailById.get(r.user_id as string) ?? "cuenta eliminada"}
+                        </p>
+                        <p className="text-xs text-white/40">
+                          Activado el {formatDateTime(r.created_at as string)}
+                        </p>
+                      </div>
+                      <TestPushButton subscriptionId={r.id as string} />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           <NotificationForm />

@@ -8,7 +8,13 @@ import { ADMIN_EMAIL } from "@/lib/admin";
 // Sin ellas, los envíos se omiten sin dar error.
 
 export type PushPayload = { title: string; body: string; url?: string; tag?: string };
-export type PushResult = { sent: number; removed: number; failed: number; skipped?: boolean };
+export type PushResult = {
+  sent: number;
+  removed: number;
+  failed: number;
+  skipped?: boolean;
+  detail?: string; // motivo del primer envío fallido (para diagnosticar)
+};
 
 type SubscriptionRow = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string };
 
@@ -53,7 +59,10 @@ export async function sendPush(
         } catch (e) {
           const status = (e as { statusCode?: number }).statusCode;
           if (status === 404 || status === 410) expired.push(s.id);
-          else result.failed++;
+          else {
+            result.failed++;
+            result.detail ??= `código ${status ?? "desconocido"}`;
+          }
         }
       })
     );

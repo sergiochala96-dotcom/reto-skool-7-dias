@@ -669,8 +669,10 @@ export async function savePushSubscription(sub: PushSubscriptionJSON): Promise<{
   return { ok: !error };
 }
 
-// Solo el admin: manda un aviso de prueba a sus propios dispositivos.
-export async function adminSendTestPush(): Promise<PushResult & { error?: string }> {
+// Solo el admin: manda un aviso de prueba a UN dispositivo de la lista del panel.
+export async function adminSendTestPush(
+  subscriptionId: string
+): Promise<PushResult & { error?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -681,11 +683,15 @@ export async function adminSendTestPush(): Promise<PushResult & { error?: string
   }
   const service = createServiceClient();
   if (!service) return { sent: 0, removed: 0, failed: 0, error: "Falta SUPABASE_SERVICE_ROLE_KEY." };
-  const subs = await loadSubscriptions(service, user.id);
-  if (subs.length === 0) {
-    return { sent: 0, removed: 0, failed: 0, error: "Aún no activaste los avisos en ningún dispositivo." };
+  const { data: sub } = await service
+    .from("push_subscriptions")
+    .select("id, user_id, endpoint, p256dh, auth")
+    .eq("id", subscriptionId)
+    .maybeSingle();
+  if (!sub) {
+    return { sent: 0, removed: 0, failed: 0, error: "Ese dispositivo ya no está registrado." };
   }
-  return sendPush(service, subs, {
+  return sendPush(service, [sub], {
     title: "Prueba de Skooly 🔔",
     body: "Si ves esto en la pantalla de bloqueo, las notificaciones funcionan.",
     tag: "prueba",
