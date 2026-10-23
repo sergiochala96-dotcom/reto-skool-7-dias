@@ -23,9 +23,19 @@ function urlBase64ToUint8Array(base64: string) {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
+// Los avisos se ofrecen solo en celulares y tablets (la pantalla de bloqueo del celular es lo
+// que se le vende a la persona); en computadora no se muestra nada.
+function isMobile() {
+  const ua = navigator.userAgent;
+  return (
+    /Android|iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+  );
+}
+
 function isSupported() {
   return (
     Boolean(VAPID_PUBLIC_KEY) &&
+    isMobile() &&
     "serviceWorker" in navigator &&
     "PushManager" in window &&
     "Notification" in window
