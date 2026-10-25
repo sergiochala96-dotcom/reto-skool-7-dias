@@ -51,8 +51,9 @@ export default async function TriviaPage() {
         <p className="text-5xl">✅</p>
         <p className="mt-3 text-2xl font-extrabold text-white">¡Ya completaste la trivia de hoy!</p>
         <p className="mt-2 text-sm text-white/60">
-          Acertaste {trivia.questions.length - wrong} de {trivia.questions.length} en «{trivia.title}». Vuelve
-          mañana, desde las 6:00 a. m., para una trivia nueva.
+          Completaste las {trivia.questions.length} preguntas de «{trivia.title}»
+          {wrong === 0 ? " sin ningún error" : ` con ${wrong} ${wrong === 1 ? "error" : "errores"}`}. Vuelve mañana,
+          desde las 6:00 a. m., para una trivia nueva.
         </p>
       </div>
     );

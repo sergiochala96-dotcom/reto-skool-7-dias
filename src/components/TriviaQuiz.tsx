@@ -55,6 +55,9 @@ export default function TriviaQuiz({
   const [wrong, setWrong] = useState(initialWrong);
   const [selected, setSelected] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  // Opciones ya falladas en la pregunta actual (hay que volver a intentarla) y aviso de reintento.
+  const [wrongPicks, setWrongPicks] = useState<number[]>([]);
+  const [retry, setRetry] = useState(false);
   const [pendingFinal, setPendingFinal] = useState<Final | null>(null);
   const [final, setFinal] = useState<Final | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -79,10 +82,22 @@ export default function TriviaQuiz({
         r.status === "completed" || r.status === "failed"
           ? { status: r.status, awarded: r.awarded ?? 0 }
           : null;
-      if (r.correct === undefined || r.correctIndex === undefined) {
-        // Ya no tenía vidas: la trivia terminó sin monedas.
+      if (r.status === "failed") {
+        // Se quedó sin vidas: la trivia terminó sin monedas.
         setFinal(end ?? { status: "failed", awarded: 0 });
         router.refresh();
+        return;
+      }
+      if (r.correct === false) {
+        // Falló: pierde una vida y repite esta misma pregunta (sin ver la respuesta correcta).
+        setWrongPicks((p) => [...p, picked]);
+        setSelected(null);
+        setRetry(true);
+        router.refresh();
+        return;
+      }
+      if (r.correct === undefined || r.correctIndex === undefined) {
+        setError("No se pudo comprobar tu respuesta. Inténtalo de nuevo.");
         return;
       }
       setFeedback({
@@ -103,6 +118,8 @@ export default function TriviaQuiz({
     }
     setFeedback(null);
     setSelected(null);
+    setWrongPicks([]);
+    setRetry(false);
     setStep(step + 1);
   }
 
@@ -167,7 +184,9 @@ export default function TriviaQuiz({
         <p className="text-5xl">{wrong === 0 ? "🏆" : "🎉"}</p>
         <p className="mt-2 text-2xl font-extrabold text-white">¡Trivia completada!</p>
         <p className="mt-1 text-white/70">
-          Acertaste {total - wrong} de {total}
+          {wrong === 0
+            ? "Las respondiste todas sin ningún error"
+            : `Completaste las ${total} preguntas con ${wrong} ${wrong === 1 ? "error" : "errores"}`}
         </p>
         {final.awarded > 0 && (
           <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-black/25 px-4 py-2 text-lg font-extrabold text-amber-300">
@@ -255,6 +274,9 @@ export default function TriviaQuiz({
             } else {
               style = "border-white/10 bg-white/[0.02] text-white/40";
             }
+          } else if (wrongPicks.includes(i)) {
+            style = "border-red-400/60 bg-red-500/10 text-white/45 line-through";
+            badge = "bg-red-500/70 text-white";
           } else if (selected === i) {
             style = "border-fuchsia-400 bg-fuchsia-500/20 text-white";
             badge = "bg-fuchsia-500 text-white";
@@ -263,8 +285,11 @@ export default function TriviaQuiz({
             <button
               key={i}
               type="button"
-              onClick={() => setSelected(i)}
-              disabled={pending || showing}
+              onClick={() => {
+                setSelected(i);
+                setRetry(false);
+              }}
+              disabled={pending || showing || wrongPicks.includes(i)}
               className={`flex items-center gap-3 rounded-2xl border-2 px-4 py-3.5 text-left text-base font-semibold transition ${style}`}
             >
               <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-extrabold ${badge}`}>
@@ -287,6 +312,15 @@ export default function TriviaQuiz({
             {feedback.correct ? "¡Correcto!" : "Incorrecto, perdiste una vida 💔"}
           </p>
           {feedback.explanation && <p className="mt-1 text-sm leading-snug text-white/70">{feedback.explanation}</p>}
+        </div>
+      )}
+
+      {retry && !showing && (
+        <div role="status" className="mt-5 rounded-2xl border-2 border-red-400/50 bg-red-400/10 p-4">
+          <p className="text-lg font-extrabold text-red-300">Incorrecto, perdiste una vida 💔</p>
+          <p className="mt-1 text-sm leading-snug text-white/70">
+            Inténtalo de nuevo: tienes que acertar esta misma pregunta para pasar a la siguiente.
+          </p>
         </div>
       )}
 

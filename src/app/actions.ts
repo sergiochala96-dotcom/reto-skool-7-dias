@@ -764,9 +764,10 @@ export type TriviaAnswerResult = {
 };
 
 // Responde la pregunta que sigue de la trivia del día. El servidor califica con las respuestas que
-// NO están en el navegador y revela la correcta recién al responder. Cada respuesta fallada cuesta
-// una vida; si se queda sin vidas la trivia queda como fallida (sin monedas) hasta el día siguiente
-// (6:00 a. m. de Colombia). Al contestar bien la última (con vidas), se dan las monedas una sola vez.
+// NO están en el navegador. Cada respuesta fallada cuesta una vida y obliga a repetir la MISMA
+// pregunta (la correcta no se revela); solo avanza con un acierto. Si se queda sin vidas la trivia
+// queda como fallida (sin monedas) hasta el día siguiente (6:00 a. m. de Colombia). Al acertar la
+// última (con vidas), se dan las monedas una sola vez.
 export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> {
   const supabase = await createClient();
   const {
@@ -818,25 +819,52 @@ export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> 
   const question = trivia.questions[index];
   const correct = choice === question.answer;
 
-  // Solo cuenta si es la pregunta que sigue (evita responder dos veces la misma).
+  // Respuesta incorrecta: pierde una vida y tiene que volver a responder ESTA misma pregunta (no se
+  // avanza). La respuesta correcta no se revela mientras le queden vidas. Con 0 vidas, la trivia
+  // queda fallida hasta el día siguiente.
+  if (!correct) {
+    const wrong = attempt.wrong + 1;
+    await service
+      .from("trivia_attempts")
+      .update({ wrong, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("play_date", date)
+      .eq("status", "in_progress");
+    const { data: left } = await service.rpc("lose_life", { p_user: user.id });
+    lives = Number(left ?? 0);
+    const failed = lives <= 0;
+    if (failed) {
+      await service
+        .from("trivia_attempts")
+        .update({ status: "failed", updated_at: new Date().toISOString() })
+        .eq("user_id", user.id)
+        .eq("play_date", date);
+    }
+    revalidatePath("/", "layout");
+    return {
+      ok: true,
+      correct: false,
+      lives,
+      wrong,
+      total,
+      status: failed ? "failed" : "in_progress",
+    };
+  }
+
+  // Acierto: solo cuenta si es la pregunta que sigue (evita responder dos veces la misma). En
+  // "answers" se guardan solo los aciertos, así que su largo es la pregunta en la que va.
   const { data: appended } = await service.rpc("append_trivia_answer", {
     p_user: user.id,
     p_date: date,
     p_index: index,
     p_choice: choice,
-    p_is_wrong: !correct,
+    p_is_wrong: false,
   });
   if (!appended) return { ok: false, error: "Esa pregunta ya se respondió. Recarga la página." };
 
-  const wrong = attempt.wrong + (correct ? 0 : 1);
+  const wrong = attempt.wrong;
   let status: "in_progress" | "completed" | "failed" = "in_progress";
-
-  if (!correct) {
-    const { data: left } = await service.rpc("lose_life", { p_user: user.id });
-    lives = Number(left ?? 0);
-    if (lives <= 0) status = "failed";
-  }
-  if (status === "in_progress" && index === total - 1) status = "completed";
+  if (index === total - 1) status = "completed";
 
   if (status !== "in_progress") {
     await service
