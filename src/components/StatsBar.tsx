@@ -14,12 +14,20 @@ export default function StatsBar({
   coins,
   lives,
   className = "",
+  size = "default",
+  sheet = false,
+  extra,
 }: {
   completedDays: number[];
   coins: number;
   lives: number;
   className?: string;
+  size?: "default" | "compact"; // compact: barra delgada del celular
+  sheet?: boolean; // la ventanita ocupa todo el ancho de la barra (celular)
+  extra?: React.ReactNode; // elemento al final de la barra (la campana en el celular)
 }) {
+  const compact = size === "compact";
+  const icon = compact ? "h-6 w-6" : "h-9 w-9";
   const [open, setOpen] = useState<Panel>(null);
   const ref = useRef<HTMLDivElement>(null);
   const done = new Set(completedDays);
@@ -47,7 +55,9 @@ export default function StatsBar({
       onClick={() => setOpen(open === panel ? null : panel)}
       aria-expanded={open === panel}
       aria-label={label}
-      className={`flex items-center gap-2.5 rounded-2xl border-2 px-3.5 py-2.5 text-xl font-extrabold transition ${
+      className={`flex items-center rounded-2xl border-2 font-extrabold transition ${
+        compact ? "gap-1.5 px-2 py-1 text-base" : "gap-2.5 px-3.5 py-2.5 text-xl"
+      } ${
         open === panel
           ? "border-white/20 bg-white/10"
           : "border-transparent hover:bg-white/5"
@@ -62,7 +72,7 @@ export default function StatsBar({
       {chip(
         "racha",
         <>
-          <FlameIcon className="h-9 w-9" lit={count > 0} />
+          <FlameIcon className={icon} lit={count > 0} />
           <span className={count > 0 ? "text-orange-400" : "text-white/35"}>{count}</span>
         </>,
         `Racha: ${count} días del reto completados`
@@ -70,7 +80,7 @@ export default function StatsBar({
       {chip(
         "monedas",
         <>
-          <CoinIcon className="h-9 w-9" />
+          <CoinIcon className={icon} />
           <span className="text-amber-300">{coins}</span>
         </>,
         `${coins} monedas de oro`
@@ -78,16 +88,18 @@ export default function StatsBar({
       {chip(
         "vidas",
         <>
-          <HeartIcon className="h-9 w-9" />
+          <HeartIcon className={icon} />
           <span className="text-red-400">{lives}</span>
         </>,
         `${lives} vidas`
       )}
 
+      {extra}
+
       {open && (
         <div
           role="dialog"
-          className="absolute right-0 top-full z-50 mt-2 w-[19rem] rounded-2xl border-2 border-white/15 bg-[#1c0c35] p-5 text-white shadow-2xl shadow-black/50"
+          className={`absolute top-full z-50 mt-2 ${sheet ? "inset-x-0" : "right-0 w-[19rem]"} rounded-2xl border-2 border-white/15 bg-[#1c0c35] p-5 text-white shadow-2xl shadow-black/50`}
         >
           {open === "racha" && (
             <>

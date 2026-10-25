@@ -82,6 +82,8 @@ export default async function TriviaPage() {
         completedDays={completedList}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="min-w-0 flex-1 px-4 py-10 md:px-6 md:py-5">

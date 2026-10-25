@@ -78,6 +78,8 @@ export default async function DashboardPage() {
         completedDays={completedList}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="min-w-0 flex-1 px-4 py-10 md:py-5">

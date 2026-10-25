@@ -20,6 +20,7 @@ import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
 import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
+import { MobileBottomNav, MobileTopBar } from "@/components/MobileChrome";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
 
 // Elementos del menú: etiquetas en mayúsculas y negrita, esquinas redondeadas y borde de color en
@@ -43,6 +44,8 @@ export default function Sidebar({
   completedDays,
   notifications,
   plan,
+  coins,
+  lives,
 }: {
   nombre: string;
   email: string;
@@ -51,6 +54,8 @@ export default function Sidebar({
   completedDays: number[];
   notifications: SidebarNotification[];
   plan: PlanId;
+  coins: number;
+  lives: number;
 }) {
   const pathname = usePathname();
   const { platform: installPlatform, openInstall } = useInstallApp();
@@ -123,29 +128,15 @@ export default function Sidebar({
 
   return (
     <>
-      <div className="flex items-center gap-3 border-b border-white/10 bg-[#150826] px-4 py-3 md:hidden">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="rounded-lg p-1.5 text-white/70 hover:bg-white/10"
-          aria-label="Abrir menú"
-        >
-          ☰
-        </button>
-        <Link
-          href="/dashboard"
-          onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-2 text-lg font-extrabold text-white"
-        >
-          <Image
-            src="/mascota-skooly.png"
-            alt="Skooly"
-            width={32}
-            height={32}
-            className="h-8 w-8 object-contain"
-          />
-          <SkoolyLogo />
-        </Link>
-      </div>
+      {/* Celular: barra superior fija (llama, monedas, vidas y campana) y barra inferior fija (menú). */}
+      <MobileTopBar
+        completedDays={completedDays}
+        coins={coins}
+        lives={lives}
+        notifications={notifications}
+        userKey={email}
+      />
+      <MobileBottomNav />
 
       {mobileOpen && (
         <div
@@ -160,7 +151,7 @@ export default function Sidebar({
             "--sidebar-w": effectiveCollapsed ? "80px" : `${width}px`,
           } as React.CSSProperties
         }
-        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-72 flex-shrink-0 flex-col border-r border-white/10 bg-[#150826] transition-transform duration-200 md:sticky md:top-0 md:z-auto md:w-[var(--sidebar-w)] md:translate-x-0 ${
+        className={`max-md:hidden fixed inset-y-0 left-0 z-50 flex h-screen w-72 flex-shrink-0 flex-col border-r border-white/10 bg-[#150826] transition-transform duration-200 md:sticky md:top-0 md:z-auto md:w-[var(--sidebar-w)] md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

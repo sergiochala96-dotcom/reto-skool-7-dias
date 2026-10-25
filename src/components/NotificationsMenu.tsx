@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { markNotificationRead } from "@/app/actions";
+import { BellFilledIcon } from "@/components/BellIcon";
 import type { SidebarNotification } from "@/lib/sidebar-data";
 
 function formatDate(iso: string) {
@@ -42,7 +43,9 @@ export default function NotificationsMenu({
   collapsed,
   onOpenNotification,
   onToggle,
+  variant = "sidebar",
 }: {
+  variant?: "sidebar" | "bar"; // bar: solo la campana, para la barra superior del celular
   notifications: SidebarNotification[];
   collapsed: boolean;
   onOpenNotification?: () => void;
@@ -96,9 +99,10 @@ export default function NotificationsMenu({
   }
 
   const badge = unread.length > 9 ? "9+" : String(unread.length);
+  const bar = variant === "bar";
 
   return (
-    <div ref={wrapperRef} className="relative px-3 pb-1">
+    <div ref={wrapperRef} className={bar ? "relative" : "relative px-3 pb-1"}>
       <button
         type="button"
         onClick={() => {
@@ -107,25 +111,37 @@ export default function NotificationsMenu({
         }}
         title={collapsed ? "Notificaciones" : undefined}
         aria-label={`Notificaciones${unread.length ? `, ${unread.length} sin leer` : ""}`}
-        className={`flex w-full items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-left text-[13px] font-extrabold uppercase tracking-wider transition md:text-sm ${
+        className={bar ? "relative flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-white/10" : `flex w-full items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-left text-[13px] font-extrabold uppercase tracking-wider transition md:text-sm ${
           open
             ? "border-white/20 bg-white/10 text-white"
             : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
         }`}
       >
-        <span className="relative flex h-7 w-7 items-center justify-center text-2xl leading-none">
-          🔔
+        <span
+          className={
+            bar
+              ? "relative flex h-8 w-8 items-center justify-center"
+              : "relative flex h-7 w-7 items-center justify-center text-2xl leading-none"
+          }
+        >
+          {bar ? <BellFilledIcon className="h-7 w-7" /> : "🔔"}
           {unread.length > 0 && (
             <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-[#150826]">
               {badge}
             </span>
           )}
         </span>
-        {!collapsed && <span className="flex-1">Notificaciones</span>}
+        {!collapsed && !bar && <span className="flex-1">Notificaciones</span>}
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-3 right-3 z-20 mb-1 overflow-hidden md:right-auto md:w-72 rounded-xl border border-white/10 bg-[#1f0f38] shadow-xl">
+        <div
+          className={
+            bar
+              ? "absolute right-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-white/10 bg-[#1f0f38] shadow-xl"
+              : "absolute bottom-full left-3 right-3 z-20 mb-1 overflow-hidden md:right-auto md:w-72 rounded-xl border border-white/10 bg-[#1f0f38] shadow-xl"
+          }
+        >
           <div className="flex border-b border-white/10 text-sm font-semibold">
             <button
               type="button"

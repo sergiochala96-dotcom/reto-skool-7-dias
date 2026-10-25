@@ -133,7 +133,7 @@ export default async function AdminUserPage({
   params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
-  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
@@ -173,6 +173,8 @@ export default async function AdminUserPage({
         completedDays={Array.from(completedDays)}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="flex-1 px-4 py-10">

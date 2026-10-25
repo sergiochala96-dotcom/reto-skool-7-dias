@@ -18,7 +18,7 @@ export default async function Episodio2SectionPage({
   const section = getEpisode2Section(slug);
   if (!section) notFound();
 
-  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await requireEpisode2Access();
 
   return (
@@ -31,6 +31,8 @@ export default async function Episodio2SectionPage({
         completedDays={Array.from(completedDays)}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="flex-1 px-4 py-10 lg:px-10">

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 // Pantalla interna con solo los planes, con la misma identidad que la portada.
 export default async function PlanesPanelPage() {
-  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await getSidebarData();
 
   // Con un plan de pago se muestra cómo gestionar o cancelar la suscripción, con el correo con el
@@ -39,6 +39,8 @@ export default async function PlanesPanelPage() {
         completedDays={Array.from(completedDays)}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="ventas min-w-0 flex-1 px-4 py-14 sm:py-20">

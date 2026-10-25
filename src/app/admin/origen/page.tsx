@@ -36,7 +36,7 @@ export default async function OrigenPage({
 }: {
   searchParams: Promise<{ tipo?: string }>;
 }) {
-  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
@@ -99,6 +99,8 @@ export default async function OrigenPage({
         completedDays={Array.from(completedDays)}
         notifications={notifications}
         plan={plan}
+        coins={coins}
+        lives={lives}
       />
 
       <main className="min-w-0 flex-1 px-4 py-10 md:px-8">
