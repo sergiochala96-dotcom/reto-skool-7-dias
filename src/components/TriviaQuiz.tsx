@@ -41,6 +41,8 @@ export default function TriviaQuiz({
   initialLives: number;
   initialWrong: number;
 }) {
+  // Paso previo: confirmar que quiere empezar. Si ya había respondido preguntas hoy, sigue donde iba.
+  const [started, setStarted] = useState(initialStep > 0);
   const [step, setStep] = useState(initialStep);
   const [lives, setLives] = useState(initialLives);
   const [wrong, setWrong] = useState(initialWrong);
@@ -130,6 +132,35 @@ export default function TriviaQuiz({
         <div className="mt-4 flex justify-center">
           <Hearts lives={0} />
         </div>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div className="rounded-3xl border-2 border-white/10 bg-white/[0.03] p-6 text-center sm:p-8">
+        <p className="text-6xl">{emoji}</p>
+        <p className="mt-3 text-sm font-bold uppercase tracking-wide text-fuchsia-300">{title}</p>
+        <h2 className="mt-1 text-2xl font-extrabold leading-snug text-white">
+          ¿Listo para la trivia de hoy?
+        </h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/65">
+          Responde {total} preguntas y gana{" "}
+          <strong className="inline-flex items-center gap-1 text-amber-300">
+            <CoinIcon className="h-4 w-4" /> {reward} monedas de oro
+          </strong>
+          . Cada respuesta fallada te quita una vida.
+        </p>
+        <div className="mt-4 flex justify-center">
+          <Hearts lives={lives} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setStarted(true)}
+          className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2"
+        >
+          Empezar trivia
+        </button>
       </div>
     );
   }
