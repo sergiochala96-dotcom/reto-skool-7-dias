@@ -516,8 +516,8 @@ export default function Sidebar({
         />
       )}
 
-      {/* El video de bienvenida solo se vuelve a ver desde el panel (/dashboard). */}
-      {pathname === "/dashboard" && <WelcomeVideoReplayButton />}
+      {/* Reproducir otra vez el video de bienvenida: solo existe en el panel de admin. */}
+      {admin && pathname === "/admin" && <WelcomeVideoReplayButton />}
     </>
   );
 }

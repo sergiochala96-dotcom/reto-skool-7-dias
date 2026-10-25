@@ -107,14 +107,16 @@ export default function NotificationsMenu({
         }}
         title={collapsed ? "Notificaciones" : undefined}
         aria-label={`Notificaciones${unread.length ? `, ${unread.length} sin leer` : ""}`}
-        className={`flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-left text-sm transition hover:bg-white/5 md:text-base ${
-          open ? "bg-white/5 text-white" : "text-white/70 hover:text-white"
+        className={`flex w-full items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-left text-[13px] font-extrabold uppercase tracking-wider transition md:text-sm ${
+          open
+            ? "border-white/20 bg-white/10 text-white"
+            : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
         }`}
       >
-        <span className="relative text-lg leading-none md:text-2xl">
+        <span className="relative flex h-7 w-7 items-center justify-center text-2xl leading-none">
           🔔
           {unread.length > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-[#150826]">
+            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-[#150826]">
               {badge}
             </span>
           )}
@@ -162,20 +164,27 @@ export default function NotificationsMenu({
                 <button
                   type="button"
                   onClick={() => openNotification(n)}
-                  className="flex w-full items-start gap-2 border-b border-white/5 px-4 py-2.5 text-left transition last:border-b-0 hover:bg-white/5"
+                  className="flex w-full items-center gap-3 border-b border-white/5 px-4 py-3 text-left transition last:border-b-0 hover:bg-white/5"
                 >
-                  {!n.read && (
-                    <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
-                  )}
+                  <span
+                    className={`relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-xl ${
+                      n.read ? "bg-white/5 opacity-60" : "bg-white/10"
+                    }`}
+                  >
+                    🔔
+                    {!n.read && (
+                      <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-red-500 ring-2 ring-[#1f0f38]" />
+                    )}
+                  </span>
                   <span className="min-w-0 flex-1">
                     <span
-                      className={`block truncate text-sm ${
+                      className={`block truncate text-[15px] ${
                         n.read ? "text-white/70" : "font-semibold text-white"
                       }`}
                     >
                       {n.title}
                     </span>
-                    <span className="block text-xs text-white/40">{formatDate(n.created_at)}</span>
+                    <span className="block text-xs text-white/45">{formatDate(n.created_at)}</span>
                   </span>
                 </button>
               </li>
