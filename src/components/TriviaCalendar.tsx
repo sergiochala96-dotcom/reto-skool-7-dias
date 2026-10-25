@@ -8,11 +8,13 @@ const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 export default function TriviaCalendar({
   today,
   completedDates,
+  className = "",
 }: {
   /** Día de juego de hoy, "AAAA-MM-DD" (el día cambia a las 6:00 a. m. de Colombia). */
   today: string;
   /** Fechas "AAAA-MM-DD" en las que la trivia quedó completada. */
   completedDates: string[];
+  className?: string;
 }) {
   const [year, month, todayDay] = today.split("-").map(Number);
   const monthKey = today.slice(0, 7);
@@ -24,7 +26,7 @@ export default function TriviaCalendar({
   );
 
   return (
-    <section className="mt-8 rounded-3xl border-2 border-white/10 bg-white/[0.03] p-5 sm:p-6">
+    <section className={`rounded-3xl border-2 border-white/10 bg-white/[0.03] p-5 sm:p-6 ${className}`}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-extrabold text-white">Tu racha de trivias de este mes</h2>
         <span className="shrink-0 text-sm font-bold capitalize text-white/50">{MONTHS[month - 1]}</span>

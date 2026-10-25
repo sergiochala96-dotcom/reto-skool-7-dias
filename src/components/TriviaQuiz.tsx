@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { answerTrivia, type TriviaAnswerResult } from "@/app/actions";
 import { CoinIcon, HeartIcon } from "@/components/StatIcons";
@@ -24,6 +24,11 @@ function Hearts({ lives }: { lives: number }) {
 
 // Trivia del día. Cada pregunta se califica en el servidor al instante: si fallas pierdes una vida y
 // ves la respuesta correcta. Sin vidas no puedes terminar y pierdes las monedas.
+// Primero se muestra una tarjeta de confirmación; al empezar, en computadora la trivia ocupa toda la
+// pantalla (en celular sigue en la página).
+// `blocked` es la tarjeta que arma el servidor cuando hoy ya no se puede jugar (completada o sin
+// vidas). Se muestra solo fuera de una partida: así, aunque la página se vuelva a pedir al servidor
+// al responder, la última pregunta y el resultado no desaparecen a mitad de la partida.
 export default function TriviaQuiz({
   title,
   emoji,
@@ -32,6 +37,7 @@ export default function TriviaQuiz({
   initialStep,
   initialLives,
   initialWrong,
+  blocked,
 }: {
   title: string;
   emoji: string;
@@ -40,9 +46,10 @@ export default function TriviaQuiz({
   initialStep: number;
   initialLives: number;
   initialWrong: number;
+  blocked?: ReactNode;
 }) {
   // Paso previo: confirmar que quiere empezar. Si ya había respondido preguntas hoy, sigue donde iba.
-  const [started, setStarted] = useState(initialStep > 0);
+  const [started, setStarted] = useState(initialStep > 0 && !blocked);
   const [step, setStep] = useState(initialStep);
   const [lives, setLives] = useState(initialLives);
   const [wrong, setWrong] = useState(initialWrong);
@@ -99,44 +106,33 @@ export default function TriviaQuiz({
     setStep(step + 1);
   }
 
-  if (final?.status === "completed") {
-    return (
-      <div className="rounded-2xl border-2 border-amber-300/40 bg-amber-300/[0.07] p-8 text-center">
-        <p className="text-5xl">{wrong === 0 ? "🏆" : "🎉"}</p>
-        <p className="mt-2 text-2xl font-extrabold text-white">¡Trivia completada!</p>
-        <p className="mt-1 text-white/70">
-          Acertaste {total - wrong} de {total}
-        </p>
-        {final.awarded > 0 && (
-          <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-black/25 px-4 py-2 text-lg font-extrabold text-amber-300">
-            <CoinIcon className="h-6 w-6" /> +{final.awarded} monedas de oro
-          </p>
-        )}
-        <div className="mt-4 flex justify-center">
-          <Hearts lives={lives} />
-        </div>
-        <p className="mt-4 text-sm text-white/60">Vuelve mañana (a partir de las 6:00 a. m.) para una trivia nueva.</p>
-      </div>
-    );
+  // Sale de la partida y vuelve a la página (con la tarjeta del servidor ya actualizada).
+  function leave() {
+    setStarted(false);
+    router.refresh();
   }
 
-  if (final?.status === "failed") {
+  // En computadora la partida ocupa toda la pantalla, con una X arriba a la derecha para salir.
+  function shell(children: ReactNode) {
     return (
-      <div className="rounded-2xl border-2 border-red-400/40 bg-red-400/[0.06] p-8 text-center">
-        <p className="text-5xl">💔</p>
-        <p className="mt-2 text-2xl font-extrabold text-white">Te quedaste sin vidas</p>
-        <p className="mt-2 text-white/70">
-          No puedes terminar la trivia de hoy y pierdes las {reward} monedas. Tus vidas se reinician a
-          3 mañana a las 6:00 a. m. (GMT-5).
-        </p>
-        <div className="mt-4 flex justify-center">
-          <Hearts lives={0} />
+      <div className="md:fixed md:inset-0 md:z-[90] md:overflow-y-auto md:bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_70%)] md:px-6 md:py-10">
+        <button
+          type="button"
+          onClick={leave}
+          aria-label="Salir de la trivia"
+          className="hidden h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl font-bold leading-none text-white transition hover:bg-white/20 md:fixed md:right-6 md:top-6 md:flex"
+        >
+          ×
+        </button>
+        <div className="md:mx-auto md:flex md:min-h-full md:max-w-2xl md:flex-col md:justify-center">
+          {children}
         </div>
       </div>
     );
   }
 
   if (!started) {
+    if (blocked) return <>{blocked}</>;
     return (
       <div className="rounded-3xl border-2 border-white/10 bg-white/[0.03] p-6 text-center sm:p-8">
         <p className="text-6xl">{emoji}</p>
@@ -165,10 +161,61 @@ export default function TriviaQuiz({
     );
   }
 
+  if (final?.status === "completed") {
+    return shell(
+      <div className="rounded-2xl border-2 border-amber-300/40 bg-amber-300/[0.07] p-8 text-center">
+        <p className="text-5xl">{wrong === 0 ? "🏆" : "🎉"}</p>
+        <p className="mt-2 text-2xl font-extrabold text-white">¡Trivia completada!</p>
+        <p className="mt-1 text-white/70">
+          Acertaste {total - wrong} de {total}
+        </p>
+        {final.awarded > 0 && (
+          <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-black/25 px-4 py-2 text-lg font-extrabold text-amber-300">
+            <CoinIcon className="h-6 w-6" /> +{final.awarded} monedas de oro
+          </p>
+        )}
+        <div className="mt-4 flex justify-center">
+          <Hearts lives={lives} />
+        </div>
+        <p className="mt-4 text-sm text-white/60">Vuelve mañana (a partir de las 6:00 a. m.) para una trivia nueva.</p>
+        <button
+          type="button"
+          onClick={leave}
+          className="mt-6 hidden w-full rounded-2xl border-b-4 border-emerald-700 bg-emerald-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-emerald-400 active:translate-y-0.5 active:border-b-2 md:block"
+        >
+          Volver
+        </button>
+      </div>
+    );
+  }
+
+  if (final?.status === "failed") {
+    return shell(
+      <div className="rounded-2xl border-2 border-red-400/40 bg-red-400/[0.06] p-8 text-center">
+        <p className="text-5xl">💔</p>
+        <p className="mt-2 text-2xl font-extrabold text-white">Te quedaste sin vidas</p>
+        <p className="mt-2 text-white/70">
+          No puedes terminar la trivia de hoy y pierdes las {reward} monedas. Tus vidas se reinician a
+          3 mañana a las 6:00 a. m. (GMT-5).
+        </p>
+        <div className="mt-4 flex justify-center">
+          <Hearts lives={0} />
+        </div>
+        <button
+          type="button"
+          onClick={leave}
+          className="mt-6 hidden w-full rounded-2xl border-b-4 border-red-800 bg-red-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-red-400 active:translate-y-0.5 active:border-b-2 md:block"
+        >
+          Volver
+        </button>
+      </div>
+    );
+  }
+
   const q = questions[step];
   const showing = feedback !== null;
 
-  return (
+  return shell(
     <div>
       <div className="mb-6 flex items-center gap-3">
         <div

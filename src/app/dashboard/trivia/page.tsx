@@ -42,10 +42,11 @@ export default async function TriviaPage() {
   const status = (attempt?.status as "in_progress" | "completed" | "failed" | undefined) ?? "in_progress";
   const outOfLives = lives <= 0;
 
-  let body: React.ReactNode;
+  // Tarjeta de "hoy ya no se puede jugar" (completada o sin vidas); la muestra TriviaQuiz fuera de una partida.
+  let blocked: React.ReactNode = null;
   if (status === "completed") {
     const wrong = attempt?.wrong ?? 0;
-    body = (
+    blocked = (
       <div className="rounded-2xl border-2 border-emerald-400/40 bg-emerald-400/[0.06] p-8 text-center">
         <p className="text-5xl">✅</p>
         <p className="mt-3 text-2xl font-extrabold text-white">¡Ya completaste la trivia de hoy!</p>
@@ -56,7 +57,7 @@ export default async function TriviaPage() {
       </div>
     );
   } else if (status === "failed" || outOfLives) {
-    body = (
+    blocked = (
       <div className="rounded-2xl border-2 border-red-400/40 bg-red-400/[0.06] p-8 text-center">
         <p className="text-5xl">💔</p>
         <p className="mt-3 text-2xl font-extrabold text-white">Sin vidas por hoy</p>
@@ -68,20 +69,21 @@ export default async function TriviaPage() {
         </p>
       </div>
     );
-  } else {
-    body = (
-      <TriviaQuiz
-        title={trivia.title}
-        emoji={trivia.emoji}
-        reward={TRIVIA_REWARD}
-        initialStep={answered}
-        initialLives={lives}
-        initialWrong={attempt?.wrong ?? 0}
-        // Las respuestas correctas NO se envían al navegador: el servidor revela cada una al responder.
-        questions={trivia.questions.map((q) => ({ q: q.q, options: [...q.options] }))}
-      />
-    );
   }
+
+  const body = (
+    <TriviaQuiz
+      title={trivia.title}
+      emoji={trivia.emoji}
+      reward={TRIVIA_REWARD}
+      initialStep={answered}
+      initialLives={lives}
+      initialWrong={attempt?.wrong ?? 0}
+      blocked={blocked}
+      // Las respuestas correctas NO se envían al navegador: el servidor revela cada una al responder.
+      questions={trivia.questions.map((q) => ({ q: q.q, options: [...q.options] }))}
+    />
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
@@ -103,15 +105,16 @@ export default async function TriviaPage() {
           <StatsBar completedDays={completedList} coins={coins} lives={lives} />
         </div>
 
-        <div className="mx-auto max-w-2xl">
-
+        <div className="mx-auto max-w-2xl md:max-w-5xl">
           <header className="mb-6 text-center">
             <h1 className="text-3xl font-extrabold text-white">Trivia del día</h1>
           </header>
 
-          {body}
-
-          <TriviaCalendar today={date} completedDates={completedDates} />
+          {/* Computadora: la tarjeta de la trivia a la izquierda y el calendario a la derecha. */}
+          <div className="md:grid md:grid-cols-2 md:items-start md:gap-6">
+            <div>{body}</div>
+            <TriviaCalendar today={date} completedDates={completedDates} className="mt-8 md:mt-0" />
+          </div>
         </div>
       </main>
     </div>
