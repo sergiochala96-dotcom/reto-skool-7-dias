@@ -4,6 +4,7 @@ import { useActionState, useRef } from "react";
 import Image from "next/image";
 import { updateAvatar } from "@/app/actions";
 import type { AuthState } from "@/app/actions";
+import AvatarIcon, { avatarIconKey } from "@/components/AvatarIcon";
 
 export default function Avatar({
   avatarUrl,
@@ -23,13 +24,17 @@ export default function Avatar({
   const inputRef = useRef<HTMLInputElement>(null);
   // Tamaño del icono de la cámara: proporcional al avatar, pero nunca demasiado pequeño.
   const cameraSize = Math.max(22, Math.round(size * 0.36));
+  // Si la foto es un icono de la tienda ("icon:llama") se dibuja en vez de cargar una imagen.
+  const iconKey = avatarIconKey(avatarUrl);
 
   const circle = (
     <span
       className="relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-fuchsia-400/30 to-purple-500/30"
       style={{ width: size, height: size }}
     >
-      {avatarUrl ? (
+      {iconKey ? (
+        <AvatarIcon name={iconKey} size={size} />
+      ) : avatarUrl ? (
         <Image
           src={avatarUrl}
           alt={nombre}

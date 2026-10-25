@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { upgradeMySubscription } from "@/app/actions";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import GemIcon from "@/components/GemIcon";
 import type { PlanId } from "@/lib/planes";
 
 // Mejora de plan para quien YA paga (por ejemplo, de Premium a VIP): cambia la misma suscripción en
@@ -17,14 +19,12 @@ export default function UpgradePlanButton({
   featured: boolean;
 }) {
   const [pending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  function onClick() {
-    const ok = window.confirm(
-      "Tu plan cambiará ahora mismo y se te cobrará la diferencia proporcional del período en curso. Seguirás con una sola suscripción. ¿Continuar?"
-    );
-    if (!ok) return;
+  function upgrade() {
+    setConfirming(false);
     setError(null);
     startTransition(async () => {
       const r = await upgradeMySubscription(plan);
@@ -37,13 +37,28 @@ export default function UpgradePlanButton({
     <>
       <button
         type="button"
-        onClick={onClick}
+        onClick={() => setConfirming(true)}
         disabled={pending}
         className={`v-btn mt-8 disabled:opacity-60 ${featured ? "v-btn-solid" : "v-btn-ghost"}`}
       >
         {pending ? "Cambiando tu plan..." : label}
       </button>
       {error && <p className="mt-3 text-center text-xs text-red-300">{error}</p>}
+
+      <ConfirmDialog
+        open={confirming}
+        icon={<GemIcon className="h-12 w-12 text-fuchsia-300" />}
+        title="¿Cambiar tu plan?"
+        confirmLabel="Cambiar plan"
+        tone="fuchsia"
+        onConfirm={upgrade}
+        onCancel={() => setConfirming(false)}
+      >
+        <p>
+          Tu plan cambiará <strong className="text-white">ahora mismo</strong> y se te cobrará la
+          diferencia proporcional del período en curso. Seguirás con una sola suscripción.
+        </p>
+      </ConfirmDialog>
     </>
   );
 }

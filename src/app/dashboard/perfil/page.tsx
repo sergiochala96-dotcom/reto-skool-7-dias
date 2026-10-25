@@ -26,11 +26,13 @@ export default async function PerfilPage() {
         plan={plan}
       />
 
-      <main className="min-w-0 flex-1 px-4 py-10 md:py-6">
+      <main className="min-w-0 flex-1 px-4 py-10 md:px-6 md:py-5">
+        {/* Estadísticas en la esquina superior derecha de la pantalla. */}
+        <div className="mb-2 hidden justify-end md:flex">
+          <StatsBar completedDays={completedList} coins={coins} lives={lives} />
+        </div>
+
         <div className="mx-auto max-w-xl">
-          <div className="mb-2 hidden justify-end md:flex">
-            <StatsBar completedDays={completedList} coins={coins} lives={lives} />
-          </div>
           <header className="mb-6 text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-fuchsia-300">Perfil</p>
             <h1 className="mt-1 text-3xl font-extrabold text-white">Tu perfil</h1>

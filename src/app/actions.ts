@@ -11,6 +11,7 @@ import { CREEM_API_BASE, PLANS, PLAN_RANK, effectivePlan, isPlanId } from "@/lib
 import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { TRIVIA_REWARD, getTodayTrivia } from "@/lib/trivias";
+import { AVATAR_ICON_PREFIX, isAvatarIconKey } from "@/components/AvatarIcon";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
 import { createCampaignAutomation, updateCampaignSteps } from "@/lib/systemeCampaigns";
@@ -929,6 +930,48 @@ export async function adminSaveJoinCodes(
   if (error) return { error: "No se pudieron guardar los códigos." };
 
   revalidatePath("/admin/notificaciones");
+  return { ok: true };
+}
+
+// Pone un icono de la tienda (ya canjeado) como foto de perfil: se guarda "icon:<clave>".
+export async function setAvatarIcon(itemId: string): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: item } = await supabase
+    .from("shop_items")
+    .select("kind")
+    .eq("id", itemId)
+    .maybeSingle();
+  if (item?.kind !== "avatar") return { ok: false, error: "Ese producto no es un icono." };
+
+  // Solo se puede usar lo canjeado (la base ya esconde el contenido de lo no canjeado).
+  const { data: redemption } = await supabase
+    .from("shop_redemptions")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("item_id", itemId)
+    .maybeSingle();
+  if (!redemption && !isAdmin(user.email)) return { ok: false, error: "Primero canjea este icono." };
+
+  const { data: content } = await supabase
+    .from("shop_item_contents")
+    .select("content")
+    .eq("item_id", itemId)
+    .maybeSingle();
+  const key = content?.content;
+  if (!isAvatarIconKey(key)) return { ok: false, error: "No se encontró el icono." };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: `${AVATAR_ICON_PREFIX}${key}` })
+    .eq("id", user.id);
+  if (error) return { ok: false, error: "No se pudo cambiar tu foto." };
+
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 

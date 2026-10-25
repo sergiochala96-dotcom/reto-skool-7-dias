@@ -3,9 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { redeemShopItem } from "@/app/actions";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { CoinIcon } from "@/components/StatIcons";
 
-// Botón de canje de la tienda: descuenta las monedas y deja ver el contenido del producto.
+// Botón de canje de la tienda: pide confirmar en una ventana propia, descuenta las monedas y deja
+// ver el contenido del producto.
 export default function RedeemButton({
   itemId,
   cost,
@@ -18,13 +20,14 @@ export default function RedeemButton({
   balance: number;
 }) {
   const [pending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const missing = cost - balance;
   const canAfford = missing <= 0;
 
-  function onClick() {
-    if (!window.confirm(`¿Canjear «${title}» por ${cost} monedas de oro?`)) return;
+  function redeem() {
+    setConfirming(false);
     setError(null);
     startTransition(async () => {
       const r = await redeemShopItem(itemId);
@@ -37,7 +40,7 @@ export default function RedeemButton({
     <div>
       <button
         type="button"
-        onClick={onClick}
+        onClick={() => setConfirming(true)}
         disabled={pending || !canAfford}
         className={`flex w-full items-center justify-center gap-2 rounded-2xl border-b-4 px-4 py-3 text-sm font-extrabold uppercase tracking-wide transition active:translate-y-0.5 active:border-b-2 disabled:cursor-not-allowed ${
           canAfford
@@ -58,6 +61,21 @@ export default function RedeemButton({
         )}
       </button>
       {error && <p className="mt-2 text-center text-xs text-red-300">{error}</p>}
+
+      <ConfirmDialog
+        open={confirming}
+        icon={<CoinIcon className="h-14 w-14" />}
+        title="¿Canjear este producto?"
+        confirmLabel="Canjear"
+        onConfirm={redeem}
+        onCancel={() => setConfirming(false)}
+      >
+        <p className="font-bold text-white">{title}</p>
+        <p className="mt-1">
+          Costará <strong className="text-amber-300">{cost} monedas de oro</strong>. Te quedarán{" "}
+          <strong className="text-white">{balance - cost}</strong>.
+        </p>
+      </ConfirmDialog>
     </div>
   );
 }

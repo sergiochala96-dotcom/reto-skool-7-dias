@@ -33,7 +33,7 @@ const NAV_IDLE = "border-transparent text-white/70 hover:bg-white/5 hover:text-w
 const GLASS_BTN =
   "flex items-center justify-center gap-2 border border-white/15 bg-white/[0.07] font-semibold text-white shadow-lg shadow-black/25 backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.13] active:scale-[0.98]";
 const PREMIUM_BTN =
-  "flex items-center justify-center gap-2 border border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/25 to-violet-500/30 font-semibold text-white shadow-lg shadow-fuchsia-500/20 backdrop-blur-md transition hover:border-fuchsia-300/60 hover:from-fuchsia-500/40 hover:to-violet-500/40 active:scale-[0.98]";
+  "flex items-center justify-center gap-2 border border-white/15 bg-white/10 font-semibold text-white shadow-lg shadow-black/25 transition hover:bg-white/15 active:scale-[0.98]";
 
 export default function Sidebar({
   nombre,
@@ -408,34 +408,23 @@ export default function Sidebar({
                 <Link
                   href="/dashboard/planes"
                   onClick={() => setMobileOpen(false)}
-                  className={`block rounded-2xl border-2 bg-gradient-to-br from-fuchsia-500/20 via-purple-500/15 to-violet-500/20 p-3 shadow-lg shadow-fuchsia-500/10 backdrop-blur-md transition hover:border-fuchsia-300/60 ${
-                    pathname === "/dashboard/planes" ? "border-fuchsia-300/70" : "border-fuchsia-400/30"
+                  className={`group block rounded-2xl border bg-white/[0.04] p-3.5 transition hover:bg-white/[0.07] ${
+                    pathname === "/dashboard/planes" ? "border-fuchsia-300/60" : "border-white/10"
                   }`}
                 >
-                  <div className="flex items-start gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="inline-block rounded-md bg-gradient-to-r from-fuchsia-500 to-violet-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
-                        {plan === "standard" ? "Premium" : "VIP"}
-                      </span>
-                      <p className="mt-1.5 text-[15px] font-extrabold leading-tight text-white">
-                        {plan === "standard" ? "Conoce Skooly Premium" : "Pasa a Skooly VIP"}
-                      </p>
-                      <p className="mt-1 text-xs leading-snug text-white/65">
-                        {plan === "standard"
-                          ? "Abre el Episodio 2 con prompts y estrategias antichurn."
-                          : "Clases en vivo semanales y acceso a la membresía de Skool."}
-                      </p>
-                    </div>
-                    <Image
-                      src="/mascota-skooly.png"
-                      alt=""
-                      width={52}
-                      height={52}
-                      className="h-[3.25rem] w-[3.25rem] shrink-0 object-contain"
-                    />
-                  </div>
-                  <span className="mt-3 block rounded-xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-3 py-2 text-center text-xs font-extrabold uppercase tracking-wide text-white">
-                    {plan === "standard" ? "Ver Skooly Premium" : "Ver Skooly VIP"}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-300/90">
+                    {plan === "standard" ? "Premium" : "VIP"}
+                  </span>
+                  <p className="mt-1 text-[15px] font-bold leading-tight text-white">
+                    {plan === "standard" ? "Conoce Skooly Premium" : "Pasa a Skooly VIP"}
+                  </p>
+                  <p className="mt-1 text-xs leading-snug text-white/55">
+                    {plan === "standard"
+                      ? "Abre el Episodio 2 con prompts y estrategias antichurn."
+                      : "Clases en vivo semanales y acceso a la membresía de Skool."}
+                  </p>
+                  <span className="mt-3 block rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-center text-xs font-bold uppercase tracking-wide text-white/90 transition group-hover:bg-white/15">
+                    {plan === "standard" ? "Ver Premium" : "Ver VIP"}
                   </span>
                 </Link>
               ))}

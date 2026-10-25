@@ -162,8 +162,8 @@ export default function StatsBar({
                 puedes terminarla y pierdes las monedas.
               </p>
               <p className="mt-2 text-sm leading-snug text-white/70">
-                Todos los días a las <strong className="text-white">6:00 a. m.</strong> (hora de
-                Colombia) tus vidas vuelven a 3.
+                Todos los días a las <strong className="text-white">6:00 a. m. (GMT-5)</strong> tus
+                vidas se reinician a 3.
               </p>
             </>
           )}

@@ -124,8 +124,8 @@ export default function TriviaQuiz({
         <p className="text-5xl">💔</p>
         <p className="mt-2 text-2xl font-extrabold text-white">Te quedaste sin vidas</p>
         <p className="mt-2 text-white/70">
-          No puedes terminar la trivia de hoy y pierdes las {reward} monedas. Tus vidas vuelven a 3
-          mañana a las 6:00 a. m. (hora de Colombia).
+          No puedes terminar la trivia de hoy y pierdes las {reward} monedas. Tus vidas se reinician a
+          3 mañana a las 6:00 a. m. (GMT-5).
         </p>
         <div className="mt-4 flex justify-center">
           <Hearts lives={0} />

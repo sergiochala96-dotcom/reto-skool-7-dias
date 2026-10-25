@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Trivia del día | Skooly",
 };
 
-// Trivia del día: 5 preguntas, una trivia nueva cada día (a las 6:00 a. m. de Colombia). Cada
+// Trivia del día: 5 preguntas, una trivia nueva cada día (a las 6:00 a. m., GMT-5). Cada
 // respuesta fallada cuesta una vida; sin vidas no se puede terminar y se pierden las monedas.
 export default async function TriviaPage() {
   const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
@@ -53,7 +53,7 @@ export default async function TriviaPage() {
           {status === "failed"
             ? `Te quedaste sin vidas durante la trivia, así que hoy no ganas las ${TRIVIA_REWARD} monedas. `
             : "No te quedan vidas para jugar la trivia de hoy. "}
-          Tus vidas vuelven a 3 mañana a las 6:00 a. m. (hora de Colombia).
+          Tus vidas se reinician a 3 mañana a las 6:00 a. m. (GMT-5).
         </p>
       </div>
     );
@@ -84,11 +84,13 @@ export default async function TriviaPage() {
         plan={plan}
       />
 
-      <main className="min-w-0 flex-1 px-4 py-10 md:py-6">
+      <main className="min-w-0 flex-1 px-4 py-10 md:px-6 md:py-5">
+        {/* Estadísticas en la esquina superior derecha de la pantalla. */}
+        <div className="mb-2 hidden justify-end md:flex">
+          <StatsBar completedDays={completedList} coins={coins} lives={lives} />
+        </div>
+
         <div className="mx-auto max-w-2xl">
-          <div className="mb-2 hidden justify-end md:flex">
-            <StatsBar completedDays={completedList} coins={coins} lives={lives} />
-          </div>
 
           <header className="mb-6 text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Trivia del día</p>
@@ -100,7 +102,7 @@ export default async function TriviaPage() {
               </strong>
               . Cada respuesta fallada te quita una{" "}
               <HeartIcon className="inline h-4 w-4 align-text-bottom" /> vida; si te quedas sin vidas, no
-              puedes terminar y pierdes las monedas. Las vidas vuelven a 3 todos los días a las 6:00 a. m.
+              puedes terminar y pierdes las monedas. Las vidas se reinician a 3 todos los días a las 6:00 a. m. (GMT-5).
             </p>
           </header>
 
