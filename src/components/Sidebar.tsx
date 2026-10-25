@@ -332,8 +332,8 @@ export default function Sidebar({
             <Link
               href="/dashboard/planes"
               onClick={() => setMobileOpen(false)}
-              title={effectiveCollapsed ? "Ver planes" : undefined}
-              aria-label="Ver planes"
+              title={effectiveCollapsed ? "Actualizar a Premium" : undefined}
+              aria-label="Actualizar a Premium"
               className={`flex items-center justify-center gap-2 font-bold shadow-md shadow-purple-300/20 transition ${
                 pathname === "/dashboard/planes"
                   ? "bg-white text-purple-950 ring-2 ring-fuchsia-400"
@@ -345,7 +345,7 @@ export default function Sidebar({
               }`}
             >
               <GemIcon className="h-5 w-5 shrink-0" />
-              {!effectiveCollapsed && <span>Ver planes</span>}
+              {!effectiveCollapsed && <span>Actualizar a Premium</span>}
             </Link>
 
             {/* Solo en celulares y tablets (y si la app aún no está instalada). */}
