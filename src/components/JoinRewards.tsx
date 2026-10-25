@@ -78,7 +78,7 @@ export function JoinCard({
         </span>
         <h2 className="mt-5 text-2xl font-extrabold leading-tight text-white">{c.title}</h2>
         <span className="mt-3 flex items-center gap-1.5 rounded-2xl bg-black/25 px-4 py-1.5 text-xl font-extrabold text-amber-300">
-          <CoinIcon className="h-6 w-6" /> +50
+          <CoinIcon className="h-6 w-6" /> +50 monedas de oro
         </span>
 
         {claimed ? (
