@@ -109,6 +109,8 @@ function PlanCard({
         <>
           <Link
             href={href}
+            // El checkout de Creem se abre en una pestaña nueva; crear la cuenta (/reto) no.
+            {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             className={`v-btn mt-8 ${featured ? "v-btn-solid" : "v-btn-ghost"}`}
           >
             {current !== undefined ? (plan.upgradeCta ?? plan.cta) : plan.cta}
