@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/Sidebar";
 import StatsBar from "@/components/StatsBar";
-import { CoinIcon, HeartIcon } from "@/components/StatIcons";
+import TriviaCalendar from "@/components/TriviaCalendar";
 import TriviaQuiz from "@/components/TriviaQuiz";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { createClient } from "@/lib/supabase/server";
@@ -26,6 +26,17 @@ export default async function TriviaPage() {
     .eq("user_id", user.id)
     .eq("play_date", date)
     .maybeSingle();
+
+  // Días de este mes en que completó la trivia (para el calendario de la racha).
+  const monthStart = `${date.slice(0, 7)}-01`;
+  const { data: monthRows } = await supabase
+    .from("trivia_attempts")
+    .select("play_date")
+    .eq("user_id", user.id)
+    .eq("status", "completed")
+    .gte("play_date", monthStart)
+    .lte("play_date", date);
+  const completedDates = (monthRows ?? []).map((r) => r.play_date as string);
 
   const answered = (attempt?.answers as number[] | undefined)?.length ?? 0;
   const status = (attempt?.status as "in_progress" | "completed" | "failed" | undefined) ?? "in_progress";
@@ -95,20 +106,12 @@ export default async function TriviaPage() {
         <div className="mx-auto max-w-2xl">
 
           <header className="mb-6 text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Trivia del día</p>
-            <h1 className="mt-1 text-3xl font-extrabold text-white">5 preguntas, {TRIVIA_REWARD} monedas</h1>
-            <p className="mt-2 text-sm leading-relaxed text-white/60">
-              Completa la trivia y gana{" "}
-              <strong className="inline-flex items-center gap-1 text-amber-300">
-                <CoinIcon className="h-4 w-4" /> {TRIVIA_REWARD} monedas de oro
-              </strong>
-              . Cada respuesta fallada te quita una{" "}
-              <HeartIcon className="inline h-4 w-4 align-text-bottom" /> vida; si te quedas sin vidas, no
-              puedes terminar y pierdes las monedas. Las vidas se reinician a 3 todos los días a las 6:00 a. m. (GMT-5).
-            </p>
+            <h1 className="text-3xl font-extrabold text-white">Trivia del día</h1>
           </header>
 
           {body}
+
+          <TriviaCalendar today={date} completedDates={completedDates} />
         </div>
       </main>
     </div>
