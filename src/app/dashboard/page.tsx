@@ -102,7 +102,11 @@ export default async function DashboardPage() {
           </div>
 
           {/* Las dos misiones de inicio (WhatsApp y Skool) las ve todo el mundo, siempre. */}
-          <StartMissions initial={startMissions} />
+          {/* El banner "Primeras misiones" es solo del celular; en computadora las recompensas por
+              unirse a las comunidades viven en la columna derecha (o aquí abajo en pantallas medianas). */}
+          <div className="md:hidden">
+            <StartMissions initial={startMissions} />
+          </div>
 
           {/* Con pantalla grande estas recompensas están en la columna derecha. */}
           <JoinRewards claimed={claimed} className="mx-auto mb-5 max-w-md min-[1400px]:hidden" />
