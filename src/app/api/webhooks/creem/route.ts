@@ -6,6 +6,8 @@ import { createServiceClient } from "@/lib/supabase/service";
 // Aviso de pago de Creem (webhook). En el panel de Creem se registra esta dirección:
 //   https://skool.neobrandclub.com/api/webhooks/creem
 // y su "signing secret" va en la variable de entorno CREEM_WEBHOOK_SECRET (Vercel).
+// Opcional: CREEM_WEBHOOK_SECRET_TEST con el secreto del webhook del MODO DE PRUEBA de Creem
+// (es distinto), para probar pagos sin dinero real. Borrarla al terminar las pruebas.
 //
 // Cuando una suscripción se paga (subscription.paid) o empieza (subscription.active), se sube el
 // plan de la persona según el producto comprado y se guarda hasta cuándo está pagado
@@ -34,14 +36,17 @@ type CreemSubscription = {
 };
 
 export async function POST(request: Request) {
-  const secret = process.env.CREEM_WEBHOOK_SECRET;
-  if (!secret) {
+  const secrets = [process.env.CREEM_WEBHOOK_SECRET, process.env.CREEM_WEBHOOK_SECRET_TEST].filter(
+    (v): v is string => Boolean(v)
+  );
+  if (secrets.length === 0) {
     // 500: Creem reintenta, así que no se pierde el aviso mientras falta configurar la clave.
     return NextResponse.json({ error: "Falta CREEM_WEBHOOK_SECRET" }, { status: 500 });
   }
 
   const rawBody = await request.text();
-  if (!validSignature(rawBody, request.headers.get("creem-signature"), secret)) {
+  const signature = request.headers.get("creem-signature");
+  if (!secrets.some((secret) => validSignature(rawBody, signature, secret))) {
     return NextResponse.json({ error: "Firma no válida" }, { status: 401 });
   }
 
