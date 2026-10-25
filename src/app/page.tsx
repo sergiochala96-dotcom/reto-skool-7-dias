@@ -91,7 +91,7 @@ const FAQS = [
   },
   {
     q: "¿Qué pasa cuando termino los 7 días?",
-    a: "Terminas con tu Skool configurado y abres el Cofre del Tesoro. Con el plan Premium desbloqueas todos los niveles siguientes y recibes recursos cada mes.",
+    a: "Terminas con tu Skool configurado y abres el Cofre del Tesoro. Con el plan Premium abres el Episodio 2, Escala tu Skool, y recibes recursos nuevos como prompts y estrategias antichurn.",
   },
   {
     q: "¿Puedo usar Skooly desde el celular?",
@@ -103,7 +103,7 @@ const FAQS = [
   },
   {
     q: "¿Cómo funciona el plan VIP?",
-    a: "Incluye el grupo de WhatsApp VIP de Skoolers, sesiones grupales en vivo de Skool y una sesión 1 a 1 de 30 minutos cada mes.",
+    a: "Incluye todo lo del plan Premium, clases en vivo cada semana y acceso a la membresía de Skool de Neobrand Academy.",
   },
 ];
 

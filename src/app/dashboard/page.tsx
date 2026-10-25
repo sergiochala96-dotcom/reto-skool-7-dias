@@ -44,7 +44,8 @@ export default async function DashboardPage() {
     .select("episode2_locked_override")
     .eq("id", user.id)
     .single();
-  const episode2Locked = profileRow?.episode2_locked_override !== false;
+  // Los planes Premium y VIP incluyen el Episodio 2: se abre solo, sin tocar nada.
+  const episode2Locked = profileRow?.episode2_locked_override !== false && plan === "standard";
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">

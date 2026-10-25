@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import Link from "next/link";
 import { WORKSHOP_SOLD_PERCENT, WORKSHOP_START, WORKSHOP_URL } from "@/lib/captacion";
 import { trackEvent } from "@/lib/metaPixel";
 
@@ -147,6 +148,12 @@ export default function WorkshopUnlock({ admin = false }: { admin?: boolean }) {
       >
         Desbloquear
       </button>
+      <Link
+        href="/dashboard/planes"
+        className="mt-1 text-sm font-semibold text-purple-200 underline decoration-purple-200/40 underline-offset-2 transition hover:text-white"
+      >
+        o ábrelo con el plan Premium
+      </Link>
 
       {/* Celular: debajo del botón. */}
       <MiniCountdown className="mt-2 flex lg:hidden" />

@@ -56,12 +56,12 @@ export default function TerminosPage() {
             <strong>Standard — $0:</strong> acceso gratuito al reto de 7 días.
           </li>
           <li>
-            <strong>Premium — $5 al mes:</strong> el reto de 7 días, recursos mensuales y el
-            desbloqueo de los niveles que siguen al reto.
+            <strong>Premium — $5 al mes:</strong> el reto de 7 días, el acceso al Episodio 2
+            (&quot;Escala tu Skool&quot;) y recursos nuevos como prompts y estrategias antichurn.
           </li>
           <li>
-            <strong>VIP — $25 al mes:</strong> grupo de WhatsApp VIP de Skoolers, sesiones grupales
-            en vivo de Skool y una sesión 1 a 1 de 30 minutos al mes.
+            <strong>VIP — $25 al mes:</strong> todo lo del plan Premium, clases en vivo semanales y
+            acceso a la membresía de Skool de Neobrand Academy.
           </li>
         </ul>
         <p>
@@ -98,12 +98,13 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="7. Sesiones y grupo VIP">
+      <Section title="7. Clases en vivo y membresía de Skool (plan VIP)">
         <p>
-          Las sesiones grupales en vivo y la sesión 1 a 1 del plan VIP se coordinan con anticipación
-          y se anuncian en el grupo VIP o por correo. Si no puedes asistir a una sesión, avísanos
-          con tiempo para reprogramarla. El acceso al grupo VIP depende de que tu suscripción esté
-          activa.
+          Las clases en vivo del plan VIP se realizan cada semana y se anuncian con anticipación por
+          correo o dentro de la membresía de Skool. Si no puedes asistir, puedes ponerte al día con
+          los materiales que se compartan. El acceso a la membresía de Skool se otorga a través de
+          esa plataforma, que se rige por sus propios términos, y depende de que tu suscripción
+          esté activa: si la cancelas, el acceso termina al final del período pagado.
         </p>
       </Section>
 
