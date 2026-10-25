@@ -35,12 +35,11 @@ export default function ChallengePath({
     y: MISSIONS.length * SPACING + NODE / 2 + TOP_BUFFER,
   };
 
-  // Mascota en los huecos que deja la curva (como en Duolingo). Se posicionan
+  // Mascota en el hueco derecho de la curva (la izquierda queda libre para los iconos fijos de WhatsApp y Skool). Se posicionan
   // pegadas al borde de la TARJETA (no del canvas del camino) para que no
   // obliguen a hacer scroll horizontal ni descentren los checkpoints.
   const MASCOT_SIZE = 130;
   const TITLE_BLOCK_HEIGHT = 62; // alto aprox. del título arriba del canvas
-  const mascotLeftY = TITLE_BLOCK_HEIGHT + points[2].y;
   const mascotRightY = TITLE_BLOCK_HEIGHT + (points[5].y + points[6].y) / 2;
 
   const width = AMPLITUDE * 2 * 1.4 + NODE + 100;
@@ -73,13 +72,6 @@ export default function ChallengePath({
           <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
-
-        <div
-          className="absolute z-10"
-          style={{ left: 4, top: mascotLeftY - MASCOT_SIZE / 2 }}
-        >
-          <MascotCashButton className="h-[130px] w-[130px]" />
-        </div>
 
         <div
           className="absolute z-10"

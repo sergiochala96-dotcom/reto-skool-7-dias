@@ -12,6 +12,7 @@ import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import EpisodeStickyHeader from "@/components/EpisodeStickyHeader";
 import { PushPromptCard } from "@/components/PushNotifications";
 import JoinRewards from "@/components/JoinRewards";
+import JoinTiles from "@/components/JoinTiles";
 import RightRail from "@/components/RightRail";
 import StatsBar from "@/components/StatsBar";
 
@@ -101,8 +102,9 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          {/* Con pantalla grande estas recompensas están en la columna derecha. */}
-          <JoinRewards claimed={claimed} className="mx-auto mb-5 max-w-md min-[1400px]:hidden" />
+          {/* Con pantalla grande estas recompensas están en la columna derecha; en el celular son los
+              dos iconos cuadrados fijos bajo la tarjeta del episodio (JoinTiles). */}
+          <JoinRewards claimed={claimed} className="mx-auto mb-5 max-w-md max-md:hidden min-[1400px]:hidden" />
 
           {/* Invitación a activar los avisos: llega tras el primer día completado. */}
           {completedDays.size >= 1 && <PushPromptCard userKey={user.email ?? user.id} />}
@@ -111,6 +113,7 @@ export default async function DashboardPage() {
               sus puntos y cambia al llegar al Episodio 2 (por eso van juntos en este bloque). */}
           <div>
             <EpisodeStickyHeader />
+            <JoinTiles claimed={claimed} />
             <ChallengePathHorizontal completedDays={completedList} />
             <div id="episodio-1" className="md:hidden">
               <ChallengePath completedDays={completedList} />

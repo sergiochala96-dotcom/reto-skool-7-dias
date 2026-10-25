@@ -30,7 +30,7 @@ const COPY: Record<
   },
 };
 
-function JoinCard({ kind, claimed }: { kind: Kind; claimed: boolean }) {
+export function JoinCard({ kind, claimed }: { kind: Kind; claimed: boolean }) {
   const c = COPY[kind];
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
