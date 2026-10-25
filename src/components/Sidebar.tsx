@@ -21,6 +21,12 @@ import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
 
+// Botones del menú: cristal translúcido; el de planes lleva un degradado fucsia para destacar.
+const GLASS_BTN =
+  "flex items-center justify-center gap-2 border border-white/15 bg-white/[0.07] font-semibold text-white shadow-lg shadow-black/25 backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.13] active:scale-[0.98]";
+const PREMIUM_BTN =
+  "flex items-center justify-center gap-2 border border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/25 to-violet-500/30 font-semibold text-white shadow-lg shadow-fuchsia-500/20 backdrop-blur-md transition hover:border-fuchsia-300/60 hover:from-fuchsia-500/40 hover:to-violet-500/40 active:scale-[0.98]";
+
 export default function Sidebar({
   nombre,
   email,
@@ -301,13 +307,13 @@ export default function Sidebar({
               }}
               title={effectiveCollapsed ? "Unirme al WhatsApp" : undefined}
               aria-label="Unirme al WhatsApp"
-              className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
+              className={`${GLASS_BTN} ${
                 effectiveCollapsed
                   ? "h-10 w-10 rounded-full"
                   : "rounded-xl px-3 py-2 text-sm md:text-base"
               }`}
             >
-              <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0 text-[#25D366]" aria-hidden="true">
                 <path d={WHATSAPP_PATH} />
               </svg>
               {!effectiveCollapsed && <span>Unirme al WhatsApp</span>}
@@ -322,13 +328,13 @@ export default function Sidebar({
               }}
               title={effectiveCollapsed ? "Unirme al curso en Skool" : undefined}
               aria-label="Unirme al curso en Skool"
-              className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
+              className={`${GLASS_BTN} ${
                 effectiveCollapsed
                   ? "h-10 w-10 rounded-full"
                   : "rounded-xl px-3 py-2 text-sm md:text-base"
               }`}
             >
-              <CourseIcon className="h-5 w-5 shrink-0" />
+              <CourseIcon className="h-5 w-5 shrink-0 text-amber-300" />
               {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
             </a>
 
@@ -337,17 +343,15 @@ export default function Sidebar({
               onClick={() => setMobileOpen(false)}
               title={effectiveCollapsed ? sidebarPlanLabel(plan) : undefined}
               aria-label={sidebarPlanLabel(plan)}
-              className={`flex items-center justify-center gap-2 font-bold shadow-md shadow-purple-300/20 transition ${
-                pathname === "/dashboard/planes"
-                  ? "bg-white text-purple-950 ring-2 ring-fuchsia-400"
-                  : "bg-purple-200 text-purple-950 hover:bg-purple-100"
+              className={`${PREMIUM_BTN} ${
+                pathname === "/dashboard/planes" ? "ring-2 ring-fuchsia-300/70" : ""
               } ${
                 effectiveCollapsed
                   ? "h-10 w-10 rounded-full"
                   : "rounded-xl px-3 py-2 text-sm md:text-base"
               }`}
             >
-              <GemIcon className="h-5 w-5 shrink-0" />
+              <GemIcon className="h-5 w-5 shrink-0 text-fuchsia-200" />
               {!effectiveCollapsed && <span>{sidebarPlanLabel(plan)}</span>}
             </Link>
 
@@ -361,13 +365,13 @@ export default function Sidebar({
                 }}
                 title={effectiveCollapsed ? "Instalar la app en mi celular" : undefined}
                 aria-label="Instalar la app en mi celular"
-                className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 ${
+                className={`${GLASS_BTN} ${
                   effectiveCollapsed
                     ? "h-10 w-10 rounded-full"
                     : "rounded-xl px-3 py-2 text-sm md:text-base"
                 }`}
               >
-                <InstallIcon className="h-5 w-5 shrink-0" />
+                <InstallIcon className="h-5 w-5 shrink-0 text-fuchsia-300" />
                 {!effectiveCollapsed && <span>Instalar la app en mi celular</span>}
               </button>
             )}
@@ -496,7 +500,8 @@ export default function Sidebar({
         />
       )}
 
-      <WelcomeVideoReplayButton />
+      {/* El video de bienvenida solo se vuelve a ver desde el panel (/dashboard). */}
+      {pathname === "/dashboard" && <WelcomeVideoReplayButton />}
     </>
   );
 }

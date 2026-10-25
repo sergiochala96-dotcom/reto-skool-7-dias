@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Heading, PlansGrid } from "@/components/PlanesSection";
 import Sidebar from "@/components/Sidebar";
 import { getSidebarData } from "@/lib/sidebar-data";
@@ -44,11 +45,20 @@ export default async function PlanesPanelPage() {
         <div className="v-glow v-glow-blue -right-40 top-1/2 h-[24rem] w-[24rem]" />
 
         <div className="relative mx-auto max-w-6xl">
-          <Heading
+          <Link
+            href="/dashboard"
+            className="v-btn v-btn-ghost !px-4 !py-2.5 !text-sm"
+          >
+            ← Volver al inicio
+          </Link>
+
+          <div className="mt-6">
+            <Heading
             eyebrow="Planes"
             title="Elige cómo quieres avanzar"
             text="Empieza gratis. Si quieres seguir después del reto o ir acompañado, tienes más opciones."
-          />
+            />
+          </div>
           <div className="mt-16">
             <PlansGrid current={plan} userId={user.id} />
           </div>

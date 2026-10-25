@@ -128,11 +128,11 @@ export function PushSidebarButton({
       }}
       title={collapsed ? "Activar avisos en mi celular" : undefined}
       aria-label="Activar avisos en mi celular"
-      className={`flex items-center justify-center gap-2 bg-purple-200 font-bold text-purple-950 shadow-md shadow-purple-300/20 transition hover:bg-purple-100 disabled:opacity-60 ${
+      className={`flex items-center justify-center gap-2 border border-white/15 bg-white/[0.07] font-semibold text-white shadow-lg shadow-black/25 backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.13] active:scale-[0.98] disabled:opacity-60 ${
         collapsed ? "h-10 w-10 rounded-full" : "rounded-xl px-3 py-2 text-sm md:text-base"
       }`}
     >
-      <BellIcon className="h-5 w-5 shrink-0" />
+      <BellIcon className="h-5 w-5 shrink-0 text-amber-300" />
       {!collapsed && <span>{busy ? "Activando..." : "Activar avisos en mi celular"}</span>}
     </button>
   );
