@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isDayUnlocked, MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import type { SidebarNotification } from "@/lib/sidebar-data";
+import { sidebarPlanLabel, type PlanId } from "@/lib/planes";
 import { adminResetProgress, adminUnlockAll, completeStartMission, signOut } from "@/app/actions";
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
@@ -27,6 +28,7 @@ export default function Sidebar({
   admin,
   completedDays,
   notifications,
+  plan,
 }: {
   nombre: string;
   email: string;
@@ -34,6 +36,7 @@ export default function Sidebar({
   admin: boolean;
   completedDays: number[];
   notifications: SidebarNotification[];
+  plan: PlanId;
 }) {
   const pathname = usePathname();
   const { platform: installPlatform, openInstall } = useInstallApp();
@@ -332,8 +335,8 @@ export default function Sidebar({
             <Link
               href="/dashboard/planes"
               onClick={() => setMobileOpen(false)}
-              title={effectiveCollapsed ? "Actualizar a Premium" : undefined}
-              aria-label="Actualizar a Premium"
+              title={effectiveCollapsed ? sidebarPlanLabel(plan) : undefined}
+              aria-label={sidebarPlanLabel(plan)}
               className={`flex items-center justify-center gap-2 font-bold shadow-md shadow-purple-300/20 transition ${
                 pathname === "/dashboard/planes"
                   ? "bg-white text-purple-950 ring-2 ring-fuchsia-400"
@@ -345,7 +348,7 @@ export default function Sidebar({
               }`}
             >
               <GemIcon className="h-5 w-5 shrink-0" />
-              {!effectiveCollapsed && <span>Actualizar a Premium</span>}
+              {!effectiveCollapsed && <span>{sidebarPlanLabel(plan)}</span>}
             </Link>
 
             {/* Solo en celulares y tablets (y si la app aún no está instalada). */}

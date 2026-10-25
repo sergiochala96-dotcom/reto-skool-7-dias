@@ -2,6 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
+import AdminPlanSelect from "@/components/AdminPlanSelect";
+import { isPlanId } from "@/lib/planes";
 import { MISSIONS, TOTAL_DAYS } from "@/lib/challenge";
 import {
   getMissionSections,
@@ -131,7 +133,7 @@ export default async function AdminUserPage({
   params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
-  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
@@ -139,7 +141,7 @@ export default async function AdminUserPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, email, created_at")
+    .select("display_name, email, created_at, plan")
     .eq("id", userId)
     .single();
   if (!profile) notFound();
@@ -168,6 +170,7 @@ export default async function AdminUserPage({
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
+        plan={plan}
       />
 
       <main className="flex-1 px-4 py-10">
@@ -182,6 +185,10 @@ export default async function AdminUserPage({
               {profile.display_name ?? profile.email}
             </h1>
             <p className="text-sm text-white/40">{profile.email}</p>
+            <AdminPlanSelect
+              userId={userId}
+              plan={isPlanId(profile.plan) ? profile.plan : "standard"}
+            />
           </header>
 
           <div className="space-y-6">

@@ -19,7 +19,7 @@ function formatDateTime(iso: string) {
 }
 
 export default async function AdminNotificationsPage() {
-  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
@@ -62,6 +62,7 @@ export default async function AdminNotificationsPage() {
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
+        plan={plan}
       />
 
       <main className="flex-1 px-4 py-10">

@@ -21,6 +21,7 @@ export default async function DashboardPage() {
     completedDays,
     welcomeVideoSeen,
     notifications,
+    plan,
     startMissions,
   } = await getSidebarData();
   const completedList = Array.from(completedDays);
@@ -61,6 +62,7 @@ export default async function DashboardPage() {
         admin={admin}
         completedDays={completedList}
         notifications={notifications}
+        plan={plan}
       />
 
       <main className="flex-1 px-4 py-10 md:py-5">

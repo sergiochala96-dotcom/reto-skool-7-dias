@@ -5,7 +5,7 @@ import { getSidebarData } from "@/lib/sidebar-data";
 import Sidebar from "@/components/Sidebar";
 
 export default async function CofrePage() {
-  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
     await getSidebarData();
 
   if (completedDays.size < TOTAL_DAYS) redirect("/dashboard");
@@ -19,6 +19,7 @@ export default async function CofrePage() {
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
+        plan={plan}
       />
 
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">

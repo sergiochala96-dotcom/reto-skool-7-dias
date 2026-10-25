@@ -7,6 +7,7 @@ import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isDayUnlocked, TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
+import { isPlanId } from "@/lib/planes";
 import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
@@ -639,6 +640,31 @@ export async function adminApplyEmailTexts(): Promise<UpdateResult> {
     error:
       [emails.error, welcome.error, steps.error].filter(Boolean).join(" | ") || undefined,
   };
+}
+
+// Solo el admin: cambia el plan de una persona. La base de datos ignora este cambio si lo hace
+// cualquier otra persona (ver protect_plan en la migración 0017).
+export async function adminSetPlan(
+  userId: string,
+  plan: string
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+  if (!isPlanId(plan)) return { ok: false, error: "Plan no válido." };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ plan })
+    .eq("id", userId)
+    .select("plan")
+    .single();
+  if (error || data?.plan !== plan) return { ok: false, error: "No se pudo cambiar el plan." };
+
+  revalidatePath("/", "layout");
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------

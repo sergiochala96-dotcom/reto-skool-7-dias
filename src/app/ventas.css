@@ -115,6 +115,12 @@
   background: oklch(1 0 0 / 0.14);
   transform: translateY(-2px);
 }
+.ventas .v-btn-current {
+  background: oklch(0.86 0.11 215 / 0.12);
+  border: 1px solid oklch(0.86 0.11 215 / 0.35);
+  color: var(--cyan-300);
+  cursor: default;
+}
 .ventas .v-btn-disabled {
   background: oklch(1 0 0 / 0.06);
   border: 1px dashed var(--hair-strong);

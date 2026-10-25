@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 // Pantalla interna con solo los planes, con la misma identidad que la portada.
 export default async function PlanesPanelPage() {
-  const { nombre, user, avatarUrl, admin, completedDays, notifications } =
+  const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
     await getSidebarData();
 
   return (
@@ -22,6 +22,7 @@ export default async function PlanesPanelPage() {
         admin={admin}
         completedDays={Array.from(completedDays)}
         notifications={notifications}
+        plan={plan}
       />
 
       <main className="ventas min-w-0 flex-1 px-4 py-14 sm:py-20">
@@ -35,7 +36,7 @@ export default async function PlanesPanelPage() {
             text="Empieza gratis. Si quieres seguir después del reto o ir acompañado, tienes más opciones."
           />
           <div className="mt-16">
-            <PlansGrid />
+            <PlansGrid current={plan} />
           </div>
         </div>
       </main>
