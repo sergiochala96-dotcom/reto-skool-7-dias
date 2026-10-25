@@ -10,6 +10,7 @@ import { adminResetProgress, adminUnlockAll, completeStartMission, signOut } fro
 import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
 import CourseIcon from "@/components/CourseIcon";
+import GemIcon from "@/components/GemIcon";
 import InstallIcon from "@/components/InstallIcon";
 import { PushSidebarButton } from "@/components/PushNotifications";
 import { useInstallApp } from "@/components/InstallAppProvider";
@@ -327,6 +328,25 @@ export default function Sidebar({
               <CourseIcon className="h-5 w-5 shrink-0" />
               {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
             </a>
+
+            <Link
+              href="/dashboard/planes"
+              onClick={() => setMobileOpen(false)}
+              title={effectiveCollapsed ? "Ver planes" : undefined}
+              aria-label="Ver planes"
+              className={`flex items-center justify-center gap-2 font-bold shadow-md shadow-purple-300/20 transition ${
+                pathname === "/dashboard/planes"
+                  ? "bg-white text-purple-950 ring-2 ring-fuchsia-400"
+                  : "bg-purple-200 text-purple-950 hover:bg-purple-100"
+              } ${
+                effectiveCollapsed
+                  ? "h-10 w-10 rounded-full"
+                  : "rounded-xl px-3 py-2 text-sm md:text-base"
+              }`}
+            >
+              <GemIcon className="h-5 w-5 shrink-0" />
+              {!effectiveCollapsed && <span>Ver planes</span>}
+            </Link>
 
             {/* Solo en celulares y tablets (y si la app aún no está instalada). */}
             {installPlatform && (
