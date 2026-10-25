@@ -7,6 +7,8 @@ const PUBLIC_PATHS = [
   "/auth",
   "/reto",
   "/planes",
+  "/terminos",
+  "/reembolsos",
   "/gracias",
   "/privacidad",
   "/olvide-contrasena",

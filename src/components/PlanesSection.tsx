@@ -66,7 +66,10 @@ function PlanCard({ plan, current }: { plan: Plan; current?: PlanId }) {
       <p className="v-eyebrow">{plan.name}</p>
       <p className="mt-4 flex items-baseline gap-1">
         <span className="text-5xl font-semibold tracking-tight">{plan.price}</span>
-        {plan.period && <span className="v-muted text-base">{plan.period}</span>}
+        <span className="v-muted text-base">
+          {plan.currency}
+          {plan.period}
+        </span>
       </p>
       <p className="v-muted mt-3 text-sm leading-relaxed">{plan.tagline}</p>
 

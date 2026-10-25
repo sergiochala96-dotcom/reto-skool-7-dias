@@ -68,7 +68,13 @@ export default function PrivacidadPage() {
               </li>
               <li>
                 <strong>Datos técnicos y de origen:</strong> de qué enlace o anuncio llegaste
-                (etiquetas como utm_source o utm_medium), el tipo de navegador y la dirección IP.
+                (etiquetas como utm_source o utm_medium), el tipo de navegador, el tipo de dispositivo
+                (computadora, Android o iPhone) y la dirección IP.
+              </li>
+              <li>
+                <strong>Avisos en tu dispositivo:</strong> si activas las notificaciones, guardamos
+                el identificador técnico que tu navegador nos da para poder enviártelas. Puedes
+                desactivarlas cuando quieras desde la configuración de tu navegador o teléfono.
               </li>
             </ul>
           </Section>
@@ -99,6 +105,11 @@ export default function PrivacidadPage() {
               <li>ManyChat y Meta (Instagram y Facebook): mensajes y publicidad.</li>
               <li>Google: inicio de sesión con tu cuenta de Google.</li>
               <li>Hotmart: procesamiento de pagos de talleres y productos que compres.</li>
+              <li>
+                Creem: procesamiento de los pagos de las suscripciones (Premium y VIP). Creem actúa
+                como vendedor autorizado, recibe tus datos de pago y nosotros no los vemos ni los
+                guardamos.
+              </li>
             </ul>
           </Section>
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import { createClient } from "@/lib/supabase/server";
+import { SUPPORT_EMAIL } from "@/lib/legal";
 import { MISSIONS } from "@/lib/challenge";
 import { Heading, PlansGrid } from "@/components/PlanesSection";
 import "./ventas.css";
@@ -95,6 +96,10 @@ const FAQS = [
   {
     q: "¿Puedo usar Skooly desde el celular?",
     a: "Sí. Puedes instalar Skooly en la pantalla de inicio y activar los avisos para que te recordemos tu reto.",
+  },
+  {
+    q: "¿Cómo pago y puedo cancelar cuando quiera?",
+    a: "Los planes de pago son suscripciones mensuales en dólares (USD), procesadas por Creem. Puedes cancelar cuando quieras y conservas el acceso hasta el final del período que ya pagaste. Los pagos ya realizados no se reembolsan, salvo error de cobro (ver política de reembolsos).",
   },
   {
     q: "¿Cómo funciona el plan VIP?",
@@ -364,10 +369,22 @@ export default async function Home() {
 
       <footer className="v-hair border-t px-4 py-8 text-center text-sm">
         <p className="v-muted">Derechos Reservados - Neobrand Academy 2026</p>
-        <p className="mt-1 text-xs">
+        <p className="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs">
+          <Link href="/terminos" className="v-muted underline decoration-white/30 hover:text-white">
+            Términos y condiciones
+          </Link>
           <Link href="/privacidad" className="v-muted underline decoration-white/30 hover:text-white">
             Política de privacidad
           </Link>
+          <Link href="/reembolsos" className="v-muted underline decoration-white/30 hover:text-white">
+            Reembolsos y cancelación
+          </Link>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="v-muted underline decoration-white/30 hover:text-white"
+          >
+            {SUPPORT_EMAIL}
+          </a>
         </p>
       </footer>
     </div>

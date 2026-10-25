@@ -27,6 +27,7 @@ export type Plan = {
   id: PlanId;
   name: string;
   price: string;
+  currency: string; // moneda de los precios, se muestra junto al monto
   period: string | null; // "/mes", o null si es gratis
   tagline: string;
   features: string[];
@@ -41,6 +42,7 @@ export const PLANS: Plan[] = [
     id: "standard",
     name: "Standard",
     price: "$0",
+    currency: "USD",
     period: null,
     tagline: "Empieza gratis y crea tu Skool en 7 días.",
     features: [
@@ -56,6 +58,7 @@ export const PLANS: Plan[] = [
     id: "premium",
     name: "Premium",
     price: "$5",
+    currency: "USD",
     period: "/mes",
     tagline: "Sigue avanzando cuando el reto termina.",
     features: [
@@ -72,6 +75,7 @@ export const PLANS: Plan[] = [
     id: "vip",
     name: "VIP",
     price: "$25",
+    currency: "USD",
     period: "/mes",
     tagline: "Acompañamiento cercano para avanzar más rápido.",
     features: [
