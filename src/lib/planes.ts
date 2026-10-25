@@ -5,10 +5,9 @@
 // Dentro de la app, quien ya tiene sesión ve "Plan actual" en su plan y "Actualizar a ..." (con
 // este mismo enlace) en los planes superiores.
 
-// Interruptor de pagos reales: mientras Creem no apruebe la cuenta, los enlaces de producción
-// muestran "Live payments are not enabled", así que se usa el enlace de prueba. Cuando la cuenta
-// esté aprobada y el aviso de pago registrado en producción, cambiar a true.
-const CREEM_LIVE = false;
+// Interruptor de pagos reales: true usa los enlaces de producción de Creem (cuenta aprobada el
+// 25/10/2026); false vuelve a los enlaces de prueba (con tarjetas de prueba, sin cobrar).
+const CREEM_LIVE = true;
 
 export type PlanId = "standard" | "premium" | "vip";
 
