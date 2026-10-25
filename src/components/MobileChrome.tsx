@@ -54,7 +54,7 @@ export function MobileTopBar({
   return (
     <>
       <PushBanner userKey={userKey} />
-      <div className="sticky top-0 z-40 border-b border-white/10 bg-[#150826]/95 px-2 py-1.5 backdrop-blur md:hidden">
+      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-white/10 bg-[#150826]/95 px-3 backdrop-blur md:hidden">
         <StatsBar
           completedDays={completedDays}
           coins={coins}
@@ -90,8 +90,8 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Menú principal"
-      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/10 bg-[#150826]/95 px-2 pt-2 backdrop-blur md:hidden"
-      style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/10 bg-[#150826]/95 px-2 pt-3 backdrop-blur md:hidden"
+      style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
     >
       {ITEMS.map((item) => {
         const active = pathname === item.href;
@@ -101,7 +101,7 @@ export function MobileBottomNav() {
             href={item.href}
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
-            className={`flex h-12 w-14 items-center justify-center rounded-2xl border-2 transition ${
+            className={`flex h-14 w-16 items-center justify-center rounded-2xl border-2 transition ${
               active
                 ? "border-fuchsia-400/60 bg-fuchsia-500/15"
                 : "border-transparent hover:bg-white/5"

@@ -27,7 +27,7 @@ export default function StatsBar({
   extra?: React.ReactNode; // elemento al final de la barra (la campana en el celular)
 }) {
   const compact = size === "compact";
-  const icon = compact ? "h-6 w-6" : "h-9 w-9";
+  const icon = compact ? "h-7 w-7" : "h-9 w-9";
   const [open, setOpen] = useState<Panel>(null);
   const ref = useRef<HTMLDivElement>(null);
   const done = new Set(completedDays);
@@ -56,7 +56,7 @@ export default function StatsBar({
       aria-expanded={open === panel}
       aria-label={label}
       className={`flex items-center rounded-2xl border-2 font-extrabold transition ${
-        compact ? "gap-1.5 px-2 py-1 text-base" : "gap-2.5 px-3.5 py-2.5 text-xl"
+        compact ? "gap-2 px-2.5 py-1.5 text-lg" : "gap-2.5 px-3.5 py-2.5 text-xl"
       } ${
         open === panel
           ? "border-white/20 bg-white/10"

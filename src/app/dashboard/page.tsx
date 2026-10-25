@@ -9,7 +9,7 @@ import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
-import StartMissions from "@/components/StartMissions";
+import EpisodeStickyHeader from "@/components/EpisodeStickyHeader";
 import { PushPromptCard } from "@/components/PushNotifications";
 import JoinRewards from "@/components/JoinRewards";
 import RightRail from "@/components/RightRail";
@@ -27,7 +27,6 @@ export default async function DashboardPage() {
     plan,
     coins,
     lives,
-    startMissions,
   } = await getSidebarData();
   const completedList = Array.from(completedDays);
   const completedCount = completedList.length;
@@ -82,7 +81,7 @@ export default async function DashboardPage() {
         lives={lives}
       />
 
-      <main className="min-w-0 flex-1 px-4 py-10 md:py-5">
+      <main className="min-w-0 flex-1 px-4 pb-10 pt-6 md:py-5">
         <div className="mx-auto max-w-2xl md:max-w-7xl">
           {/* En computadora con pantalla mediana, las estadísticas van arriba a la derecha; en
               pantallas grandes viven en la columna derecha. */}
@@ -103,29 +102,29 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          {/* Las dos misiones de inicio (WhatsApp y Skool) las ve todo el mundo, siempre. */}
-          {/* El banner "Primeras misiones" es solo del celular; en computadora las recompensas por
-              unirse a las comunidades viven en la columna derecha (o aquí abajo en pantallas medianas). */}
-          <div className="md:hidden">
-            <StartMissions initial={startMissions} />
-          </div>
-
           {/* Con pantalla grande estas recompensas están en la columna derecha. */}
           <JoinRewards claimed={claimed} className="mx-auto mb-5 max-w-md min-[1400px]:hidden" />
 
           {/* Invitación a activar los avisos: llega tras el primer día completado. */}
           {completedDays.size >= 1 && <PushPromptCard userKey={user.email ?? user.id} />}
 
-          <ChallengePathHorizontal completedDays={completedList} />
-          <div className="md:hidden">
-            <ChallengePath completedDays={completedList} />
-          </div>
+          {/* Los episodios. En el celular, la tarjeta amarilla de arriba se queda pegada mientras se ven
+              sus puntos y cambia al llegar al Episodio 2 (por eso van juntos en este bloque). */}
+          <div>
+            <EpisodeStickyHeader />
+            <ChallengePathHorizontal completedDays={completedList} />
+            <div id="episodio-1" className="md:hidden">
+              <ChallengePath completedDays={completedList} />
+            </div>
 
-          {/* El Episodio 2 (workshop) aparece cuando se termina el Día 2. El admin siempre lo ve,
-              y también quien tenga el acceso abierto a mano desde el panel de admin. */}
-          {(admin || completedDays.has(2) || !episode2Locked) && (
-            <Episode2Card locked={episode2Locked} admin={admin} />
-          )}
+            {/* El Episodio 2 (workshop) aparece cuando se termina el Día 2. El admin siempre lo ve,
+                y también quien tenga el acceso abierto a mano desde el panel de admin. */}
+            {(admin || completedDays.has(2) || !episode2Locked) && (
+              <div id="episodio-2">
+                <Episode2Card locked={episode2Locked} admin={admin} />
+              </div>
+            )}
+          </div>
         </div>
       </main>
 

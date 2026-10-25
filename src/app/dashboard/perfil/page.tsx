@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { signOut } from "@/app/actions";
+import InstallAppRow from "@/components/InstallAppRow";
 import ProfileForm from "@/components/ProfileForm";
 import Sidebar from "@/components/Sidebar";
 import StatsBar from "@/components/StatsBar";
@@ -42,6 +43,8 @@ export default async function PerfilPage() {
             <h1 className="mt-1 text-3xl font-extrabold text-white">Tu perfil</h1>
           </header>
           <ProfileForm nombre={nombre} email={user.email ?? ""} avatarUrl={avatarUrl} />
+
+          <InstallAppRow />
 
           {/* En el celular el menú lateral no existe: aquí quedan la administración y cerrar sesión. */}
           {admin && (
