@@ -12,8 +12,8 @@ const cardTitle = "text-base font-extrabold text-white";
 const cardLink =
   "text-xs font-extrabold uppercase tracking-wide text-sky-400 transition hover:text-sky-300";
 
-// Columna derecha del panel en computadora (como la de Duolingo): estadísticas, recompensas por
-// unirse a las comunidades, avance del reto, monedas y enlaces del pie.
+// Columna derecha del panel en computadora (como la de Duolingo): estadísticas, avance del reto,
+// recompensas por unirse a las comunidades, monedas y enlaces del pie.
 export default function RightRail({
   completedDays,
   coins,
@@ -43,8 +43,6 @@ export default function RightRail({
       className="hidden min-[1400px]:flex w-[22rem] shrink-0 flex-col gap-4 px-5 py-6"
     >
       <StatsBar completedDays={completedDays} coins={coins} lives={lives} />
-
-      <JoinRewards claimed={claimed} />
 
       <section className={card}>
         <div className={cardHead}>
@@ -78,6 +76,8 @@ export default function RightRail({
         </p>
       </section>
 
+      <JoinRewards claimed={claimed} />
+
       <section className={card}>
         <div className={cardHead}>
           <h2 className={cardTitle}>Monedas de oro</h2>
@@ -93,7 +93,8 @@ export default function RightRail({
           </div>
         </div>
         <p className="mt-3 text-xs leading-snug text-white/50">
-          Gana monedas completando días y canjéalas en la tienda por prompts, plantillas y enlaces.
+          Gana monedas con los días del reto, las comunidades y la trivia del día, y canjéalas en la
+          tienda por prompts, plantillas y enlaces.
         </p>
       </section>
 

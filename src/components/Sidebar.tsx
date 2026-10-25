@@ -212,6 +212,15 @@ export default function Sidebar({
             {!effectiveCollapsed && <span>Inicio</span>}
           </Link>
           <Link
+            href="/dashboard/trivia"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Trivia del día" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/trivia" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center text-2xl">🧠</span>
+            {!effectiveCollapsed && <span>Trivia del día</span>}
+          </Link>
+          <Link
             href="/dashboard/tienda"
             onClick={() => setMobileOpen(false)}
             title={effectiveCollapsed ? "Tienda" : undefined}
@@ -232,6 +241,15 @@ export default function Sidebar({
               <GemIcon className="h-6 w-6 text-fuchsia-300" />
             </span>
             {!effectiveCollapsed && <span>Planes</span>}
+          </Link>
+          <Link
+            href="/dashboard/perfil"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Perfil" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/perfil" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center text-2xl">👤</span>
+            {!effectiveCollapsed && <span>Perfil</span>}
           </Link>
         </div>
 

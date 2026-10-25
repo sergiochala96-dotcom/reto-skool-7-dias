@@ -73,7 +73,8 @@ export default async function TiendaPage() {
               Ganas <strong className="text-white/80">10</strong> monedas por cada día del reto
               completado, <strong className="text-white/80">50</strong> por unirte a WhatsApp y otras{" "}
               <strong className="text-white/80">50</strong> por unirte a Skool, y{" "}
-              <strong className="text-white/80">50</strong> de bono al terminar los 7 días.
+              <strong className="text-white/80">50</strong> de bono al terminar los 7 días, y{" "}
+              <strong className="text-white/80">5</strong> por la trivia de cada día.
             </p>
           </header>
 

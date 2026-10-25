@@ -10,6 +10,7 @@ import { isAdmin } from "@/lib/admin";
 import { CREEM_API_BASE, PLANS, PLAN_RANK, effectivePlan, isPlanId } from "@/lib/planes";
 import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
+import { TRIVIA_REWARD, getTodayTrivia } from "@/lib/trivias";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
 import { createCampaignAutomation, updateCampaignSteps } from "@/lib/systemeCampaigns";
@@ -731,6 +732,71 @@ export async function upgradeMySubscription(
 
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+export type TriviaResult = {
+  ok: boolean;
+  error?: string;
+  score?: number;
+  total?: number;
+  correct?: number[];
+  explanations?: string[];
+  awarded?: number;
+};
+
+// Entrega de la trivia del día: el servidor califica con las respuestas que NO están en el
+// navegador, da las monedas una sola vez por día (el libro de monedas lo impide repetir) y devuelve
+// las respuestas correctas para repasarlas.
+export async function submitTrivia(answers: number[]): Promise<TriviaResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { trivia, date } = getTodayTrivia();
+  const total = trivia.questions.length;
+  if (
+    !Array.isArray(answers) ||
+    answers.length !== total ||
+    answers.some((a) => !Number.isInteger(a) || a < 0 || a > 3)
+  ) {
+    return { ok: false, error: "Responde las 5 preguntas para terminar." };
+  }
+
+  const score = trivia.questions.filter((q, i) => q.answer === answers[i]).length;
+
+  const { data: already } = await supabase
+    .from("coin_transactions")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("reason", "trivia")
+    .eq("ref", date)
+    .maybeSingle();
+
+  let awarded = 0;
+  if (!already) {
+    const service = createServiceClient();
+    if (!service) return { ok: false, error: "No pudimos guardar tu trivia. Inténtalo de nuevo." };
+    const { error } = await service.rpc("award_coins", {
+      p_user: user.id,
+      p_amount: TRIVIA_REWARD,
+      p_reason: "trivia",
+      p_ref: date,
+    });
+    if (error) return { ok: false, error: "No pudimos guardar tu trivia. Inténtalo de nuevo." };
+    awarded = TRIVIA_REWARD;
+  }
+
+  revalidatePath("/", "layout");
+  return {
+    ok: true,
+    score,
+    total,
+    correct: trivia.questions.map((q) => q.answer),
+    explanations: trivia.questions.map((q) => q.explain),
+    awarded,
+  };
 }
 
 // Recompensa de 50 monedas por unirse a WhatsApp o a Skool: la persona escribe un código que solo se
