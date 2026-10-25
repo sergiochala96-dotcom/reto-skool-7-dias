@@ -120,9 +120,10 @@ export const PLANS: Plan[] = [
     ],
     cta: "Quiero el plan VIP",
     upgradeCta: "Actualizar a VIP",
-    // Sin enlace de prueba: hasta pasar a producción el botón dice "Próximamente".
-    href: CREEM_LIVE ? "https://www.creem.io/payment/prod_5XDF6DOjskVQXQfvmAINGp" : null,
-    creemProductIds: ["prod_5XDF6DOjskVQXQfvmAINGp"],
+    href: CREEM_LIVE
+      ? "https://www.creem.io/payment/prod_5XDF6DOjskVQXQfvmAINGp"
+      : "https://www.creem.io/test/payment/prod_32s0o8DYuOPxzYq9TcCs0q",
+    creemProductIds: ["prod_32s0o8DYuOPxzYq9TcCs0q", "prod_5XDF6DOjskVQXQfvmAINGp"],
   },
 ];
 
