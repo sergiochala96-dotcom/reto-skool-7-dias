@@ -5,6 +5,11 @@
 // Dentro de la app, quien ya tiene sesión ve "Plan actual" en su plan y "Actualizar a ..." (con
 // este mismo enlace) en los planes superiores.
 
+// Interruptor de pagos reales: mientras Creem no apruebe la cuenta, los enlaces de producción
+// muestran "Live payments are not enabled", así que se usa el enlace de prueba. Cuando la cuenta
+// esté aprobada y el aviso de pago registrado en producción, cambiar a true.
+const CREEM_LIVE = false;
+
 export type PlanId = "standard" | "premium" | "vip";
 
 export const PLAN_IDS: PlanId[] = ["standard", "premium", "vip"];
@@ -94,10 +99,11 @@ export const PLANS: Plan[] = [
     ],
     cta: "Quiero el plan Premium",
     upgradeCta: "Actualizar a Premium",
-    // Enlace de PRUEBA (modo de prueba de Creem). Al aprobar la cuenta, cambiarlo por el de
-    // producción y agregar su id a creemProductIds.
-    href: "https://www.creem.io/test/payment/prod_7Nwh7z8GtdlVRhT2mJNuPv",
-    creemProductIds: ["prod_7Nwh7z8GtdlVRhT2mJNuPv"],
+    href: CREEM_LIVE
+      ? "https://www.creem.io/payment/prod_4Vjq9hArLGdNBrRw11lzHy"
+      : "https://www.creem.io/test/payment/prod_7Nwh7z8GtdlVRhT2mJNuPv",
+    // Ids de prueba y de producción: el aviso de pago acepta los dos.
+    creemProductIds: ["prod_7Nwh7z8GtdlVRhT2mJNuPv", "prod_4Vjq9hArLGdNBrRw11lzHy"],
     badge: "Más popular",
   },
   {
@@ -114,8 +120,9 @@ export const PLANS: Plan[] = [
     ],
     cta: "Quiero el plan VIP",
     upgradeCta: "Actualizar a VIP",
-    href: null, // TODO: enlace de pago de Creem
-    creemProductIds: [],
+    // Sin enlace de prueba: hasta pasar a producción el botón dice "Próximamente".
+    href: CREEM_LIVE ? "https://www.creem.io/payment/prod_5XDF6DOjskVQXQfvmAINGp" : null,
+    creemProductIds: ["prod_5XDF6DOjskVQXQfvmAINGp"],
   },
 ];
 
