@@ -733,6 +733,33 @@ export async function upgradeMySubscription(
   return { ok: true };
 }
 
+// Canjea un producto de la tienda con monedas de oro (todo se valida en la base de datos: saldo,
+// que no se cobre dos veces y que el contenido solo se vea después de canjear).
+export async function redeemShopItem(itemId: string): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase.rpc("redeem_shop_item", { p_item: itemId });
+  if (error) return { ok: false, error: "No se pudo canjear. Inténtalo de nuevo." };
+
+  const result = data as { ok?: boolean; error?: string } | null;
+  if (!result?.ok) {
+    return {
+      ok: false,
+      error:
+        result?.error === "insufficient"
+          ? "Aún no tienes monedas suficientes."
+          : "Ese producto ya no está disponible.",
+    };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
 // ---------------------------------------------------------------------------
 // Notificaciones push (pantalla de bloqueo)
 // ---------------------------------------------------------------------------

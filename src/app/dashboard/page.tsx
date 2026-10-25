@@ -11,6 +11,8 @@ import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import StartMissions from "@/components/StartMissions";
 import { PushPromptCard } from "@/components/PushNotifications";
+import RightRail from "@/components/RightRail";
+import StatsBar from "@/components/StatsBar";
 
 export default async function DashboardPage() {
   const {
@@ -22,6 +24,8 @@ export default async function DashboardPage() {
     welcomeVideoSeen,
     notifications,
     plan,
+    coins,
+    lives,
     startMissions,
   } = await getSidebarData();
   const completedList = Array.from(completedDays);
@@ -66,8 +70,14 @@ export default async function DashboardPage() {
         plan={plan}
       />
 
-      <main className="flex-1 px-4 py-10 md:py-5">
+      <main className="min-w-0 flex-1 px-4 py-10 md:py-5">
         <div className="mx-auto max-w-2xl md:max-w-7xl">
+          {/* En computadora con pantalla mediana, las estadísticas van arriba a la derecha; en
+              pantallas grandes viven en la columna derecha. */}
+          <div className="mb-2 hidden justify-end md:max-[1399px]:flex">
+            <StatsBar completedDays={completedList} coins={coins} lives={lives} />
+          </div>
+
           <div className="mb-8 text-center md:mb-9">
             <div className="mb-3 flex justify-center md:mb-2">
               <Avatar avatarUrl={avatarUrl} nombre={nombre} size={64} editable />
@@ -99,6 +109,8 @@ export default async function DashboardPage() {
           )}
         </div>
       </main>
+
+      <RightRail completedDays={completedList} coins={coins} lives={lives} plan={plan} />
     </div>
   );
 }

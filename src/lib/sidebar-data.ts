@@ -24,6 +24,9 @@ export type SidebarData = {
   notifications: SidebarNotification[];
   // Plan de la persona (standard, premium o vip).
   plan: PlanId;
+  // Monedas de oro y vidas de la persona.
+  coins: number;
+  lives: number;
   // Misiones de inicio: si ya tocó los botones de unirse a WhatsApp y a Skool.
   startMissions: { skool: boolean; whatsapp: boolean };
 };
@@ -47,7 +50,7 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at")
+    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at, coins, lives")
     .eq("id", user.id)
     .single();
 
@@ -101,5 +104,7 @@ export async function getSidebarData(): Promise<SidebarData> {
     welcomeVideoSeen: profile?.welcome_video_seen ?? false,
     notifications,
     plan: effectivePlan(profile?.plan, profile?.plan_expires_at),
+    coins: Number(profile?.coins ?? 0),
+    lives: Number(profile?.lives ?? 3),
   };
 }

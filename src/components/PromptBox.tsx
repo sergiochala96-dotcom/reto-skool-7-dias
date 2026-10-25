@@ -3,7 +3,17 @@
 import { useState } from "react";
 
 // Caja con un prompt listo para copiar (mismo estilo que los prompts de las misiones).
-export default function PromptBox({ title, text }: { title: string; text: string }) {
+export default function PromptBox({
+  title,
+  text,
+  buttonLabel = "📋 Copiar prompt",
+  hint = "Cambia lo que está entre [corchetes] por tus datos antes de pegarlo en tu IA.",
+}: {
+  title: string;
+  text: string;
+  buttonLabel?: string;
+  hint?: string | null;
+}) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -27,11 +37,9 @@ export default function PromptBox({ title, text }: { title: string; text: string
         onClick={copy}
         className="mt-3 rounded-xl bg-black px-4 py-2.5 text-sm font-bold text-white transition hover:bg-gray-800"
       >
-        {copied ? "Copiado ✓" : "📋 Copiar prompt"}
+        {copied ? "Copiado ✓" : buttonLabel}
       </button>
-      <p className="mt-2 text-xs text-fuchsia-700/70">
-        Cambia lo que está entre [corchetes] por tus datos antes de pegarlo en tu IA.
-      </p>
+      {hint && <p className="mt-2 text-xs text-fuchsia-700/70">{hint}</p>}
     </div>
   );
 }

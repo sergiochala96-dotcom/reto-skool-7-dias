@@ -12,6 +12,7 @@ import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
 import CourseIcon from "@/components/CourseIcon";
 import GemIcon from "@/components/GemIcon";
+import { CoinIcon } from "@/components/StatIcons";
 import InstallIcon from "@/components/InstallIcon";
 import { PushSidebarButton } from "@/components/PushNotifications";
 import { useInstallApp } from "@/components/InstallAppProvider";
@@ -20,6 +21,13 @@ import { SKOOL_COMMUNITY_URL, WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
+
+// Elementos del menú: etiquetas en mayúsculas y negrita, esquinas redondeadas y borde de color en
+// el que está activo (estilo Duolingo).
+const NAV_ITEM =
+  "flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-[13px] font-extrabold uppercase tracking-wider transition md:text-sm";
+const NAV_ACTIVE = "border-fuchsia-400/50 bg-fuchsia-500/15 text-fuchsia-100";
+const NAV_IDLE = "border-transparent text-white/70 hover:bg-white/5 hover:text-white";
 
 // Botones del menú: cristal translúcido; el de planes lleva un degradado fucsia para destacar.
 const GLASS_BTN =
@@ -193,18 +201,26 @@ export default function Sidebar({
           {!effectiveCollapsed && <SkoolyLogo className="text-xl font-extrabold" />}
         </Link>
 
-        <div className="px-3 pb-2">
+        <div className="flex flex-col gap-1 px-3 pb-2">
           <Link
             href="/dashboard"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-semibold transition md:text-base ${
-              pathname === "/dashboard"
-                ? "bg-fuchsia-500/20 text-white"
-                : "text-white/70 hover:bg-white/5 hover:text-white"
-            }`}
+            title={effectiveCollapsed ? "Inicio" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard" ? NAV_ACTIVE : NAV_IDLE}`}
           >
-            <span className="text-lg md:text-xl">🏠</span>
+            <span className="flex h-7 w-7 items-center justify-center text-2xl">🏠</span>
             {!effectiveCollapsed && <span>Inicio</span>}
+          </Link>
+          <Link
+            href="/dashboard/tienda"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Tienda" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/tienda" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center">
+              <CoinIcon className="h-6 w-6" />
+            </span>
+            {!effectiveCollapsed && <span>Tienda</span>}
           </Link>
         </div>
 
@@ -224,12 +240,12 @@ export default function Sidebar({
               const content = (
                 <div
                   title={effectiveCollapsed ? `Día ${mission.day}: ${mission.title}` : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition md:text-base ${
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
                     active
-                      ? "bg-fuchsia-500/20 text-white"
+                      ? NAV_ACTIVE
                       : unlocked
-                      ? "text-white/70 hover:bg-white/5 hover:text-white"
-                      : "text-white/30"
+                      ? NAV_IDLE
+                      : "border-transparent text-white/30"
                   }`}
                 >
                   <span className="text-lg md:text-xl">{mission.emoji}</span>
@@ -270,10 +286,10 @@ export default function Sidebar({
                   href="/cofre"
                   onClick={() => setMobileOpen(false)}
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm transition md:text-base ${
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
                     pathname === "/cofre"
-                      ? "bg-amber-400/20 text-amber-200"
-                      : "text-amber-300/80 hover:bg-amber-400/10"
+                      ? "border-amber-400/50 bg-amber-400/15 text-amber-200"
+                      : "border-transparent text-amber-300/80 hover:bg-amber-400/10"
                   }`}
                 >
                   <span className="text-lg md:text-xl">🗝️</span>
@@ -282,7 +298,7 @@ export default function Sidebar({
               ) : (
                 <div
                   title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-1.5 text-sm text-white/20 md:text-base"
+                  className="flex cursor-not-allowed items-center gap-3 rounded-2xl border-2 border-transparent px-3 py-2 text-sm font-bold text-white/20 md:text-[15px]"
                 >
                   <span className="text-lg md:text-xl">🔒</span>
                   {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
