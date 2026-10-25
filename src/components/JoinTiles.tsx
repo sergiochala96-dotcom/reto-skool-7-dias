@@ -21,19 +21,19 @@ function Tile({ kind, claimed, onOpen }: { kind: Kind; claimed: boolean; onOpen:
       type="button"
       onClick={onOpen}
       aria-label={t.label}
-      className="w-[3.25rem] overflow-hidden rounded-2xl shadow-lg shadow-black/40 ring-1 ring-black/20 transition active:scale-95"
+      className="w-[4.25rem] overflow-hidden rounded-2xl shadow-lg shadow-black/40 ring-1 ring-black/20 transition active:scale-95"
     >
       <span className={`flex h-11 items-center justify-center text-white ${t.top}`}>
         {kind === "whatsapp" ? (
-          <svg viewBox="0 0 32 32" fill="currentColor" className="h-7 w-7" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="currentColor" className="h-8 w-8" aria-hidden="true">
             <path d={WHATSAPP_PATH} />
           </svg>
         ) : (
-          <CourseIcon className="h-7 w-7" />
+          <CourseIcon className="h-8 w-8" />
         )}
       </span>
       <span
-        className={`flex h-6 items-center justify-center gap-0.5 text-[11px] font-extrabold text-white ${t.bar}`}
+        className={`flex h-[1.375rem] items-center justify-center gap-0.5 text-xs font-extrabold text-white ${t.bar}`}
       >
         {claimed ? (
           "✓"
@@ -71,7 +71,7 @@ export default function JoinTiles({ claimed }: { claimed: { whatsapp: boolean; s
   return (
     <>
       <div className="sticky top-[9rem] z-20 h-0 md:hidden">
-        <div className="absolute left-0 top-0 flex flex-col gap-3">
+        <div className="absolute -left-2 top-0 flex flex-col gap-3">
           <Tile kind="whatsapp" claimed={claimed.whatsapp} onOpen={() => setOpen("whatsapp")} />
           <Tile kind="skool" claimed={claimed.skool} onOpen={() => setOpen("skool")} />
         </div>
@@ -83,7 +83,7 @@ export default function JoinTiles({ claimed }: { claimed: { whatsapp: boolean; s
             role="dialog"
             aria-modal="true"
             aria-label={TILE[open].label}
-            className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_70%)] px-4 pb-8 pt-4 md:hidden"
+            className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_70%)] px-4 pb-6 pt-3 md:hidden"
           >
             <div className="flex justify-end">
               <button
@@ -95,8 +95,8 @@ export default function JoinTiles({ claimed }: { claimed: { whatsapp: boolean; s
                 ×
               </button>
             </div>
-            <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-              <JoinCard kind={open} claimed={claimed[open]} />
+            <div className="mx-auto flex w-full max-w-md flex-1 flex-col pt-1">
+              <JoinCard kind={open} claimed={claimed[open]} large />
             </div>
           </div>,
           document.body

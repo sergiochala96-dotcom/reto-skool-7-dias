@@ -30,7 +30,16 @@ const COPY: Record<
   },
 };
 
-export function JoinCard({ kind, claimed }: { kind: Kind; claimed: boolean }) {
+// large: versión de pantalla completa del celular (popup), con todo más grande y centrado.
+export function JoinCard({
+  kind,
+  claimed,
+  large = false,
+}: {
+  kind: Kind;
+  claimed: boolean;
+  large?: boolean;
+}) {
   const c = COPY[kind];
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +54,73 @@ export function JoinCard({ kind, claimed }: { kind: Kind; claimed: boolean }) {
       if (r.ok) router.refresh();
       else setError(r.error ?? "No se pudo canjear.");
     });
+  }
+
+  if (large) {
+    return (
+      <section
+        className={`flex flex-1 flex-col items-center justify-center rounded-3xl border-2 p-6 text-center ${
+          claimed ? "border-emerald-400/40 bg-emerald-400/[0.06]" : "border-white/10 bg-white/[0.03]"
+        }`}
+      >
+        <span
+          className={`flex h-24 w-24 items-center justify-center rounded-full ${
+            kind === "whatsapp" ? "bg-[#25D366] text-white" : "bg-amber-400 text-white"
+          }`}
+        >
+          {kind === "whatsapp" ? (
+            <svg viewBox="0 0 32 32" fill="currentColor" className="h-14 w-14" aria-hidden="true">
+              <path d={WHATSAPP_PATH} />
+            </svg>
+          ) : (
+            <CourseIcon className="h-14 w-14" />
+          )}
+        </span>
+        <h2 className="mt-5 text-2xl font-extrabold leading-tight text-white">{c.title}</h2>
+        <span className="mt-3 flex items-center gap-1.5 rounded-2xl bg-black/25 px-4 py-1.5 text-xl font-extrabold text-amber-300">
+          <CoinIcon className="h-6 w-6" /> +50
+        </span>
+
+        {claimed ? (
+          <p className="mt-6 text-base font-bold text-emerald-300">✓ Verificado: ya ganaste tus 50 monedas</p>
+        ) : (
+          <>
+            <a
+              href={c.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => void completeStartMission(kind)}
+              className={`mt-7 block w-full rounded-2xl px-4 py-4 text-center text-sm font-extrabold uppercase tracking-wide transition active:translate-y-0.5 active:border-b-2 ${c.tone}`}
+            >
+              {c.join}
+            </a>
+            <p className="mt-7 text-sm leading-snug text-white/60">
+              Cuando estés dentro, busca el <strong className="text-white/85">código</strong> en {c.where} y
+              escríbelo aquí para ganar tus monedas:
+            </p>
+            <form onSubmit={submit} className="mt-3 flex w-full flex-col gap-3">
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Escribe el código"
+                maxLength={40}
+                autoComplete="off"
+                aria-label={`Código de ${kind === "whatsapp" ? "WhatsApp" : "Skool"}`}
+                className="w-full rounded-2xl border-2 border-white/15 bg-white/10 px-4 py-3.5 text-center text-base text-white placeholder-white/35 outline-none focus:border-fuchsia-400"
+              />
+              <button
+                type="submit"
+                disabled={pending || code.trim().length === 0}
+                className="w-full rounded-2xl bg-fuchsia-500 px-4 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-fuchsia-400 disabled:opacity-50"
+              >
+                {pending ? "..." : "Canjear"}
+              </button>
+            </form>
+            {error && <p className="mt-3 text-sm font-semibold text-red-300">{error}</p>}
+          </>
+        )}
+      </section>
+    );
   }
 
   return (
