@@ -234,7 +234,7 @@ export async function uncompleteDay(day: number): Promise<void> {
 }
 
 export type MissionState =
-  | { saved: true; missing: number; total: number; dayComplete: boolean }
+  | { saved: true; missing: number; total: number; dayComplete: boolean; coins: number }
   | undefined;
 
 export async function saveMissionAnswers(
@@ -281,6 +281,7 @@ export async function saveMissionAnswers(
   const { total } = countRequiredFields(day, answers);
   const dayComplete = missingIds.length === 0;
   const newlyCompleted = dayComplete && !completedDays.has(day);
+  const savingStartedAt = new Date(Date.now() - 5_000).toISOString();
 
   // Las respuestas y el progreso no dependen entre sí, así que se guardan en
   // paralelo en vez de uno tras otro (esto era lo que hacía tardar el popup
@@ -306,7 +307,20 @@ export async function saveMissionAnswers(
 
   revalidatePath(`/dia/${day}`);
 
-  return { saved: true, missing: missingIds.length, total, dayComplete };
+  // Monedas que dio ESTE guardado (las da un trigger de la base al completar el día, una sola vez:
+  // si ya las había ganado antes, por ejemplo tras reiniciar el progreso, no se vuelven a dar).
+  let coins = 0;
+  if (newlyCompleted) {
+    const { data: earned } = await supabase
+      .from("coin_transactions")
+      .select("amount")
+      .eq("user_id", user.id)
+      .in("reason", ["day", "bono"])
+      .gte("created_at", savingStartedAt);
+    coins = (earned ?? []).reduce((sum, t) => sum + Number(t.amount ?? 0), 0);
+  }
+
+  return { saved: true, missing: missingIds.length, total, dayComplete, coins };
 }
 
 export async function adminUnlockAll(): Promise<void> {

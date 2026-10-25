@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { CoinIcon } from "@/components/StatIcons";
 import Image from "next/image";
 import Link from "next/link";
 import confetti from "canvas-confetti";
@@ -550,12 +551,12 @@ function SliderField({
 function CelebrationModal({
   day,
   totalDays,
-  totalXp,
+  coins,
   onClose,
 }: {
   day: number;
   totalDays: number;
-  totalXp: number;
+  coins: number;
   onClose: () => void;
 }) {
   const isLastDay = day >= totalDays;
@@ -593,11 +594,22 @@ function CelebrationModal({
         <div className="mt-8 flex w-full gap-4">
           <div className="flex-1 rounded-2xl border-2 border-amber-400 bg-amber-400/10 px-4 py-4 sm:py-5">
             <p className="text-xs font-bold uppercase tracking-wide text-amber-300 sm:text-sm">
-              Exp total
+              Monedas
             </p>
-            <p className="mt-1 flex items-center justify-center gap-1.5 text-3xl font-extrabold text-amber-300 sm:text-4xl">
-              ⚡ {totalXp}
-            </p>
+            {coins > 0 ? (
+              <>
+                <p className="mt-1 flex items-center justify-center gap-2 text-3xl font-extrabold text-amber-300 sm:text-4xl">
+                  <CoinIcon className="h-8 w-8 sm:h-9 sm:w-9" /> +{coins}
+                </p>
+                {coins > 10 && (
+                  <p className="mt-1 text-[11px] font-semibold text-amber-200/70">incluye 50 de bono por terminar el reto</p>
+                )}
+              </>
+            ) : (
+              <p className="mt-1 flex items-center justify-center gap-2 text-lg font-extrabold text-amber-300/80 sm:text-xl">
+                <CoinIcon className="h-6 w-6" /> Ya las ganaste ✓
+              </p>
+            )}
           </div>
           <div className="flex-1 rounded-2xl border-2 border-emerald-400 bg-emerald-400/10 px-4 py-4 sm:py-5">
             <p className="text-xs font-bold uppercase tracking-wide text-emerald-300 sm:text-sm">
@@ -1073,7 +1085,7 @@ export default function MissionForm({
   const [xpPop, setXpPop] = useState(false);
   const [sectionCelebrate, setSectionCelebrate] = useState<string | null>(null);
   const [showAllExpanded, setShowAllExpanded] = useState(false);
-  const [celebration, setCelebration] = useState<{ total: number } | null>(null);
+  const [celebration, setCelebration] = useState<{ coins: number } | null>(null);
 
   const { total, done } = countRequiredFields(day, answers);
   const allDone = total > 0 && done >= total;
@@ -1101,7 +1113,7 @@ export default function MissionForm({
       trackCustomEvent("DiaCompletado", { dia: day });
       if (day === 1) trackCustomEvent("Dia1Completado");
       if (day === totalDays) trackCustomEvent("RetoCompletado");
-      setCelebration({ total: state.total });
+      setCelebration({ coins: state.coins });
       playVictoryFanfare();
 
       const duration = 1500;
@@ -1447,7 +1459,7 @@ export default function MissionForm({
       <CelebrationModal
         day={day}
         totalDays={totalDays}
-        totalXp={celebration.total}
+        coins={celebration.coins}
         onClose={() => setCelebration(null)}
       />
     )}
