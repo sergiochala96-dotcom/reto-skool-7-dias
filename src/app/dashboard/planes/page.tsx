@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Heading, PlansGrid } from "@/components/PlanesSection";
 import Sidebar from "@/components/Sidebar";
 import { getSidebarData } from "@/lib/sidebar-data";
+import { createClient } from "@/lib/supabase/server";
 import "../../ventas.css";
 
 export const metadata: Metadata = {
@@ -12,6 +13,19 @@ export const metadata: Metadata = {
 export default async function PlanesPanelPage() {
   const { nombre, user, avatarUrl, admin, completedDays, notifications, plan } =
     await getSidebarData();
+
+  // Con un plan de pago se muestra cómo gestionar o cancelar la suscripción, con el correo con el
+  // que se pagó (puede ser distinto al de la cuenta).
+  let payerEmail: string | null = null;
+  if (plan !== "standard") {
+    const supabase = await createClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("creem_customer_email")
+      .eq("id", user.id)
+      .single();
+    payerEmail = profile?.creem_customer_email ?? null;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0a0614] md:flex-row">
@@ -38,6 +52,32 @@ export default async function PlanesPanelPage() {
           <div className="mt-16">
             <PlansGrid current={plan} userId={user.id} />
           </div>
+
+          {plan !== "standard" && (
+            <div className="v-glass mx-auto mt-10 max-w-2xl p-6 text-center">
+              <p className="font-semibold">Gestiona tu suscripción</p>
+              <p className="v-muted mt-1 text-sm leading-relaxed">
+                Puedes ver tus recibos, cambiar tu método de pago o cancelar cuando quieras. Al
+                cancelar conservas el acceso hasta el final del período que ya pagaste. Entra con el
+                correo con el que pagaste
+                {payerEmail ? (
+                  <>
+                    : <strong className="text-white">{payerEmail}</strong>
+                  </>
+                ) : (
+                  "."
+                )}
+              </p>
+              <a
+                href="https://creem.io/my-orders/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="v-btn v-btn-ghost mt-4"
+              >
+                Gestionar o cancelar mi suscripción
+              </a>
+            </div>
+          )}
         </div>
       </main>
     </div>

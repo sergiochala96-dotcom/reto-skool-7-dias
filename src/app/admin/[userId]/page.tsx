@@ -141,7 +141,9 @@ export default async function AdminUserPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, email, created_at, plan")
+    .select(
+      "display_name, email, created_at, plan, plan_expires_at, creem_customer_email, creem_subscription_id"
+    )
     .eq("id", userId)
     .single();
   if (!profile) notFound();
@@ -189,6 +191,14 @@ export default async function AdminUserPage({
               userId={userId}
               plan={isPlanId(profile.plan) ? profile.plan : "standard"}
             />
+            {(profile.creem_customer_email || profile.creem_subscription_id || profile.plan_expires_at) && (
+              <p className="mt-2 text-xs text-white/50">
+                {profile.plan_expires_at &&
+                  `Pagado hasta el ${new Date(profile.plan_expires_at).toLocaleDateString("es", { day: "numeric", month: "long", year: "numeric" })}`}
+                {profile.creem_customer_email && ` · Pagó con: ${profile.creem_customer_email}`}
+                {profile.creem_subscription_id && ` · Suscripción: ${profile.creem_subscription_id}`}
+              </p>
+            )}
           </header>
 
           <div className="space-y-6">

@@ -30,7 +30,7 @@ function validSignature(rawBody: string, received: string | null, secret: string
 type CreemSubscription = {
   id?: string;
   product?: { id?: string } | string;
-  customer?: { email?: string } | string;
+  customer?: { id?: string; email?: string } | string;
   metadata?: Record<string, unknown>;
   current_period_end_date?: string | null;
 };
@@ -77,7 +77,15 @@ export async function POST(request: Request) {
   const periodEnd = sub.current_period_end_date
     ? new Date(sub.current_period_end_date)
     : new Date(Date.now() + FALLBACK_DAYS * 86_400_000);
-  const update = { plan, plan_expires_at: periodEnd.toISOString() };
+  const customer = typeof sub.customer === "string" ? { id: sub.customer } : sub.customer;
+  const update = {
+    plan,
+    plan_expires_at: periodEnd.toISOString(),
+    // Para soporte: con qué correo pagó (puede ser distinto al de su cuenta) y sus ids en Creem.
+    creem_customer_email: customer && "email" in customer ? (customer.email ?? null) : null,
+    creem_customer_id: customer?.id ?? null,
+    creem_subscription_id: sub.id ?? null,
+  };
 
   // 1) Por el id que va dentro del enlace de pago.
   const metaUser = sub.metadata?.user_id;
@@ -89,7 +97,7 @@ export async function POST(request: Request) {
 
   // 2) Si no vino el id (por ejemplo, alguien pagó desde un enlace sin él), por el correo.
   if (!matched) {
-    const email = typeof sub.customer === "string" ? undefined : sub.customer?.email;
+    const email = customer && "email" in customer ? customer.email : undefined;
     if (email) {
       const { data } = await supabase
         .from("profiles")
