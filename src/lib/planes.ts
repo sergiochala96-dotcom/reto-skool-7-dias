@@ -16,6 +16,28 @@ export function isPlanId(value: unknown): value is PlanId {
   return typeof value === "string" && (PLAN_IDS as string[]).includes(value);
 }
 
+// Días de gracia después del fin del período pagado antes de volver a Standard (por si el aviso
+// de renovación de Creem se demora).
+const PLAN_GRACE_DAYS = 3;
+
+// Plan que realmente tiene la persona: el guardado, salvo que su pago ya haya vencido.
+// expiresAt null = sin vencimiento (plan dado a mano por el admin).
+export function effectivePlan(plan: unknown, expiresAt: string | null | undefined): PlanId {
+  if (!isPlanId(plan)) return "standard";
+  if (plan !== "standard" && expiresAt) {
+    const limit = new Date(expiresAt).getTime() + PLAN_GRACE_DAYS * 86_400_000;
+    if (Number.isFinite(limit) && limit < Date.now()) return "standard";
+  }
+  return plan;
+}
+
+// Enlace de pago con el id de la persona, para que el aviso de Creem sepa a quién subirle el plan.
+export function checkoutUrl(href: string, userId: string): string {
+  const url = new URL(href);
+  url.searchParams.set("metadata[user_id]", userId);
+  return url.toString();
+}
+
 // Texto del botón del menú lateral según el plan de la persona.
 export function sidebarPlanLabel(plan: PlanId): string {
   if (plan === "standard") return "Actualizar a Premium";
@@ -34,6 +56,9 @@ export type Plan = {
   cta: string; // texto del botón en la portada (sin sesión)
   upgradeCta?: string; // texto del botón dentro de la app para quien tiene un plan inferior
   href: string | null;
+  // Ids del producto en Creem (el de prueba y, luego, el de producción): con ellos el aviso de
+  // pago sabe qué plan se compró.
+  creemProductIds: string[];
   badge?: string; // etiqueta destacada (ej: "Más popular")
 };
 
@@ -53,6 +78,7 @@ export const PLANS: Plan[] = [
     ],
     cta: "Empezar gratis",
     href: "/reto",
+    creemProductIds: [],
   },
   {
     id: "premium",
@@ -68,7 +94,10 @@ export const PLANS: Plan[] = [
     ],
     cta: "Quiero el plan Premium",
     upgradeCta: "Actualizar a Premium",
-    href: null, // TODO: enlace de pago de Creem
+    // Enlace de PRUEBA (modo de prueba de Creem). Al aprobar la cuenta, cambiarlo por el de
+    // producción y agregar su id a creemProductIds.
+    href: "https://www.creem.io/test/payment/prod_7Nwh7z8GtdlVRhT2mJNuPv",
+    creemProductIds: ["prod_7Nwh7z8GtdlVRhT2mJNuPv"],
     badge: "Más popular",
   },
   {
@@ -86,5 +115,10 @@ export const PLANS: Plan[] = [
     cta: "Quiero el plan VIP",
     upgradeCta: "Actualizar a VIP",
     href: null, // TODO: enlace de pago de Creem
+    creemProductIds: [],
   },
 ];
+
+export function planFromCreemProduct(productId: string): PlanId | null {
+  return PLANS.find((p) => p.creemProductIds.includes(productId))?.id ?? null;
+}

@@ -657,7 +657,7 @@ export async function adminSetPlan(
 
   const { data, error } = await supabase
     .from("profiles")
-    .update({ plan })
+    .update({ plan, plan_expires_at: null }) // a mano: sin vencimiento
     .eq("id", userId)
     .select("plan")
     .single();

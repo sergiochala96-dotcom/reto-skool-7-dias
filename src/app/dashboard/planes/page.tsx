@@ -36,7 +36,7 @@ export default async function PlanesPanelPage() {
             text="Empieza gratis. Si quieres seguir después del reto o ir acompañado, tienes más opciones."
           />
           <div className="mt-16">
-            <PlansGrid current={plan} />
+            <PlansGrid current={plan} userId={user.id} />
           </div>
         </div>
       </main>

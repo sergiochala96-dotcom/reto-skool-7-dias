@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPPORT_EMAIL } from "@/lib/legal";
 import { MISSIONS } from "@/lib/challenge";
 import { Heading, PlansGrid } from "@/components/PlanesSection";
+import { effectivePlan } from "@/lib/planes";
 import "./ventas.css";
 
 export const metadata: Metadata = {
@@ -113,6 +114,12 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Con sesión, los planes muestran el plan actual y el botón de mejorar.
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("plan, plan_expires_at").eq("id", user.id).single()
+    : { data: null };
+  const currentPlan = user ? effectivePlan(profile?.plan, profile?.plan_expires_at) : undefined;
 
   return (
     <div className="ventas min-h-screen">
@@ -312,7 +319,7 @@ export default async function Home() {
               text="Empieza gratis. Si quieres seguir después del reto o ir acompañado, tienes más opciones."
             />
             <div className="mt-16">
-              <PlansGrid />
+              <PlansGrid current={currentPlan} userId={user?.id} />
             </div>
           </div>
         </section>

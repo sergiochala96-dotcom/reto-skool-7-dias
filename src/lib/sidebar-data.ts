@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { detectDevice } from "@/lib/device";
-import { isPlanId, type PlanId } from "@/lib/planes";
+import { effectivePlan, type PlanId } from "@/lib/planes";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
 import type { User } from "@supabase/supabase-js";
@@ -47,7 +47,7 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan")
+    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at")
     .eq("id", user.id)
     .single();
 
@@ -100,6 +100,6 @@ export async function getSidebarData(): Promise<SidebarData> {
     admin: isAdmin(user.email),
     welcomeVideoSeen: profile?.welcome_video_seen ?? false,
     notifications,
-    plan: isPlanId(profile?.plan) ? profile.plan : "standard",
+    plan: effectivePlan(profile?.plan, profile?.plan_expires_at),
   };
 }

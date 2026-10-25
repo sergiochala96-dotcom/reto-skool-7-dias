@@ -13,6 +13,7 @@ const PUBLIC_PATHS = [
   "/privacidad",
   "/olvide-contrasena",
   "/api/cron",
+  "/api/webhooks",
   // Para poder instalar la app en el celular: el navegador los pide sin sesión.
   "/manifest.webmanifest",
   "/sw.js",
