@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { detectDevice } from "@/lib/device";
+import { effectiveLives } from "@/lib/lives";
 import { effectivePlan, type PlanId } from "@/lib/planes";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
@@ -50,7 +51,7 @@ export async function getSidebarData(): Promise<SidebarData> {
   // subido. profiles.avatar_url solo lo escribe nuestra propia función.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at, coins, lives")
+    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at, coins, lives, lives_refilled_at")
     .eq("id", user.id)
     .single();
 
@@ -105,6 +106,6 @@ export async function getSidebarData(): Promise<SidebarData> {
     notifications,
     plan: effectivePlan(profile?.plan, profile?.plan_expires_at),
     coins: Number(profile?.coins ?? 0),
-    lives: Number(profile?.lives ?? 3),
+    lives: effectiveLives(Number(profile?.lives ?? 3), profile?.lives_refilled_at),
   };
 }

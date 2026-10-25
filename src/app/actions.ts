@@ -734,67 +734,124 @@ export async function upgradeMySubscription(
   return { ok: true };
 }
 
-export type TriviaResult = {
+export type TriviaAnswerResult = {
   ok: boolean;
   error?: string;
-  score?: number;
+  correct?: boolean; // ¿acertó esta pregunta? (no viene si ya no tenía vidas)
+  correctIndex?: number; // la opción correcta, que se revela al responder
+  explanation?: string;
+  lives?: number; // vidas que le quedan
+  wrong?: number; // respuestas falladas hoy
   total?: number;
-  correct?: number[];
-  explanations?: string[];
-  awarded?: number;
+  status?: "in_progress" | "completed" | "failed";
+  awarded?: number; // monedas ganadas (solo al completar)
 };
 
-// Entrega de la trivia del día: el servidor califica con las respuestas que NO están en el
-// navegador, da las monedas una sola vez por día (el libro de monedas lo impide repetir) y devuelve
-// las respuestas correctas para repasarlas.
-export async function submitTrivia(answers: number[]): Promise<TriviaResult> {
+// Responde la pregunta que sigue de la trivia del día. El servidor califica con las respuestas que
+// NO están en el navegador y revela la correcta recién al responder. Cada respuesta fallada cuesta
+// una vida; si se queda sin vidas la trivia queda como fallida (sin monedas) hasta el día siguiente
+// (6:00 a. m. de Colombia). Al contestar bien la última (con vidas), se dan las monedas una sola vez.
+export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  if (!Number.isInteger(choice) || choice < 0 || choice > 3) {
+    return { ok: false, error: "Elige una respuesta." };
+  }
+  const service = createServiceClient();
+  const unavailable = { ok: false, error: "No pudimos guardar tu respuesta. Inténtalo de nuevo." };
+  if (!service) return unavailable;
+
   const { trivia, date } = getTodayTrivia();
   const total = trivia.questions.length;
-  if (
-    !Array.isArray(answers) ||
-    answers.length !== total ||
-    answers.some((a) => !Number.isInteger(a) || a < 0 || a > 3)
-  ) {
-    return { ok: false, error: "Responde las 5 preguntas para terminar." };
+
+  // Un solo intento por día: se crea si no existe y se lee el estado actual.
+  await service
+    .from("trivia_attempts")
+    .upsert({ user_id: user.id, play_date: date }, { onConflict: "user_id,play_date", ignoreDuplicates: true });
+  const { data: attempt } = await service
+    .from("trivia_attempts")
+    .select("answers, wrong, status")
+    .eq("user_id", user.id)
+    .eq("play_date", date)
+    .single();
+  if (!attempt) return unavailable;
+  if (attempt.status !== "in_progress") {
+    return { ok: false, error: "La trivia de hoy ya terminó.", status: attempt.status };
   }
 
-  const score = trivia.questions.filter((q, i) => q.answer === answers[i]).length;
+  const index = (attempt.answers as number[]).length;
+  if (index >= total) return { ok: false, error: "La trivia de hoy ya terminó." };
 
-  const { data: already } = await supabase
-    .from("coin_transactions")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("reason", "trivia")
-    .eq("ref", date)
-    .maybeSingle();
+  // Sin vidas no se puede seguir: la trivia queda fallida y no hay monedas.
+  const { data: currentLives } = await service.rpc("sync_lives", { p_user: user.id });
+  let lives = Number(currentLives ?? 0);
+  if (lives <= 0) {
+    await service
+      .from("trivia_attempts")
+      .update({ status: "failed", updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("play_date", date);
+    revalidatePath("/", "layout");
+    return { ok: true, status: "failed", lives: 0, wrong: attempt.wrong, total };
+  }
+
+  const question = trivia.questions[index];
+  const correct = choice === question.answer;
+
+  // Solo cuenta si es la pregunta que sigue (evita responder dos veces la misma).
+  const { data: appended } = await service.rpc("append_trivia_answer", {
+    p_user: user.id,
+    p_date: date,
+    p_index: index,
+    p_choice: choice,
+    p_is_wrong: !correct,
+  });
+  if (!appended) return { ok: false, error: "Esa pregunta ya se respondió. Recarga la página." };
+
+  const wrong = attempt.wrong + (correct ? 0 : 1);
+  let status: "in_progress" | "completed" | "failed" = "in_progress";
+
+  if (!correct) {
+    const { data: left } = await service.rpc("lose_life", { p_user: user.id });
+    lives = Number(left ?? 0);
+    if (lives <= 0) status = "failed";
+  }
+  if (status === "in_progress" && index === total - 1) status = "completed";
+
+  if (status !== "in_progress") {
+    await service
+      .from("trivia_attempts")
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("play_date", date);
+  }
 
   let awarded = 0;
-  if (!already) {
-    const service = createServiceClient();
-    if (!service) return { ok: false, error: "No pudimos guardar tu trivia. Inténtalo de nuevo." };
+  if (status === "completed") {
     const { error } = await service.rpc("award_coins", {
       p_user: user.id,
       p_amount: TRIVIA_REWARD,
       p_reason: "trivia",
       p_ref: date,
     });
-    if (error) return { ok: false, error: "No pudimos guardar tu trivia. Inténtalo de nuevo." };
-    awarded = TRIVIA_REWARD;
+    if (error) console.error("answerTrivia: no se pudieron dar las monedas", error.message);
+    else awarded = TRIVIA_REWARD;
   }
 
   revalidatePath("/", "layout");
   return {
     ok: true,
-    score,
+    correct,
+    correctIndex: question.answer,
+    explanation: question.explain,
+    lives,
+    wrong,
     total,
-    correct: trivia.questions.map((q) => q.answer),
-    explanations: trivia.questions.map((q) => q.explain),
+    status,
     awarded,
   };
 }

@@ -1,9 +1,10 @@
-// Trivia del día: cada día (hora de Colombia) toca una trivia nueva de 5 preguntas, y quien la
-// completa gana monedas de oro una sola vez por día. Las trivias rotan en el orden de esta lista y,
+// Trivia del día: cada día de juego (empieza a las 6:00 a. m. de Colombia) toca una trivia nueva de 5
+// preguntas. Cada respuesta fallada cuesta una vida; sin vidas no se puede terminar y se pierden las
+// monedas. Quien la completa gana monedas de oro una sola vez por día. Las trivias rotan en el orden de esta lista y,
 // al terminarla, vuelven a empezar: para variar basta con agregar más al final.
 //
 // CONTENIDO PROVISIONAL: preguntas de ejemplo de cultura general sobre comunidades, marketing e IA.
-// Las respuestas correctas NO se envían al navegador hasta que la persona entrega sus respuestas.
+// Las respuestas correctas NO se envían al navegador: el servidor revela cada una al responder.
 
 export type TriviaQuestion = {
   q: string;
@@ -642,14 +643,17 @@ export const TRIVIAS: Trivia[] = [
   },
 ];
 
-// Fecha de hoy en Colombia (YYYY-MM-DD).
-export function todayKey(now: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(now);
+// Fecha del "día de juego" (YYYY-MM-DD): el día cambia a las 6:00 a. m. de Colombia, la misma hora a
+// la que se rellenan las vidas.
+export function playDateKey(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(
+    new Date(now.getTime() - 6 * 3_600_000)
+  );
 }
 
-// La trivia que toca hoy (rota por día).
+// La trivia que toca hoy (rota por día de juego).
 export function getTodayTrivia(now: Date = new Date()): { trivia: Trivia; date: string } {
-  const date = todayKey(now);
+  const date = playDateKey(now);
   const days = Math.floor((Date.parse(`${date}T00:00:00Z`) - Date.parse(`${FIRST_DAY}T00:00:00Z`)) / 86_400_000);
   const index = ((days % TRIVIAS.length) + TRIVIAS.length) % TRIVIAS.length;
   return { trivia: TRIVIAS[index], date };

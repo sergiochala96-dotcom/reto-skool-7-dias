@@ -158,8 +158,12 @@ export default function StatsBar({
                 </div>
               </div>
               <p className="mt-4 text-sm leading-snug text-white/70">
-                Las vidas sirven para reparar tu racha si la pierdes. Muy pronto podrás usarlas desde
-                aquí.
+                Pierdes una vida cada vez que fallas una pregunta de la trivia del día. Sin vidas no
+                puedes terminarla y pierdes las monedas.
+              </p>
+              <p className="mt-2 text-sm leading-snug text-white/70">
+                Todos los días a las <strong className="text-white">6:00 a. m.</strong> (hora de
+                Colombia) tus vidas vuelven a 3.
               </p>
             </>
           )}
