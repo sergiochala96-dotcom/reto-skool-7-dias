@@ -8,6 +8,7 @@ import Episode2AccessToggle from "@/components/Episode2AccessToggle";
 import SyncSystemeButton from "@/components/SyncSystemeButton";
 import ApplyEmailTextsButton from "@/components/ApplyEmailTextsButton";
 import { classifyTraffic, TRAFFIC_LABEL, TRAFFIC_STYLE } from "@/lib/traffic";
+import { effectivePlan, type PlanId } from "@/lib/planes";
 
 // La sincronización con Systeme.io (botón de abajo) puede tardar si hay muchos cambios.
 export const maxDuration = 60;
@@ -48,6 +49,16 @@ export default async function AdminPage({
     .from("admin_users_overview")
     .select("*", { count: "exact" })
     .range(from, to);
+
+  // Plan de cada usuario (con el vencimiento y el correo con el que pagó, si pagó).
+  const ids = (rows ?? []).map((r) => r.id as string);
+  const { data: planRows } = ids.length
+    ? await supabase
+        .from("profiles")
+        .select("id, plan, plan_expires_at, creem_customer_email")
+        .in("id", ids)
+    : { data: [] };
+  const planById = new Map((planRows ?? []).map((p) => [p.id as string, p]));
 
   // Origen del tráfico de cada usuario (si dejó su correo en /reto con etiquetas UTM).
   const emails = (rows ?? []).map((r) => String(r.email ?? "").toLowerCase()).filter(Boolean);
@@ -163,7 +174,10 @@ export default async function AdminPage({
                 <tr className="border-b border-white/10 text-white/50">
                   <th className="px-3 py-3 xl:px-4 font-medium">Nombre</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Email</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Origen</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium">Plan</th>
+                  <th className="px-3 py-3 xl:px-4 font-medium" title="De qué anuncio o enlace llegó">
+                    Origen
+                  </th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Progreso</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Días sin entrar</th>
                   <th className="px-3 py-3 xl:px-4 font-medium">Última actividad</th>
@@ -184,6 +198,45 @@ export default async function AdminPage({
                   >
                     <td className="px-3 py-3 xl:px-4">{row.display_name ?? "—"}</td>
                     <td className="px-3 py-3 xl:px-4 text-white/60">{row.email}</td>
+                    <td className="px-3 py-3 xl:px-4">
+                      {(() => {
+                        const p = planById.get(row.id as string);
+                        const current = effectivePlan(p?.plan, p?.plan_expires_at);
+                        const style: Record<PlanId, string> = {
+                          standard: "bg-white/10 text-white/60",
+                          premium: "bg-fuchsia-400/20 text-fuchsia-200",
+                          vip: "bg-amber-400/20 text-amber-300",
+                        };
+                        const label: Record<PlanId, string> = {
+                          standard: "Standard",
+                          premium: "Premium",
+                          vip: "VIP",
+                        };
+                        const until =
+                          current !== "standard" && p?.plan_expires_at
+                            ? new Date(p.plan_expires_at).toLocaleDateString("es")
+                            : null;
+                        return (
+                          <span
+                            title={
+                              p?.creem_customer_email
+                                ? `Pagó con: ${p.creem_customer_email}`
+                                : current === "standard"
+                                  ? "Plan gratuito"
+                                  : "Plan dado a mano"
+                            }
+                            className="inline-flex flex-col items-start gap-0.5"
+                          >
+                            <span
+                              className={`whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold ${style[current]}`}
+                            >
+                              {label[current]}
+                            </span>
+                            {until && <span className="text-[11px] text-white/40">hasta {until}</span>}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-3 py-3 xl:px-4">
                       {(() => {
                         const lead = leadByEmail.get(String(row.email ?? "").toLowerCase());
@@ -267,7 +320,7 @@ export default async function AdminPage({
                 ))}
                 {(rows ?? []).length === 0 && !error && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-8 text-center text-white/40">
+                    <td colSpan={11} className="px-4 py-8 text-center text-white/40">
                       Todavía no hay usuarios registrados.
                     </td>
                   </tr>
