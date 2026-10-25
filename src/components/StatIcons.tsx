@@ -53,3 +53,28 @@ export function ShopIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+// Iconos del menú (colores planos): caja de regalo para la Tienda y corona para los Planes.
+export function GiftIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <rect x="3" y="11" width="18" height="10" rx="1.8" fill="#ff4b6e" />
+      <rect x="2" y="7" width="20" height="4.6" rx="1.8" fill="#ff7a93" />
+      <rect x="10.4" y="7" width="3.2" height="14" fill="#ffd23f" />
+      <path d="M12 7C12 7 7.6 7.2 7.6 4.8 7.6 3.4 8.8 2.8 10 3.1 11.6 3.5 12 7 12 7Z" fill="#ffd23f" />
+      <path d="M12 7C12 7 16.4 7.2 16.4 4.8 16.4 3.4 15.2 2.8 14 3.1 12.4 3.5 12 7 12 7Z" fill="#ffd23f" />
+    </svg>
+  );
+}
+
+export function CrownIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path d="M2.8 8.2 7.6 12 12 5l4.4 7 4.8-3.8-1.9 10.6H4.7Z" fill="#f5b21b" />
+      <rect x="4.6" y="17.4" width="14.8" height="2.8" rx="1" fill="#d98f00" />
+      <circle cx="2.8" cy="7.6" r="1.7" fill="#ffd96a" />
+      <circle cx="12" cy="4.6" r="1.7" fill="#ffd96a" />
+      <circle cx="21.2" cy="7.6" r="1.7" fill="#ffd96a" />
+    </svg>
+  );
+}

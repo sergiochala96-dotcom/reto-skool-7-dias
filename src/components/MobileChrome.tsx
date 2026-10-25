@@ -4,10 +4,9 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BellFilledIcon } from "@/components/BellIcon";
-import GemIcon from "@/components/GemIcon";
 import NotificationsMenu from "@/components/NotificationsMenu";
 import { usePush } from "@/components/PushNotifications";
-import { CoinIcon } from "@/components/StatIcons";
+import { CrownIcon, GiftIcon } from "@/components/StatIcons";
 import StatsBar from "@/components/StatsBar";
 import type { SidebarNotification } from "@/lib/sidebar-data";
 
@@ -72,8 +71,8 @@ export function MobileTopBar({
 const ITEMS = [
   { href: "/dashboard", label: "Inicio", icon: <span className="text-2xl leading-none">🏠</span> },
   { href: "/dashboard/trivia", label: "Trivia del día", icon: <span className="text-2xl leading-none">🧠</span> },
-  { href: "/dashboard/tienda", label: "Tienda", icon: <CoinIcon className="h-7 w-7" /> },
-  { href: "/dashboard/planes", label: "Planes", icon: <GemIcon className="h-7 w-7 text-fuchsia-300" /> },
+  { href: "/dashboard/tienda", label: "Tienda", icon: <GiftIcon className="h-7 w-7" /> },
+  { href: "/dashboard/planes", label: "Planes", icon: <CrownIcon className="h-7 w-7" /> },
   { href: "/dashboard/perfil", label: "Perfil", icon: <span className="text-2xl leading-none">👤</span> },
 ];
 

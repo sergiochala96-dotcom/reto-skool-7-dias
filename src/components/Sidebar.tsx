@@ -12,7 +12,7 @@ import AccountModal from "@/components/AccountModal";
 import Avatar from "@/components/Avatar";
 import CourseIcon from "@/components/CourseIcon";
 import GemIcon from "@/components/GemIcon";
-import { CoinIcon } from "@/components/StatIcons";
+import { CrownIcon, GiftIcon } from "@/components/StatIcons";
 import InstallIcon from "@/components/InstallIcon";
 import { PushSidebarButton } from "@/components/PushNotifications";
 import { useInstallApp } from "@/components/InstallAppProvider";
@@ -203,7 +203,6 @@ export default function Sidebar({
             <span className="flex h-7 w-7 items-center justify-center text-2xl">🏠</span>
             {!effectiveCollapsed && <span>Inicio</span>}
           </Link>
-          <WorkshopMenuButton collapsed={effectiveCollapsed} className={`${NAV_ITEM} ${NAV_IDLE}`} />
           <Link
             href="/dashboard/trivia"
             onClick={() => setMobileOpen(false)}
@@ -220,21 +219,11 @@ export default function Sidebar({
             className={`${NAV_ITEM} ${pathname === "/dashboard/tienda" ? NAV_ACTIVE : NAV_IDLE}`}
           >
             <span className="flex h-7 w-7 items-center justify-center">
-              <CoinIcon className="h-6 w-6" />
+              <GiftIcon className="h-7 w-7" />
             </span>
             {!effectiveCollapsed && <span>Tienda</span>}
           </Link>
-          <Link
-            href="/dashboard/planes"
-            onClick={() => setMobileOpen(false)}
-            title={effectiveCollapsed ? "Planes" : undefined}
-            className={`${NAV_ITEM} ${pathname === "/dashboard/planes" ? NAV_ACTIVE : NAV_IDLE}`}
-          >
-            <span className="flex h-7 w-7 items-center justify-center">
-              <GemIcon className="h-6 w-6 text-fuchsia-300" />
-            </span>
-            {!effectiveCollapsed && <span>Planes</span>}
-          </Link>
+          <WorkshopMenuButton collapsed={effectiveCollapsed} className={`${NAV_ITEM} ${NAV_IDLE}`} />
           <Link
             href="/dashboard/perfil"
             onClick={() => setMobileOpen(false)}
@@ -243,6 +232,17 @@ export default function Sidebar({
           >
             <span className="flex h-7 w-7 items-center justify-center text-2xl">👤</span>
             {!effectiveCollapsed && <span>Perfil</span>}
+          </Link>
+          <Link
+            href="/dashboard/planes"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Planes" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/planes" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center">
+              <CrownIcon className="h-7 w-7" />
+            </span>
+            {!effectiveCollapsed && <span>Planes</span>}
           </Link>
         </div>
 
