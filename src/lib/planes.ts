@@ -9,6 +9,9 @@
 // 25/10/2026); false vuelve a los enlaces de prueba (con tarjetas de prueba, sin cobrar).
 const CREEM_LIVE = true;
 
+// Dirección de la API de Creem según el modo (la clave CREEM_API_KEY debe ser del mismo modo).
+export const CREEM_API_BASE = CREEM_LIVE ? "https://api.creem.io" : "https://test-api.creem.io";
+
 export type PlanId = "standard" | "premium" | "vip";
 
 export const PLAN_IDS: PlanId[] = ["standard", "premium", "vip"];
@@ -63,6 +66,8 @@ export type Plan = {
   // Ids del producto en Creem (el de prueba y, luego, el de producción): con ellos el aviso de
   // pago sabe qué plan se compró.
   creemProductIds: string[];
+  // Id del producto de Creem del modo activo (para cambiar de plan por la API).
+  creemProductId?: string;
   badge?: string; // etiqueta destacada (ej: "Más popular")
 };
 
@@ -103,6 +108,7 @@ export const PLANS: Plan[] = [
       : "https://www.creem.io/test/payment/prod_7Nwh7z8GtdlVRhT2mJNuPv",
     // Ids de prueba y de producción: el aviso de pago acepta los dos.
     creemProductIds: ["prod_7Nwh7z8GtdlVRhT2mJNuPv", "prod_4Vjq9hArLGdNBrRw11lzHy"],
+    creemProductId: CREEM_LIVE ? "prod_4Vjq9hArLGdNBrRw11lzHy" : "prod_7Nwh7z8GtdlVRhT2mJNuPv",
     badge: "Más popular",
   },
   {
@@ -123,6 +129,7 @@ export const PLANS: Plan[] = [
       ? "https://www.creem.io/payment/prod_5XDF6DOjskVQXQfvmAINGp"
       : "https://www.creem.io/test/payment/prod_32s0o8DYuOPxzYq9TcCs0q",
     creemProductIds: ["prod_32s0o8DYuOPxzYq9TcCs0q", "prod_5XDF6DOjskVQXQfvmAINGp"],
+    creemProductId: CREEM_LIVE ? "prod_5XDF6DOjskVQXQfvmAINGp" : "prod_32s0o8DYuOPxzYq9TcCs0q",
   },
 ];
 

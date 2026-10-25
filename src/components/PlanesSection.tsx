@@ -1,4 +1,5 @@
 import Link from "next/link";
+import UpgradePlanButton from "@/components/UpgradePlanButton";
 import { PLANS, PLAN_RANK, checkoutUrl, type Plan, type PlanId } from "@/lib/planes";
 
 // Piezas de la sección de planes. Las usan la portada (/) y la pantalla interna del panel
@@ -53,6 +54,10 @@ function PlanCard({
   const featured = Boolean(plan.badge);
   const isCurrent = current === plan.id;
   const isLower = current !== undefined && PLAN_RANK[plan.id] < PLAN_RANK[current];
+  // Quien ya paga y sube de plan cambia su misma suscripción (no abre un segundo checkout).
+  const isUpgradeFromPaid =
+    current !== undefined && current !== "standard" && PLAN_RANK[plan.id] > PLAN_RANK[current];
+  const canChangePlan = Boolean(process.env.CREEM_API_KEY && plan.creemProductId);
   const badge = isCurrent ? "Tu plan" : plan.badge;
   // Con sesión, los planes de pago van al checkout con el id de la persona; sin sesión, primero
   // se crea la cuenta gratis (el plan queda ligado a ella).
@@ -105,7 +110,20 @@ function PlanCard({
         <span aria-current="true" className="v-btn v-btn-current mt-8">
           ✓ Plan actual
         </span>
-      ) : isLower ? null : href ? (
+      ) : isLower ? null : isUpgradeFromPaid ? (
+        canChangePlan ? (
+          <UpgradePlanButton
+            plan={plan.id}
+            label={plan.upgradeCta ?? plan.cta}
+            featured={featured}
+          />
+        ) : (
+          <p className="v-muted mt-8 text-center text-xs leading-relaxed">
+            Para pasar a {plan.name}, cancela tu plan actual desde “Gestionar o cancelar mi
+            suscripción” y contrata {plan.name} al terminar tu período.
+          </p>
+        )
+      ) : href ? (
         <>
           <Link
             href={href}

@@ -7,7 +7,7 @@ import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isDayUnlocked, TOTAL_DAYS } from "@/lib/challenge";
 import { isAdmin } from "@/lib/admin";
-import { isPlanId } from "@/lib/planes";
+import { CREEM_API_BASE, PLANS, PLAN_RANK, effectivePlan, isPlanId } from "@/lib/planes";
 import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
@@ -662,6 +662,72 @@ export async function adminSetPlan(
     .select("plan")
     .single();
   if (error || data?.plan !== plan) return { ok: false, error: "No se pudo cambiar el plan." };
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Mejora de plan de quien ya paga (por ejemplo, Premium a VIP): cambia la MISMA suscripción en
+// Creem (se cobra al momento la diferencia proporcional) en vez de crear un segundo cobro. Bajar de
+// plan no se hace aquí: se cancela y se contrata el plan menor al terminar el período.
+// Necesita CREEM_API_KEY (clave de API de Creem del mismo modo que CREEM_LIVE).
+export async function upgradeMySubscription(
+  target: string
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  if (!isPlanId(target)) return { ok: false, error: "Plan no válido." };
+
+  const apiKey = process.env.CREEM_API_KEY;
+  if (!apiKey) return { ok: false, error: "El cambio automático de plan aún no está disponible." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan, plan_expires_at, creem_subscription_id")
+    .eq("id", user.id)
+    .single();
+  const current = effectivePlan(profile?.plan, profile?.plan_expires_at);
+  if (current === "standard" || PLAN_RANK[target] <= PLAN_RANK[current]) {
+    return { ok: false, error: "Ese cambio no está disponible." };
+  }
+
+  const subscriptionId = profile?.creem_subscription_id as string | null | undefined;
+  const productId = PLANS.find((p) => p.id === target)?.creemProductId;
+  if (!subscriptionId || !productId) {
+    return { ok: false, error: "No encontramos tu suscripción. Escríbenos a soporte." };
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(`${CREEM_API_BASE}/v1/subscriptions/${encodeURIComponent(subscriptionId)}/upgrade`, {
+      method: "POST",
+      headers: { "x-api-key": apiKey, "content-type": "application/json" },
+      body: JSON.stringify({ product_id: productId, update_behavior: "proration-charge-immediately" }),
+    });
+  } catch {
+    return { ok: false, error: "No pudimos conectar con Creem. Inténtalo de nuevo en un momento." };
+  }
+  if (!res.ok) {
+    console.error("upgradeMySubscription: Creem respondió", res.status);
+    return { ok: false, error: "Creem no pudo hacer el cambio. Inténtalo de nuevo o escríbenos a soporte." };
+  }
+
+  // La respuesta es la suscripción ya actualizada: de ahí sale hasta cuándo está pagada.
+  const sub = (await res.json().catch(() => null)) as { current_period_end_date?: string } | null;
+  const end = sub?.current_period_end_date ? new Date(sub.current_period_end_date) : null;
+  const expires =
+    end && !Number.isNaN(end.getTime()) ? end : new Date(Date.now() + 35 * 86_400_000);
+
+  const service = createServiceClient();
+  if (!service) return { ok: false, error: "Hubo un problema al guardar tu plan. Escríbenos a soporte." };
+  const { error } = await service
+    .from("profiles")
+    .update({ plan: target, plan_expires_at: expires.toISOString() })
+    .eq("id", user.id);
+  if (error) return { ok: false, error: "Se hizo el cambio, pero no pudimos guardarlo. Escríbenos a soporte." };
 
   revalidatePath("/", "layout");
   return { ok: true };

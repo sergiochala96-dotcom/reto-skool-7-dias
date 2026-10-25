@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
-import { planFromCreemProduct } from "@/lib/planes";
+import { PLAN_RANK, effectivePlan, planFromCreemProduct } from "@/lib/planes";
 import { createServiceClient } from "@/lib/supabase/service";
 
 // Aviso de pago de Creem (webhook). En el panel de Creem se registra esta dirección:
@@ -87,31 +87,45 @@ export async function POST(request: Request) {
     creem_subscription_id: sub.id ?? null,
   };
 
-  // 1) Por el id que va dentro del enlace de pago.
+  // 1) Se busca a la persona: por el id que va dentro del enlace de pago...
   const metaUser = sub.metadata?.user_id;
-  let matched = false;
+  const select = "id, plan, plan_expires_at";
+  let profile: { id: string; plan: string | null; plan_expires_at: string | null } | null = null;
   if (typeof metaUser === "string" && UUID.test(metaUser)) {
-    const { data } = await supabase.from("profiles").update(update).eq("id", metaUser).select("id");
-    matched = (data ?? []).length > 0;
+    const { data } = await supabase.from("profiles").select(select).eq("id", metaUser).maybeSingle();
+    profile = data;
   }
 
-  // 2) Si no vino el id (por ejemplo, alguien pagó desde un enlace sin él), por el correo.
-  if (!matched) {
+  // 2) ...o, si no vino el id (por ejemplo, alguien pagó desde un enlace sin él), por el correo.
+  if (!profile) {
     const email = customer && "email" in customer ? customer.email : undefined;
     if (email) {
       const { data } = await supabase
         .from("profiles")
-        .update(update)
-        .ilike("email", email)
-        .select("id");
-      matched = (data ?? []).length > 0;
+        .select(select)
+        .eq("email", email.toLowerCase())
+        .maybeSingle();
+      profile = data;
     }
   }
 
-  if (!matched) {
+  if (!profile) {
     // Se responde 200 igual (reintentar no ayudaría) y queda en el registro para resolverlo a mano.
     console.error("creem webhook: no se encontró a quién subirle el plan", event.id, plan);
     return NextResponse.json({ ok: true, unmatched: true });
+  }
+
+  // Si ya tiene vigente un plan MAYOR (por ejemplo, VIP pagado y le llega la renovación de una
+  // suscripción antigua de Premium), no se le baja.
+  if (PLAN_RANK[plan] < PLAN_RANK[effectivePlan(profile.plan, profile.plan_expires_at)]) {
+    return NextResponse.json({ ok: true, ignored: "ya tiene un plan mayor vigente" });
+  }
+
+  const { error } = await supabase.from("profiles").update(update).eq("id", profile.id);
+  if (error) {
+    // 500: Creem reintenta el aviso.
+    console.error("creem webhook: no se pudo guardar el plan", event.id, error.message);
+    return NextResponse.json({ error: "No se pudo guardar el plan" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, plan });

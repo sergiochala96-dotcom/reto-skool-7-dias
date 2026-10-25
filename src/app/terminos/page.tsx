@@ -98,6 +98,16 @@ export default function TerminosPage() {
         </p>
       </Section>
 
+      <Section title="6 bis. Cambios de plan">
+        <p>
+          Si ya tienes un plan de pago y pasas a uno superior (por ejemplo, de Premium a VIP), tu
+          suscripción actual se actualiza, el nuevo plan se activa al instante y se te cobra al
+          momento la diferencia proporcional del período en curso. No se crea una segunda
+          suscripción. Para bajar de plan, cancela el actual y contrata el menor cuando termine tu
+          período pagado.
+        </p>
+      </Section>
+
       <Section title="7. Clases en vivo y membresía de Skool (plan VIP)">
         <p>
           Las clases en vivo del plan VIP se realizan cada semana y se anuncian con anticipación por

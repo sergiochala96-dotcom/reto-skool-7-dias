@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Heading, PlansGrid } from "@/components/PlanesSection";
+import RefreshOnFocus from "@/components/RefreshOnFocus";
 import Sidebar from "@/components/Sidebar";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { createClient } from "@/lib/supabase/server";
@@ -44,6 +45,7 @@ export default async function PlanesPanelPage() {
         <div className="v-glow v-glow-violet left-1/2 top-0 h-[28rem] w-[44rem] -translate-x-1/2" />
         <div className="v-glow v-glow-blue -right-40 top-1/2 h-[24rem] w-[24rem]" />
 
+        <RefreshOnFocus />
         <div className="relative mx-auto max-w-6xl">
           <Link
             href="/dashboard"
