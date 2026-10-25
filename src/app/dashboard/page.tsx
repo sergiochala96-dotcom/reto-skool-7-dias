@@ -54,9 +54,13 @@ export default async function DashboardPage() {
     .from("coin_transactions")
     .select("ref")
     .eq("user_id", user.id)
-    .eq("reason", "verificado");
+    .in("reason", ["verificado", "instalar"]);
   const verified = new Set((verifiedRows ?? []).map((r) => r.ref as string));
-  const claimed = { whatsapp: verified.has("whatsapp"), skool: verified.has("skool") };
+  const claimed = {
+    whatsapp: verified.has("whatsapp"),
+    skool: verified.has("skool"),
+    install: verified.has("app"),
+  };
 
   const episode2Locked = profileRow?.episode2_locked_override !== false && plan === "standard";
 

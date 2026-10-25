@@ -11,6 +11,7 @@ import { CREEM_API_BASE, PLANS, PLAN_RANK, effectivePlan, isPlanId } from "@/lib
 import { loadSubscriptions, pushConfigured, sendPush, type PushResult } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { TRIVIA_REWARD, getTodayTrivia } from "@/lib/trivias";
+import { INSTALL_REWARD } from "@/lib/captacion";
 import { AVATAR_ICON_PREFIX, isAvatarIconKey } from "@/components/AvatarIcon";
 import { syncSysteme, type SyncResult } from "@/lib/syncSysteme";
 import { updateAutomationEmails, type UpdateResult } from "@/lib/systemeAutomations";
@@ -899,6 +900,30 @@ export async function claimJoinReward(
     };
     return { ok: false, error: messages[result?.error ?? ""] ?? "No se pudo verificar." };
   }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Recompensa por instalar la app: 100 monedas, una sola vez. Se pide cuando la persona abre Skooly
+// desde el icono de su pantalla de inicio (modo app). Ojo: el servidor no puede comprobarlo por sí
+// solo, así que esto confía en el aviso del navegador (el premio es único por persona).
+export async function claimInstallReward(): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+
+  const service = createServiceClient();
+  if (!service) return { ok: false };
+  const { error } = await service.rpc("award_coins", {
+    p_user: user.id,
+    p_amount: INSTALL_REWARD,
+    p_reason: "instalar",
+    p_ref: "app",
+  });
+  if (error) return { ok: false };
 
   revalidatePath("/", "layout");
   return { ok: true };

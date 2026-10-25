@@ -23,3 +23,6 @@ export const WORKSHOP_START = "2026-10-28T20:00:00-05:00";
 
 // Porcentaje de cupos vendidos del workshop que se muestra en la barra de avance.
 export const WORKSHOP_SOLD_PERCENT = 20;
+
+// Monedas de oro por instalar la app en el celular (una sola vez).
+export const INSTALL_REWARD = 100;

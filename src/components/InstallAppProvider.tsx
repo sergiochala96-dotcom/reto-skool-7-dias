@@ -319,11 +319,11 @@ export function InstallInstructions({
       aria-modal="true"
       aria-labelledby="install-title"
       onClick={onClose}
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-purple-950/80 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-purple-950/80 p-4 max-sm:items-stretch max-sm:p-0 sm:items-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl bg-white p-6 pt-7 shadow-2xl shadow-purple-950/40"
+        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl bg-white p-6 pt-7 shadow-2xl shadow-purple-950/40 max-sm:flex max-sm:max-w-none max-sm:flex-col max-sm:justify-center max-sm:overflow-y-auto max-sm:rounded-none"
       >
         <button
           type="button"

@@ -147,6 +147,7 @@ export default function StatsBar({
               <ul className="mt-4 space-y-1.5 text-sm text-white/70">
                 <li>🪙 +10 por cada día del reto completado</li>
                 <li>🪙 +50 por unirte a WhatsApp y +50 por unirte a Skool</li>
+                <li>🪙 +100 por instalar la app en tu celular</li>
                 <li>🪙 +5 por completar la trivia del día</li>
                 <li>🪙 +50 al terminar los 7 días</li>
               </ul>
