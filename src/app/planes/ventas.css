@@ -1,0 +1,202 @@
+/* Página de ventas de Skooly (/planes). Paleta y estilo inspirados en un fondo casi negro con
+   matiz violeta, brillos violeta / azul / cian, tarjetas de cristal y botones en píldora. */
+.ventas {
+  --n-950: oklch(0.085 0.012 285);
+  --n-900: oklch(0.11 0.016 285);
+  --n-850: oklch(0.14 0.02 285);
+  --n-700: oklch(0.26 0.03 285);
+  --n-300: oklch(0.74 0.02 285);
+  --n-200: oklch(0.86 0.014 285);
+  --n-50: oklch(0.975 0.004 285);
+  --violet-500: oklch(0.55 0.27 295);
+  --blue-500: oklch(0.57 0.23 266);
+  --cyan-300: oklch(0.86 0.11 215);
+  --hair: oklch(1 0 0 / 0.11);
+  --hair-strong: oklch(1 0 0 / 0.2);
+  --ink: oklch(0.16 0.04 285);
+
+  position: relative;
+  overflow-x: clip;
+  background: var(--n-950);
+  color: var(--n-50);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  scroll-behavior: smooth;
+}
+
+.ventas ::selection {
+  background: var(--violet-500);
+  color: white;
+}
+
+/* Brillos de fondo */
+.ventas .v-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.55;
+}
+.ventas .v-glow-violet {
+  background: radial-gradient(circle, var(--violet-500), transparent 70%);
+}
+.ventas .v-glow-blue {
+  background: radial-gradient(circle, var(--blue-500), transparent 70%);
+}
+.ventas .v-glow-cyan {
+  background: radial-gradient(circle, var(--cyan-300), transparent 70%);
+  opacity: 0.18;
+}
+
+/* Cuadrícula tenue que se desvanece hacia abajo */
+.ventas .v-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--hair) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent 75%);
+}
+
+/* Tarjeta de cristal */
+.ventas .v-glass {
+  background: oklch(1 0 0 / 0.05);
+  border: 1px solid var(--hair);
+  border-radius: 28px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* Etiqueta pequeña en mayúsculas */
+.ventas .v-eyebrow {
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--n-300);
+}
+
+/* Botones en píldora */
+.ventas .v-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.85rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s, border-color 0.2s;
+}
+.ventas .v-btn:focus-visible,
+.ventas a:focus-visible,
+.ventas summary:focus-visible {
+  outline: 2px solid var(--cyan-300);
+  outline-offset: 3px;
+}
+.ventas .v-btn-solid {
+  background: var(--n-50);
+  color: var(--ink);
+}
+.ventas .v-btn-solid:hover {
+  background: white;
+  transform: translateY(-2px);
+}
+.ventas .v-btn-ghost {
+  background: oklch(1 0 0 / 0.08);
+  border: 1px solid var(--hair-strong);
+  color: var(--n-50);
+}
+.ventas .v-btn-ghost:hover {
+  background: oklch(1 0 0 / 0.14);
+  transform: translateY(-2px);
+}
+.ventas .v-btn-disabled {
+  background: oklch(1 0 0 / 0.06);
+  border: 1px dashed var(--hair-strong);
+  color: var(--n-300);
+  cursor: not-allowed;
+}
+
+/* Texto con degradado */
+.ventas .v-gradient-text {
+  background-image: linear-gradient(100deg, var(--n-50) 10%, oklch(0.8 0.14 295) 50%, var(--cyan-300) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Tarjetas flotantes del héroe */
+.ventas .v-tilt-left {
+  transform: perspective(900px) rotateY(14deg) rotateX(4deg) rotateZ(-4deg);
+}
+.ventas .v-tilt-right {
+  transform: perspective(900px) rotateY(-14deg) rotateX(4deg) rotateZ(4deg);
+}
+@keyframes v-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+.ventas .v-float {
+  animation: v-float 6s ease-in-out infinite;
+}
+.ventas .v-float-slow {
+  animation: v-float 8s ease-in-out -2s infinite;
+}
+
+/* Plan destacado: borde con degradado */
+.ventas .v-featured {
+  position: relative;
+  background:
+    linear-gradient(var(--n-900), var(--n-900)) padding-box,
+    linear-gradient(160deg, var(--violet-500), var(--blue-500) 55%, var(--cyan-300)) border-box;
+  border: 1.5px solid transparent;
+  border-radius: 28px;
+  box-shadow: 0 30px 80px -30px oklch(0.55 0.27 295 / 0.6);
+}
+
+.ventas details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.ventas details > summary::-webkit-details-marker {
+  display: none;
+}
+.ventas details[open] .v-plus {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ventas {
+    scroll-behavior: auto;
+  }
+  .ventas .v-float,
+  .ventas .v-float-slow {
+    animation: none;
+  }
+  .ventas .v-btn {
+    transition: none;
+  }
+}
+
+.ventas .v-muted {
+  color: var(--n-300);
+}
+.ventas .v-soft {
+  color: var(--n-200);
+}
+.ventas .v-hair {
+  border-color: var(--hair);
+}

@@ -6,6 +6,7 @@ const PUBLIC_PATHS = [
   "/registro",
   "/auth",
   "/reto",
+  "/planes",
   "/gracias",
   "/privacidad",
   "/olvide-contrasena",
