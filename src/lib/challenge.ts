@@ -1,3 +1,5 @@
+import { EPISODE_2_SECTIONS } from "@/lib/episodio2";
+
 export type Mission = {
   day: number;
   title: string;
@@ -73,13 +75,12 @@ export type Episode2Checkpoint = {
 export const EPISODE_2_LABEL = "Episodio 2:";
 export const EPISODE_2_NAME = "Escala tu Skool";
 
-export const EPISODE_2_CHECKPOINTS: Episode2Checkpoint[] = [
-  { id: "oferta-paga", emoji: "💰", title: "Lanza tu oferta paga" },
-  { id: "referidos", emoji: "🔗", title: "Consigue referidos" },
-  { id: "ads-pagados", emoji: "📢", title: "Escala con ads pagados" },
-  { id: "eventos-en-vivo", emoji: "🎥", title: "Activa tus eventos en vivo" },
-  { id: "gamifica", emoji: "🎮", title: "Gamifica tu comunidad" },
-];
+// Cada sección de contenido del Episodio 2 (ver episodio2.ts) es un punto de la tarjeta.
+export const EPISODE_2_CHECKPOINTS: Episode2Checkpoint[] = EPISODE_2_SECTIONS.map((s) => ({
+  id: s.id,
+  emoji: s.emoji,
+  title: s.title,
+}));
 
 export function getMission(day: number): Mission | undefined {
   return MISSIONS.find((m) => m.day === day);

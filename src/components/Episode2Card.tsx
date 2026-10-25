@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EPISODE_2_CHECKPOINTS, EPISODE_2_LABEL, EPISODE_2_NAME } from "@/lib/challenge";
 import EpisodeLockToggle from "@/components/EpisodeLockToggle";
 import WorkshopUnlock from "@/components/WorkshopUnlock";
@@ -23,29 +24,22 @@ export default function Episode2Card({
           locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""
         }`}
       >
-        {EPISODE_2_CHECKPOINTS.map((cp, i) => {
-          const itemUnlocked = i === 0;
-          return (
-            <div key={cp.id} className="flex w-20 flex-col items-center sm:w-24">
-              <div
-                className={`flex h-14 w-14 items-center justify-center rounded-full border-4 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl lg:h-14 lg:w-14 ${
-                  itemUnlocked
-                    ? "border-white/30 bg-white/10"
-                    : "border-white/10 bg-white/5 grayscale"
-                }`}
-              >
-                {itemUnlocked ? cp.emoji : "🔒"}
-              </div>
-              <p
-                className={`mt-3 line-clamp-2 text-center text-[11px] leading-tight ${
-                  itemUnlocked ? "text-white/60" : "text-white/30"
-                }`}
-              >
-                {cp.title}
-              </p>
+        {EPISODE_2_CHECKPOINTS.map((cp) => (
+          // Con el episodio abierto, cada punto lleva a su sección de contenido.
+          <Link
+            key={cp.id}
+            href={`/episodio-2/${cp.id}`}
+            tabIndex={locked ? -1 : undefined}
+            className="group flex w-24 flex-col items-center sm:w-28"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-fuchsia-300/50 bg-white/10 text-xl shadow-lg transition group-hover:scale-110 group-hover:border-fuchsia-300 sm:h-16 sm:w-16 sm:text-2xl lg:h-14 lg:w-14">
+              {cp.emoji}
             </div>
-          );
-        })}
+            <p className="mt-3 line-clamp-2 text-center text-[11px] font-semibold leading-tight text-white/80 group-hover:text-white">
+              {cp.title}
+            </p>
+          </Link>
+        ))}
       </div>
 
       {locked && (
