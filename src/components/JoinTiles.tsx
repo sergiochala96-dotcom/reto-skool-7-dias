@@ -164,12 +164,14 @@ function InstallStatusCard({ claimed }: { claimed: boolean }) {
 // instalar la app +100). WhatsApp y Skool abren un popup de pantalla completa con el botón para
 // unirse y el campo del código; el de instalar abre los pasos para instalar la app (también en
 // pantalla completa). Van como hijos del bloque de episodios para que "sticky" los mantenga a la
-// vista; la caja tiene alto 0 para que floten sobre el contenido sin empujarlo.
+// vista; la caja tiene alto 0 para que floten sobre el contenido sin empujarlo. Cada icono se
+// quita solo cuando la persona ya cobró esa recompensa.
 export default function JoinTiles({ claimed }: { claimed: Claimed }) {
   const [open, setOpen] = useState<Kind | "install" | null>(null);
   const { platform, openInstall } = useInstallApp();
   const router = useRouter();
   const asked = useRef(false);
+  const allClaimed = claimed.whatsapp && claimed.skool && claimed.install;
 
   // Si la app se abrió desde el icono de la pantalla de inicio, se cobra el premio (una sola vez).
   useEffect(() => {
@@ -192,13 +194,22 @@ export default function JoinTiles({ claimed }: { claimed: Claimed }) {
 
   return (
     <>
-      <div className="sticky top-[9rem] z-20 h-0 md:hidden">
-        <div className="absolute -left-2 top-0 flex flex-col gap-3">
-          <Tile kind="whatsapp" claimed={claimed.whatsapp} reward={50} onOpen={() => setOpen("whatsapp")} />
-          <Tile kind="skool" claimed={claimed.skool} reward={50} onOpen={() => setOpen("skool")} />
-          <Tile kind="install" claimed={claimed.install} reward={INSTALL_REWARD} onOpen={openInstallTile} />
+      {/* Cada icono desaparece cuando ya se cobró su recompensa; si no queda ninguno, no se muestra nada. */}
+      {!allClaimed && (
+        <div className="sticky top-[9rem] z-20 h-0 md:hidden">
+          <div className="absolute -left-2 top-0 flex flex-col gap-3">
+            {!claimed.whatsapp && (
+              <Tile kind="whatsapp" claimed={false} reward={50} onOpen={() => setOpen("whatsapp")} />
+            )}
+            {!claimed.skool && (
+              <Tile kind="skool" claimed={false} reward={50} onOpen={() => setOpen("skool")} />
+            )}
+            {!claimed.install && (
+              <Tile kind="install" claimed={false} reward={INSTALL_REWARD} onOpen={openInstallTile} />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {open && (
         <Fullscreen label={TILE[open].label} onClose={() => setOpen(null)}>
