@@ -222,90 +222,105 @@ export default function Sidebar({
             </span>
             {!effectiveCollapsed && <span>Tienda</span>}
           </Link>
+          <Link
+            href="/dashboard/planes"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Planes" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/planes" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center">
+              <GemIcon className="h-6 w-6 text-fuchsia-300" />
+            </span>
+            {!effectiveCollapsed && <span>Planes</span>}
+          </Link>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3">
-          {!effectiveCollapsed && (
-            <p className="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wide text-white/30 md:text-[13px]">
-              Reto de 7 días
-            </p>
-          )}
-          <ul className="flex flex-col gap-0.5">
-            {MISSIONS.map((mission) => {
-              const isDone = done.has(mission.day);
-              const unlocked = isDayUnlocked(mission.day, done);
-              const href = `/dia/${mission.day}`;
-              const active = pathname === href;
+          {/* La lista de los 7 días y el cofre solo van en el menú del celular; en computadora se entra a
+              cada día desde el camino del panel. */}
+          <div className="md:hidden">
+            {!effectiveCollapsed && (
+              <p className="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wide text-white/30 md:text-[13px]">
+                Reto de 7 días
+              </p>
+            )}
+            <ul className="flex flex-col gap-0.5">
+              {MISSIONS.map((mission) => {
+                const isDone = done.has(mission.day);
+                const unlocked = isDayUnlocked(mission.day, done);
+                const href = `/dia/${mission.day}`;
+                const active = pathname === href;
 
-              const content = (
-                <div
-                  title={effectiveCollapsed ? `Día ${mission.day}: ${mission.title}` : undefined}
-                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
-                    active
-                      ? NAV_ACTIVE
-                      : unlocked
-                      ? NAV_IDLE
-                      : "border-transparent text-white/30"
-                  }`}
-                >
-                  <span className="text-lg md:text-xl">{mission.emoji}</span>
-                  {!effectiveCollapsed && (
-                    <>
-                      <span className="flex min-w-0 flex-1 items-center gap-2">
-                        <span className="flex-shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/60 md:text-[11px]">
-                          Día {mission.day}
+                const content = (
+                  <div
+                    title={effectiveCollapsed ? `Día ${mission.day}: ${mission.title}` : undefined}
+                    className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
+                      active
+                        ? NAV_ACTIVE
+                        : unlocked
+                        ? NAV_IDLE
+                        : "border-transparent text-white/30"
+                    }`}
+                  >
+                    <span className="text-lg md:text-xl">{mission.emoji}</span>
+                    {!effectiveCollapsed && (
+                      <>
+                        <span className="flex min-w-0 flex-1 items-center gap-2">
+                          <span className="flex-shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/60 md:text-[11px]">
+                            Día {mission.day}
+                          </span>
+                          <span className="truncate">{mission.title}</span>
                         </span>
-                        <span className="truncate">{mission.title}</span>
-                      </span>
-                      {isDone ? (
-                        <span className="text-emerald-400">✓</span>
-                      ) : !unlocked ? (
-                        <span className="text-white/20">🔒</span>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              );
+                        {isDone ? (
+                          <span className="text-emerald-400">✓</span>
+                        ) : !unlocked ? (
+                          <span className="text-white/20">🔒</span>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                );
 
-              return (
-                <li key={mission.day}>
-                  {unlocked ? (
-                    <Link href={href} onClick={() => setMobileOpen(false)}>
-                      {content}
-                    </Link>
-                  ) : (
-                    <div className="cursor-not-allowed">{content}</div>
-                  )}
-                </li>
-              );
-            })}
+                return (
+                  <li key={mission.day}>
+                    {unlocked ? (
+                      <Link href={href} onClick={() => setMobileOpen(false)}>
+                        {content}
+                      </Link>
+                    ) : (
+                      <div className="cursor-not-allowed">{content}</div>
+                    )}
+                  </li>
+                );
+              })}
 
-            <li className="mt-0.5">
-              {allDone ? (
-                <Link
-                  href="/cofre"
-                  onClick={() => setMobileOpen(false)}
-                  title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
-                    pathname === "/cofre"
-                      ? "border-amber-400/50 bg-amber-400/15 text-amber-200"
-                      : "border-transparent text-amber-300/80 hover:bg-amber-400/10"
-                  }`}
-                >
-                  <span className="text-lg md:text-xl">🗝️</span>
-                  {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
-                </Link>
-              ) : (
-                <div
-                  title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
-                  className="flex cursor-not-allowed items-center gap-3 rounded-2xl border-2 border-transparent px-3 py-2 text-sm font-bold text-white/20 md:text-[15px]"
-                >
-                  <span className="text-lg md:text-xl">🔒</span>
-                  {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
-                </div>
-              )}
-            </li>
-          </ul>
+              <li className="mt-0.5">
+                {allDone ? (
+                  <Link
+                    href="/cofre"
+                    onClick={() => setMobileOpen(false)}
+                    title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
+                    className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 text-sm font-bold transition md:text-[15px] ${
+                      pathname === "/cofre"
+                        ? "border-amber-400/50 bg-amber-400/15 text-amber-200"
+                        : "border-transparent text-amber-300/80 hover:bg-amber-400/10"
+                    }`}
+                  >
+                    <span className="text-lg md:text-xl">🗝️</span>
+                    {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
+                  </Link>
+                ) : (
+                  <div
+                    title={effectiveCollapsed ? "Cofre del Tesoro" : undefined}
+                    className="flex cursor-not-allowed items-center gap-3 rounded-2xl border-2 border-transparent px-3 py-2 text-sm font-bold text-white/20 md:text-[15px]"
+                  >
+                    <span className="text-lg md:text-xl">🔒</span>
+                    {!effectiveCollapsed && <span className="flex-1">Cofre del Tesoro</span>}
+                  </div>
+                )}
+              </li>
+            </ul>
+          </div>
 
           {/* Acceso permanente a las dos comunidades (para todos). Marcan las misiones de inicio. */}
           <div

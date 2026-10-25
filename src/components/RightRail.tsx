@@ -38,8 +38,9 @@ export default function RightRail({
   return (
     <aside
       // Solo en pantallas de 1400 px o más (el centro necesita espacio para el camino del reto); por
-      // debajo, el panel muestra solo la barra de estadísticas arriba a la derecha.
-      className="hidden min-[1400px]:flex sticky top-0 h-screen w-[22rem] shrink-0 flex-col gap-4 overflow-y-auto px-5 py-6"
+      // debajo, el panel muestra solo la barra de estadísticas arriba a la derecha. Sin altura fija
+      // ni barra propia: se desplaza junto con la página.
+      className="hidden min-[1400px]:flex w-[22rem] shrink-0 flex-col gap-4 px-5 py-6"
     >
       <StatsBar completedDays={completedDays} coins={coins} lives={lives} />
 

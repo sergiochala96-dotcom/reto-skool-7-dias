@@ -28,10 +28,13 @@ export default function ChallengePathHorizontal({
         </h2>
 
         <div className="flex items-center gap-6 overflow-x-auto pt-5 lg:pt-8">
-          <MascotCashButton className="hidden h-32 w-32 lg:block lg:h-28 lg:w-28" />
+          {/* La mascota solo aparece en pantallas anchas, para dejarle el espacio al camino. */}
+          <MascotCashButton className="hidden h-28 w-28 min-[1600px]:block" />
 
-          <div className="flex items-start">
-            {MISSIONS.map((mission, i) => {
+          {/* El camino se reparte el ancho disponible (los tramos se estiran entre 24 y 40 px), así
+              no aparece barra de desplazamiento. */}
+          <div className="flex min-w-0 flex-1 items-start">
+            {MISSIONS.map((mission) => {
               const isDone = done.has(mission.day);
               const unlocked = isUnlocked(mission.day);
               const isCurrent = mission.day === firstAvailable;
@@ -58,7 +61,7 @@ export default function ChallengePathHorizontal({
               );
 
               const label = (
-                <div className="mt-3 w-20 text-center">
+                <div className="-mx-2 mt-3 w-[4.5rem] text-center">
                   <p
                     className={`text-[10px] font-bold uppercase tracking-wide ${
                       isDone ? "text-amber-300" : isCurrent ? "text-fuchsia-300" : "text-white/40"
@@ -73,13 +76,13 @@ export default function ChallengePathHorizontal({
               );
 
               return (
-                <div key={mission.day} className="flex flex-shrink-0 items-start">
-                  <div className="flex flex-col items-center">
+                <div key={mission.day} className="flex min-w-0 flex-1 items-start">
+                  <div className="flex w-14 flex-shrink-0 flex-col items-center">
                     {unlocked ? <Link href={`/dia/${mission.day}`}>{node}</Link> : node}
                     {label}
                   </div>
                   <div
-                    className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:w-10 ${
+                    className={`mt-7 h-1.5 min-w-7 max-w-10 flex-1 rounded-full ${
                       isDone
                         ? "bg-gradient-to-r from-fuchsia-500 to-amber-400"
                         : "bg-white/10"
@@ -90,12 +93,12 @@ export default function ChallengePathHorizontal({
             })}
 
             <div
-              className={`mt-7 h-1.5 w-6 flex-shrink-0 rounded-full sm:w-8 lg:w-10 ${
+              className={`mt-7 h-1.5 min-w-7 max-w-10 flex-1 rounded-full ${
                 allDone ? "bg-gradient-to-r from-amber-400 to-yellow-300" : "bg-white/10"
               }`}
             />
 
-            <div className="flex flex-col items-center">
+            <div className="flex w-20 flex-shrink-0 flex-col items-center">
               {allDone ? (
                 <Link
                   href="/cofre"
@@ -108,7 +111,7 @@ export default function ChallengePathHorizontal({
                   <TreasureChestIcon locked className="h-full w-full" />
                 </div>
               )}
-              <div className="mt-3 w-20 text-center">
+              <div className="-mx-3 mt-3 w-20 text-center">
                 <p
                   className={`text-[10px] font-bold uppercase tracking-wide ${
                     allDone ? "text-amber-300" : "text-white/40"
