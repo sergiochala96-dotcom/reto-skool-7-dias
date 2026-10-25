@@ -1,21 +1,17 @@
 // Iconos del panel de estadísticas (racha, monedas de oro y vidas).
 
 export function FlameIcon({ className, lit = true }: { className?: string; lit?: boolean }) {
+  // Colores planos (sin degradados): un degradado con id repetido deja de verse si la primera
+  // copia del icono está dentro de un bloque oculto.
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffb02e" />
-          <stop offset="100%" stopColor="#ff5a1f" />
-        </linearGradient>
-      </defs>
       <path
         d="M12 2c.6 3.2-1.4 4.8-3.1 6.7C7.2 10.6 6 12.4 6 14.8 6 18.6 8.7 22 12 22s6-3.4 6-7.2c0-2.3-1-3.9-2.2-5.4-.5 1.1-1.2 1.7-2 2 .5-3.6-.6-6.5-1.8-9.4Z"
-        fill={lit ? "url(#flameGrad)" : "#5b5470"}
+        fill={lit ? "#ff7a1a" : "#5b5470"}
       />
       <path
         d="M12 22c-1.7 0-3-1.5-3-3.4 0-1.6.9-2.5 1.8-3.5.5-.6 1-1.2 1.2-2.1.9 1.1 3 2.5 3 5.2 0 2.1-1.3 3.8-3 3.8Z"
-        fill={lit ? "#ffd76a" : "#7a7390"}
+        fill={lit ? "#ffd23f" : "#7a7390"}
       />
     </svg>
   );
@@ -24,18 +20,13 @@ export function FlameIcon({ className, lit = true }: { className?: string; lit?:
 export function CoinIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffe27a" />
-          <stop offset="100%" stopColor="#f0a020" />
-        </linearGradient>
-      </defs>
-      <circle cx="12" cy="12" r="10" fill="url(#coinGrad)" />
+      <circle cx="12" cy="12" r="10" fill="#f5b21b" />
+      <circle cx="12" cy="12" r="10" fill="none" stroke="#ffd96a" strokeWidth="1.2" />
       <circle cx="12" cy="12" r="7.2" fill="none" stroke="#b36b00" strokeOpacity="0.55" strokeWidth="1.4" />
       <path
         d="m12 7.6 1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4Z"
         fill="#b36b00"
-        fillOpacity="0.8"
+        fillOpacity="0.85"
       />
     </svg>
   );

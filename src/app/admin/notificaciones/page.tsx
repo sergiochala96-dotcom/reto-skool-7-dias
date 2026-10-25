@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import NotificationForm from "@/components/NotificationForm";
 import DeleteNotificationButton from "@/components/DeleteNotificationButton";
 import TestPushButton from "@/components/TestPushButton";
+import JoinCodesForm from "@/components/JoinCodesForm";
 import { pushConfigured } from "@/lib/push";
 import { DEVICE_ICON, DEVICE_LABEL, detectDevice } from "@/lib/device";
 
@@ -46,6 +47,8 @@ export default async function AdminNotificationsPage() {
     : { data: [] };
   const emailById = new Map((pushProfiles ?? []).map((p) => [p.id as string, p.email as string]));
   const pushReady = pushConfigured();
+  const { data: codeRows } = await supabase.from("join_codes").select("kind, code");
+  const codes = new Map((codeRows ?? []).map((c) => [c.kind as string, c.code as string]));
 
   const readCount = new Map<string, number>();
   for (const r of reads ?? []) {
@@ -115,6 +118,10 @@ export default async function AdminNotificationsPage() {
           </div>
 
           <NotificationForm />
+
+          <div className="mt-10">
+            <JoinCodesForm whatsapp={codes.get("whatsapp") ?? ""} skool={codes.get("skool") ?? ""} />
+          </div>
 
           <h2 className="mb-3 mt-10 text-lg font-bold text-white">Enviadas</h2>
           {(sent ?? []).length === 0 ? (

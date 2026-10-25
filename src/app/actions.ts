@@ -733,6 +733,68 @@ export async function upgradeMySubscription(
   return { ok: true };
 }
 
+// Recompensa de 50 monedas por unirse a WhatsApp o a Skool: la persona escribe un código que solo se
+// ve dentro del grupo. La base de datos compara el código, limita los intentos y da las monedas una
+// sola vez (el código nunca sale de la base).
+export async function claimJoinReward(
+  kind: string,
+  code: string
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase.rpc("claim_join_reward", {
+    p_kind: kind,
+    p_code: code.slice(0, 80),
+  });
+  if (error) return { ok: false, error: "No se pudo verificar. Inténtalo de nuevo." };
+
+  const result = data as { ok?: boolean; error?: string } | null;
+  if (!result?.ok) {
+    const messages: Record<string, string> = {
+      wrong_code: "Ese código no es correcto. Revísalo dentro del grupo.",
+      too_many: "Demasiados intentos. Prueba de nuevo en una hora.",
+      not_configured: "Esta recompensa aún no está disponible. Vuelve pronto.",
+    };
+    return { ok: false, error: messages[result?.error ?? ""] ?? "No se pudo verificar." };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export type JoinCodesState = { ok?: boolean; error?: string } | undefined;
+
+// Solo el admin: guarda los códigos de verificación de las comunidades.
+export async function adminSaveJoinCodes(
+  _prevState: JoinCodesState,
+  formData: FormData
+): Promise<JoinCodesState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) redirect("/dashboard");
+
+  const rows = (["whatsapp", "skool"] as const).map((kind) => ({
+    kind,
+    code: String(formData.get(kind) ?? "").trim(),
+    updated_at: new Date().toISOString(),
+  }));
+  if (rows.some((r) => r.code.length > 40)) {
+    return { error: "Los códigos pueden tener hasta 40 caracteres." };
+  }
+
+  const { error } = await supabase.from("join_codes").upsert(rows, { onConflict: "kind" });
+  if (error) return { error: "No se pudieron guardar los códigos." };
+
+  revalidatePath("/admin/notificaciones");
+  return { ok: true };
+}
+
 // Canjea un producto de la tienda con monedas de oro (todo se valida en la base de datos: saldo,
 // que no se cobre dos veces y que el contenido solo se vea después de canjear).
 export async function redeemShopItem(itemId: string): Promise<{ ok: boolean; error?: string }> {

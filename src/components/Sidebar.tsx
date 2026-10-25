@@ -313,63 +313,99 @@ export default function Sidebar({
               effectiveCollapsed ? "items-center gap-2" : "gap-2"
             }`}
           >
-            <a
-              href={WHATSAPP_COMMUNITY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                setMobileOpen(false);
-                void completeStartMission("whatsapp");
-              }}
-              title={effectiveCollapsed ? "Unirme al WhatsApp" : undefined}
-              aria-label="Unirme al WhatsApp"
-              className={`${GLASS_BTN} ${
-                effectiveCollapsed
-                  ? "h-10 w-10 rounded-full"
-                  : "rounded-xl px-3 py-2 text-sm md:text-base"
-              }`}
-            >
-              <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0 text-[#25D366]" aria-hidden="true">
-                <path d={WHATSAPP_PATH} />
-              </svg>
-              {!effectiveCollapsed && <span>Unirme al WhatsApp</span>}
-            </a>
-            <a
-              href={SKOOL_COMMUNITY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                setMobileOpen(false);
-                void completeStartMission("skool");
-              }}
-              title={effectiveCollapsed ? "Unirme al curso en Skool" : undefined}
-              aria-label="Unirme al curso en Skool"
-              className={`${GLASS_BTN} ${
-                effectiveCollapsed
-                  ? "h-10 w-10 rounded-full"
-                  : "rounded-xl px-3 py-2 text-sm md:text-base"
-              }`}
-            >
-              <CourseIcon className="h-5 w-5 shrink-0 text-amber-300" />
-              {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
-            </a>
+            {/* En computadora estas dos recompensas viven en la columna derecha del panel. */}
+            <div className="flex flex-col gap-2 md:hidden">
+              <a
+                href={WHATSAPP_COMMUNITY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setMobileOpen(false);
+                  void completeStartMission("whatsapp");
+                }}
+                title={effectiveCollapsed ? "Unirme al WhatsApp" : undefined}
+                aria-label="Unirme al WhatsApp"
+                className={`${GLASS_BTN} ${
+                  effectiveCollapsed
+                    ? "h-10 w-10 rounded-full"
+                    : "rounded-xl px-3 py-2 text-sm md:text-base"
+                }`}
+              >
+                <svg viewBox="0 0 32 32" fill="currentColor" className="h-5 w-5 shrink-0 text-[#25D366]" aria-hidden="true">
+                  <path d={WHATSAPP_PATH} />
+                </svg>
+                {!effectiveCollapsed && <span>Unirme al WhatsApp</span>}
+              </a>
+              <a
+                href={SKOOL_COMMUNITY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setMobileOpen(false);
+                  void completeStartMission("skool");
+                }}
+                title={effectiveCollapsed ? "Unirme al curso en Skool" : undefined}
+                aria-label="Unirme al curso en Skool"
+                className={`${GLASS_BTN} ${
+                  effectiveCollapsed
+                    ? "h-10 w-10 rounded-full"
+                    : "rounded-xl px-3 py-2 text-sm md:text-base"
+                }`}
+              >
+                <CourseIcon className="h-5 w-5 shrink-0 text-amber-300" />
+                {!effectiveCollapsed && <span>Unirme al curso en Skool</span>}
+              </a>
+            </div>
 
-            <Link
-              href="/dashboard/planes"
-              onClick={() => setMobileOpen(false)}
-              title={effectiveCollapsed ? sidebarPlanLabel(plan) : undefined}
-              aria-label={sidebarPlanLabel(plan)}
-              className={`${PREMIUM_BTN} ${
-                pathname === "/dashboard/planes" ? "ring-2 ring-fuchsia-300/70" : ""
-              } ${
-                effectiveCollapsed
-                  ? "h-10 w-10 rounded-full"
-                  : "rounded-xl px-3 py-2 text-sm md:text-base"
-              }`}
-            >
-              <GemIcon className="h-5 w-5 shrink-0 text-fuchsia-200" />
-              {!effectiveCollapsed && <span>{sidebarPlanLabel(plan)}</span>}
-            </Link>
+            {/* Invitación a un plan superior (las personas con VIP no la ven). */}
+            {plan !== "vip" &&
+              (effectiveCollapsed ? (
+                <Link
+                  href="/dashboard/planes"
+                  onClick={() => setMobileOpen(false)}
+                  title={sidebarPlanLabel(plan)}
+                  aria-label={sidebarPlanLabel(plan)}
+                  className={`${PREMIUM_BTN} h-10 w-10 rounded-full ${
+                    pathname === "/dashboard/planes" ? "ring-2 ring-fuchsia-300/70" : ""
+                  }`}
+                >
+                  <GemIcon className="h-5 w-5 shrink-0 text-fuchsia-200" />
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard/planes"
+                  onClick={() => setMobileOpen(false)}
+                  className={`block rounded-2xl border-2 bg-gradient-to-br from-fuchsia-500/20 via-purple-500/15 to-violet-500/20 p-3 shadow-lg shadow-fuchsia-500/10 backdrop-blur-md transition hover:border-fuchsia-300/60 ${
+                    pathname === "/dashboard/planes" ? "border-fuchsia-300/70" : "border-fuchsia-400/30"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="inline-block rounded-md bg-gradient-to-r from-fuchsia-500 to-violet-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                        {plan === "standard" ? "Premium" : "VIP"}
+                      </span>
+                      <p className="mt-1.5 text-[15px] font-extrabold leading-tight text-white">
+                        {plan === "standard" ? "Conoce Skooly Premium" : "Pasa a Skooly VIP"}
+                      </p>
+                      <p className="mt-1 text-xs leading-snug text-white/65">
+                        {plan === "standard"
+                          ? "Abre el Episodio 2 con prompts y estrategias antichurn."
+                          : "Clases en vivo semanales y acceso a la membresía de Skool."}
+                      </p>
+                    </div>
+                    <Image
+                      src="/mascota-skooly.png"
+                      alt=""
+                      width={52}
+                      height={52}
+                      className="h-[3.25rem] w-[3.25rem] shrink-0 object-contain"
+                    />
+                  </div>
+                  <span className="mt-3 block rounded-xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-3 py-2 text-center text-xs font-extrabold uppercase tracking-wide text-white">
+                    {plan === "standard" ? "Ver Skooly Premium" : "Ver Skooly VIP"}
+                  </span>
+                </Link>
+              ))}
 
             {/* Solo en celulares y tablets (y si la app aún no está instalada). */}
             {installPlatform && (

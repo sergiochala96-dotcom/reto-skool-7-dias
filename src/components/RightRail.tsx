@@ -1,11 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import JoinRewards from "@/components/JoinRewards";
 import StatsBar from "@/components/StatsBar";
 import { CoinIcon } from "@/components/StatIcons";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 import { TOTAL_DAYS, isDayUnlocked } from "@/lib/challenge";
 import { SUPPORT_EMAIL } from "@/lib/legal";
-import type { PlanId } from "@/lib/planes";
 
 const card = "rounded-2xl border-2 border-white/10 bg-white/[0.03] p-4";
 const cardHead = "flex items-center justify-between gap-2";
@@ -13,18 +12,18 @@ const cardTitle = "text-base font-extrabold text-white";
 const cardLink =
   "text-xs font-extrabold uppercase tracking-wide text-sky-400 transition hover:text-sky-300";
 
-// Columna derecha del panel en computadora (como la de Duolingo): estadísticas, invitación a un
-// plan superior, avance del reto, monedas y enlaces del pie.
+// Columna derecha del panel en computadora (como la de Duolingo): estadísticas, recompensas por
+// unirse a las comunidades, avance del reto, monedas y enlaces del pie.
 export default function RightRail({
   completedDays,
   coins,
   lives,
-  plan,
+  claimed,
 }: {
   completedDays: number[];
   coins: number;
   lives: number;
-  plan: PlanId;
+  claimed: { whatsapp: boolean; skool: boolean };
 }) {
   const done = new Set(completedDays);
   const count = done.size;
@@ -44,38 +43,7 @@ export default function RightRail({
     >
       <StatsBar completedDays={completedDays} coins={coins} lives={lives} />
 
-      {plan !== "vip" && (
-        <section className={`${card} overflow-hidden`}>
-          <div className="flex items-start gap-3">
-            <div className="min-w-0 flex-1">
-              <span className="inline-block rounded-md bg-gradient-to-r from-fuchsia-500 to-violet-500 px-2 py-0.5 text-[11px] font-black uppercase tracking-wider text-white">
-                {plan === "standard" ? "Premium" : "VIP"}
-              </span>
-              <p className="mt-2 text-lg font-extrabold leading-tight text-white">
-                {plan === "standard" ? "Conoce Skooly Premium" : "Pasa a Skooly VIP"}
-              </p>
-              <p className="mt-1.5 text-sm leading-snug text-white/65">
-                {plan === "standard"
-                  ? "Abre el Episodio 2 con prompts, estrategias antichurn y más recursos nuevos."
-                  : "Clases en vivo semanales y acceso a la membresía de Skool."}
-              </p>
-            </div>
-            <Image
-              src="/mascota-skooly.png"
-              alt=""
-              width={72}
-              height={72}
-              className="h-[4.5rem] w-[4.5rem] shrink-0 object-contain"
-            />
-          </div>
-          <Link
-            href="/dashboard/planes"
-            className="mt-4 block rounded-2xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2"
-          >
-            {plan === "standard" ? "Ver Skooly Premium" : "Ver Skooly VIP"}
-          </Link>
-        </section>
-      )}
+      <JoinRewards claimed={claimed} />
 
       <section className={card}>
         <div className={cardHead}>

@@ -47,7 +47,7 @@ export default function StatsBar({
       onClick={() => setOpen(open === panel ? null : panel)}
       aria-expanded={open === panel}
       aria-label={label}
-      className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm font-extrabold transition ${
+      className={`flex items-center gap-2.5 rounded-2xl border-2 px-3.5 py-2.5 text-xl font-extrabold transition ${
         open === panel
           ? "border-white/20 bg-white/10"
           : "border-transparent hover:bg-white/5"
@@ -62,7 +62,7 @@ export default function StatsBar({
       {chip(
         "racha",
         <>
-          <FlameIcon className="h-6 w-6" lit={count > 0} />
+          <FlameIcon className="h-9 w-9" lit={count > 0} />
           <span className={count > 0 ? "text-orange-400" : "text-white/35"}>{count}</span>
         </>,
         `Racha: ${count} días del reto completados`
@@ -70,7 +70,7 @@ export default function StatsBar({
       {chip(
         "monedas",
         <>
-          <CoinIcon className="h-6 w-6" />
+          <CoinIcon className="h-9 w-9" />
           <span className="text-amber-300">{coins}</span>
         </>,
         `${coins} monedas de oro`
@@ -78,7 +78,7 @@ export default function StatsBar({
       {chip(
         "vidas",
         <>
-          <HeartIcon className="h-6 w-6" />
+          <HeartIcon className="h-9 w-9" />
           <span className="text-red-400">{lives}</span>
         </>,
         `${lives} vidas`
@@ -134,7 +134,7 @@ export default function StatsBar({
               </div>
               <ul className="mt-4 space-y-1.5 text-sm text-white/70">
                 <li>🪙 +10 por cada día del reto completado</li>
-                <li>🪙 +5 por unirte a cada comunidad</li>
+                <li>🪙 +50 por unirte a WhatsApp y +50 por unirte a Skool</li>
                 <li>🪙 +50 al terminar los 7 días</li>
               </ul>
               <Link

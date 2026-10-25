@@ -11,6 +11,7 @@ import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import StartMissions from "@/components/StartMissions";
 import { PushPromptCard } from "@/components/PushNotifications";
+import JoinRewards from "@/components/JoinRewards";
 import RightRail from "@/components/RightRail";
 import StatsBar from "@/components/StatsBar";
 
@@ -49,6 +50,15 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single();
   // Los planes Premium y VIP incluyen el Episodio 2: se abre solo, sin tocar nada.
+  // Qué comunidades ya verificó (las recompensas de 50 monedas se canjean con un código).
+  const { data: verifiedRows } = await supabase
+    .from("coin_transactions")
+    .select("ref")
+    .eq("user_id", user.id)
+    .eq("reason", "verificado");
+  const verified = new Set((verifiedRows ?? []).map((r) => r.ref as string));
+  const claimed = { whatsapp: verified.has("whatsapp"), skool: verified.has("skool") };
+
   const episode2Locked = profileRow?.episode2_locked_override !== false && plan === "standard";
 
   return (
@@ -94,6 +104,9 @@ export default async function DashboardPage() {
           {/* Las dos misiones de inicio (WhatsApp y Skool) las ve todo el mundo, siempre. */}
           <StartMissions initial={startMissions} />
 
+          {/* Con pantalla grande estas recompensas están en la columna derecha. */}
+          <JoinRewards claimed={claimed} className="mx-auto mb-5 max-w-md min-[1400px]:hidden" />
+
           {/* Invitación a activar los avisos: llega tras el primer día completado. */}
           {completedDays.size >= 1 && <PushPromptCard userKey={user.email ?? user.id} />}
 
@@ -110,7 +123,7 @@ export default async function DashboardPage() {
         </div>
       </main>
 
-      <RightRail completedDays={completedList} coins={coins} lives={lives} plan={plan} />
+      <RightRail completedDays={completedList} coins={coins} lives={lives} claimed={claimed} />
     </div>
   );
 }
