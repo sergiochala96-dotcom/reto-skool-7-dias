@@ -7,9 +7,21 @@ import { EPISODE_2_NAME } from "@/lib/challenge";
 // de arriba mientras se ven los puntos de un episodio y cambia cuando se llega al siguiente:
 // Episodio 1 (reto de 7 días) → Episodio 2. Va dentro del bloque que contiene los dos episodios,
 // así solo aparece mientras se ven sus puntos. Detecta el cambio mirando dónde está #episodio-2.
+// Cada episodio tiene su color para diferenciarlos: Episodio 1 amarillo con letra negra, Episodio 2
+// azul con letra blanca.
 const EPISODES = {
-  1: { kicker: "Episodio 1, reto de 7 días", title: "Crea y lanza tu Skool" },
-  2: { kicker: "Episodio 2", title: EPISODE_2_NAME },
+  1: {
+    kicker: "Episodio 1, reto de 7 días",
+    title: "Crea y lanza tu Skool",
+    card: "border-amber-500 bg-amber-300 text-black",
+    kickerColor: "text-black/60",
+  },
+  2: {
+    kicker: "Episodio 2",
+    title: EPISODE_2_NAME,
+    card: "border-sky-700 bg-sky-500 text-white",
+    kickerColor: "text-white/70",
+  },
 } as const;
 
 // Fracción de la altura de la pantalla: cuando el Episodio 2 sube por encima de esta línea ya se
@@ -44,8 +56,8 @@ export default function EpisodeStickyHeader() {
 
   return (
     <div className="sticky top-16 z-30 mb-4 md:hidden">
-      <div className="rounded-2xl border-b-4 border-amber-500 bg-amber-300 px-4 py-3 text-black shadow-lg shadow-black/30">
-        <p className="text-xs font-extrabold uppercase tracking-wide text-black/60">{current.kicker}</p>
+      <div className={`rounded-2xl border-b-4 px-4 py-3 shadow-lg shadow-black/30 ${current.card}`}>
+        <p className={`text-xs font-extrabold uppercase tracking-wide ${current.kickerColor}`}>{current.kicker}</p>
         <p className="mt-0.5 text-lg font-extrabold leading-tight">{current.title}</p>
       </div>
     </div>

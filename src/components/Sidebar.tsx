@@ -22,6 +22,7 @@ import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import { MobileBottomNav, MobileTopBar } from "@/components/MobileChrome";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
+import WorkshopMenuButton from "@/components/WorkshopModal";
 
 // Elementos del menú: etiquetas en mayúsculas y negrita, esquinas redondeadas y borde de color en
 // el que está activo (estilo Duolingo).
@@ -202,6 +203,7 @@ export default function Sidebar({
             <span className="flex h-7 w-7 items-center justify-center text-2xl">🏠</span>
             {!effectiveCollapsed && <span>Inicio</span>}
           </Link>
+          <WorkshopMenuButton collapsed={effectiveCollapsed} className={`${NAV_ITEM} ${NAV_IDLE}`} />
           <Link
             href="/dashboard/trivia"
             onClick={() => setMobileOpen(false)}

@@ -40,9 +40,8 @@ export default async function DashboardPage() {
       .eq("id", user.id);
   }
 
-  // El Episodio 2 está bloqueado para todos. Solo el admin lo abre, usuario por usuario
-  // desde el panel de admin (o en su propia cuenta con el botón de prueba):
-  // episode2_locked_override = false => desbloqueado.
+  // El Episodio 2 está bloqueado salvo con plan Premium/VIP o si el admin lo abre usuario por
+  // usuario desde el panel de admin: episode2_locked_override = false => desbloqueado.
   const { data: profileRow } = await supabase
     .from("profiles")
     .select("episode2_locked_override")
@@ -117,13 +116,11 @@ export default async function DashboardPage() {
               <ChallengePath completedDays={completedList} />
             </div>
 
-            {/* El Episodio 2 (workshop) aparece cuando se termina el Día 2. El admin siempre lo ve,
-                y también quien tenga el acceso abierto a mano desde el panel de admin. */}
-            {(admin || completedDays.has(2) || !episode2Locked) && (
-              <div id="episodio-2">
-                <Episode2Card locked={episode2Locked} admin={admin} />
-              </div>
-            )}
+            {/* El Episodio 2 lo ve todo el mundo; está bloqueado salvo con plan Premium/VIP o acceso
+                abierto a mano desde el panel de admin. */}
+            <div id="episodio-2">
+              <Episode2Card locked={episode2Locked} admin={admin} />
+            </div>
           </div>
         </div>
       </main>
