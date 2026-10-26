@@ -23,6 +23,16 @@ type Lead = {
   created_at: string;
 };
 
+const PAGE_SIZES = [25, 50, 100] as const;
+
+// Sin tildes y en minúsculas, para que la búsqueda encuentre "Ríchard" escribiendo "richard".
+function plain(v: unknown) {
+  return String(v ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "organico", label: "Orgánico" },
@@ -34,14 +44,18 @@ const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
 export default async function OrigenPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tipo?: string }>;
+  searchParams: Promise<{ tipo?: string; pageSize?: string; page?: string; q?: string }>;
 }) {
   const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
-  const { tipo } = await searchParams;
+  const { tipo, pageSize: pageSizeParam, page: pageParam, q: qParam } = await searchParams;
   const filter = FILTERS.some((f) => f.key === tipo) ? (tipo as TrafficType | "todos") : "todos";
+  const pageSize = PAGE_SIZES.includes(Number(pageSizeParam) as (typeof PAGE_SIZES)[number])
+    ? Number(pageSizeParam)
+    : 25;
+  const q = (qParam ?? "").trim().slice(0, 80);
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -80,7 +94,28 @@ export default async function OrigenPage({
   }
   const campaigns = [...byCampaign.values()].sort((a, b) => b.count - a.count);
 
-  const shown = leads.filter((l) => filter === "todos" || l.type === filter).slice(0, 200);
+  // Filtro por tipo, búsqueda por nombre o correo y paginación de los correos captados.
+  const needle = plain(q);
+  const matching = leads.filter(
+    (l) =>
+      (filter === "todos" || l.type === filter) &&
+      (!needle || plain(l.name).includes(needle) || plain(l.email).includes(needle))
+  );
+  const totalPages = Math.max(1, Math.ceil(matching.length / pageSize));
+  const page = Math.min(totalPages, Math.max(1, Number(pageParam) || 1));
+  const shown = matching.slice((page - 1) * pageSize, page * pageSize);
+
+  // Enlace a esta pantalla cambiando solo lo indicado (se conservan filtro, búsqueda y tamaño).
+  const href = (over: { tipo?: string; pageSize?: number; page?: number; q?: string }) => {
+    const v = { tipo: filter as string, pageSize, page: 1, q, ...over };
+    const p = new URLSearchParams();
+    if (v.tipo !== "todos") p.set("tipo", v.tipo);
+    if (v.pageSize !== 25) p.set("pageSize", String(v.pageSize));
+    if (v.q) p.set("q", v.q);
+    if (v.page > 1) p.set("page", String(v.page));
+    const qs = p.toString();
+    return `/admin/origen${qs ? `?${qs}` : ""}#correos`;
+  };
 
   const cards: { type: TrafficType; label: string }[] = [
     { type: "organico", label: "Orgánico" },
@@ -204,13 +239,13 @@ export default async function OrigenPage({
             </table>
           </div>
 
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div id="correos" className="mb-3 flex scroll-mt-6 flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-white">Correos captados</h2>
             <div className="flex flex-wrap gap-2">
               {FILTERS.map((f) => (
                 <a
                   key={f.key}
-                  href={f.key === "todos" ? "/admin/origen" : `/admin/origen?tipo=${f.key}`}
+                  href={href({ tipo: f.key, page: 1 })}
                   className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                     filter === f.key
                       ? "bg-violet-500 text-white"
@@ -218,6 +253,66 @@ export default async function OrigenPage({
                   }`}
                 >
                   {f.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <form action="/admin/origen#correos" method="get" role="search" className="relative">
+                {filter !== "todos" && <input type="hidden" name="tipo" value={filter} />}
+                {pageSize !== 25 && <input type="hidden" name="pageSize" value={pageSize} />}
+                <label htmlFor="origen-search" className="sr-only">
+                  Buscar por nombre o correo
+                </label>
+                <input
+                  id="origen-search"
+                  name="q"
+                  type="search"
+                  defaultValue={q}
+                  placeholder="Buscar nombre o correo"
+                  autoComplete="off"
+                  className="w-72 rounded-xl border border-white/15 bg-white/5 py-2 pl-10 pr-3 text-sm text-white placeholder-white/35 outline-none transition focus:border-violet-400"
+                />
+                <button
+                  type="submit"
+                  aria-label="Buscar"
+                  className="absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-3.5-3.5" />
+                  </svg>
+                </button>
+              </form>
+              <p className="text-sm text-white/60">
+                {q ? (
+                  <>
+                    {matching.length} resultado{matching.length === 1 ? "" : "s"} ·{" "}
+                    <a href={href({ q: "", page: 1 })} className="text-violet-300 hover:underline">
+                      Quitar búsqueda
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    {matching.length} contacto{matching.length === 1 ? "" : "s"}
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {PAGE_SIZES.map((size) => (
+                <a
+                  key={size}
+                  href={href({ pageSize: size, page: 1 })}
+                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                    pageSize === size
+                      ? "bg-violet-500 text-white"
+                      : "border border-white/15 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  {size} contactos
                 </a>
               ))}
             </div>
@@ -263,17 +358,29 @@ export default async function OrigenPage({
                 {shown.length === 0 && !error && (
                   <tr>
                     <td colSpan={8} className="px-4 py-8 text-center text-white/40">
-                      Todavía no hay correos captados con este filtro.
+                      {q ? "Ningún correo coincide con la búsqueda." : "Todavía no hay correos captados con este filtro."}
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-          {leads.length > shown.length && filter === "todos" && (
-            <p className="mt-3 text-center text-xs text-white/40">
-              Mostrando los últimos {shown.length} de {leads.length}.
-            </p>
+          {totalPages > 1 && (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <a
+                  key={p}
+                  href={href({ page: p })}
+                  className={`h-9 w-9 rounded-lg text-center text-sm leading-9 transition ${
+                    p === page
+                      ? "bg-violet-500 text-white"
+                      : "border border-white/15 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  {p}
+                </a>
+              ))}
+            </div>
           )}
         </div>
       </main>
