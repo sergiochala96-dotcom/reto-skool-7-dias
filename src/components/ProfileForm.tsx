@@ -36,7 +36,7 @@ export default function ProfileForm({
             defaultValue={nombre}
             required
             maxLength={80}
-            className="w-full rounded-xl border-2 border-white/15 bg-white/10 px-4 py-3 text-white outline-none focus:border-fuchsia-400"
+            className="w-full rounded-xl border-2 border-white/15 bg-white/10 px-4 py-3 text-white outline-none focus:border-violet-400"
           />
         </div>
 
@@ -65,7 +65,7 @@ export default function ProfileForm({
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-2xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2 disabled:opacity-60"
+          className="w-full rounded-2xl border-b-4 border-purple-900 bg-violet-500 px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2 disabled:opacity-60"
         >
           {pending ? "Guardando..." : "Guardar cambios"}
         </button>

@@ -28,7 +28,7 @@ export default function AccountModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#1a0b2e] p-6 shadow-2xl"
+        className="w-full max-w-sm rounded-2xl border border-white/10 bg-surface p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -55,7 +55,7 @@ export default function AccountModal({
               name="nombre"
               defaultValue={nombre}
               required
-              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white outline-none focus:border-fuchsia-400"
+              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white outline-none focus:border-violet-400"
             />
           </div>
 
@@ -84,7 +84,7 @@ export default function AccountModal({
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 px-4 py-2.5 font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+            className="w-full rounded-xl bg-violet-500 px-4 py-2.5 font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
           >
             {pending ? "Guardando..." : "Guardar cambios"}
           </button>

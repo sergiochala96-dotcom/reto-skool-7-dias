@@ -47,7 +47,7 @@ export default function UpgradePlanButton({
 
       <ConfirmDialog
         open={confirming}
-        icon={<GemIcon className="h-12 w-12 text-fuchsia-300" />}
+        icon={<GemIcon className="h-12 w-12 text-violet-300" />}
         title="¿Cambiar tu plan?"
         confirmLabel="Cambiar plan"
         tone="fuchsia"

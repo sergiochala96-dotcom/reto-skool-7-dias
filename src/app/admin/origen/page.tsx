@@ -90,7 +90,7 @@ export default async function OrigenPage({
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
@@ -110,7 +110,7 @@ export default async function OrigenPage({
             <h1 className="text-2xl font-bold text-white">Origen del tráfico</h1>
             <p className="mt-1 text-sm text-white/60">
               De dónde llegan las personas que dejan su correo en /reto. Se mide con la etiqueta{" "}
-              <code className="text-fuchsia-300">utm_medium</code> del enlace (organic = orgánico,
+              <code className="text-violet-300">utm_medium</code> del enlace (organic = orgánico,
               paid = pagado).
             </p>
           </header>
@@ -213,7 +213,7 @@ export default async function OrigenPage({
                   href={f.key === "todos" ? "/admin/origen" : `/admin/origen?tipo=${f.key}`}
                   className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                     filter === f.key
-                      ? "bg-fuchsia-500 text-white"
+                      ? "bg-violet-500 text-white"
                       : "border border-white/15 text-white/60 hover:bg-white/10"
                   }`}
                 >

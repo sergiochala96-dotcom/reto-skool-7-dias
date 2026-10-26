@@ -34,7 +34,7 @@ export default function NotificationForm() {
         required
         maxLength={120}
         placeholder="Ej: ¡Nueva clase disponible!"
-        className="w-full rounded-xl border border-white/20 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-fuchsia-400"
+        className="w-full rounded-xl border border-white/20 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-violet-400"
       />
 
       <label className="mb-1 mt-4 block text-sm font-medium text-white/80" htmlFor="notif-body">
@@ -47,7 +47,7 @@ export default function NotificationForm() {
         rows={7}
         maxLength={5000}
         placeholder="Escribe el comunicado que verán todos los usuarios..."
-        className="w-full resize-y rounded-xl border border-white/20 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-fuchsia-400"
+        className="w-full resize-y rounded-xl border border-white/20 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-violet-400"
       />
       <p className="mt-1 text-xs text-white/40">
         Los enlaces (https://...) se convierten en clicables automáticamente.

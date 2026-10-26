@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   // Color de la barra del sistema en el celular (el mismo morado oscuro de la app).
-  themeColor: "#150826",
+  themeColor: "#0f0d15",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

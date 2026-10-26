@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { updatePassword, type AuthState } from "@/app/actions";
 
 const INPUT =
-  "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400";
+  "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-violet-400";
 
 export default function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -52,7 +52,7 @@ export default function ResetPasswordForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:brightness-110 disabled:opacity-60"
+        className="w-full rounded-xl bg-violet-500 px-4 py-3 font-semibold text-white shadow-lg shadow-black/30 transition hover:brightness-110 disabled:opacity-60"
       >
         {pending ? "Guardando..." : "Guardar y entrar"}
       </button>

@@ -155,7 +155,7 @@ export function PushPromptCard({ userKey }: { userKey: string }) {
   if (state !== "off" || dismissed) return null;
 
   return (
-    <section className="mx-auto mb-5 flex w-full max-w-md items-center gap-3 rounded-3xl border-2 border-amber-300/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-4 py-4 shadow-2xl shadow-fuchsia-900/40 md:mb-6 md:max-w-4xl md:px-6">
+    <section className="mx-auto mb-5 flex w-full max-w-md items-center gap-3 rounded-3xl border-2 border-amber-300/30 bg-surface px-4 py-4 shadow-2xl shadow-black/40 md:mb-6 md:max-w-4xl md:px-6">
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-orange-500 text-purple-950">
         <BellIcon className="h-6 w-6" />
       </span>

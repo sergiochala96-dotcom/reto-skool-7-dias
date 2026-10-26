@@ -119,12 +119,12 @@ export function JoinCard({
                 maxLength={40}
                 autoComplete="off"
                 aria-label={`Código de ${kind === "whatsapp" ? "WhatsApp" : "Skool"}`}
-                className="w-full rounded-2xl border-2 border-white/15 bg-white/10 px-4 py-3.5 text-center text-base text-white placeholder-white/35 outline-none focus:border-fuchsia-400"
+                className="w-full rounded-2xl border-2 border-white/15 bg-white/10 px-4 py-3.5 text-center text-base text-white placeholder-white/35 outline-none focus:border-violet-400"
               />
               <button
                 type="submit"
                 disabled={pending || code.trim().length === 0}
-                className="w-full rounded-2xl bg-fuchsia-500 px-4 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-fuchsia-400 disabled:opacity-50"
+                className="w-full rounded-2xl bg-violet-500 px-4 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-violet-400 disabled:opacity-50"
               >
                 {pending ? "..." : "Canjear"}
               </button>
@@ -191,7 +191,7 @@ export function JoinCard({
               aria-modal="true"
               aria-label={c.title}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[94vh] w-full max-w-md animate-[popIn_0.25s_ease-out] overflow-y-auto rounded-3xl border-2 border-white/15 bg-gradient-to-b from-[#2d1257] to-[#150826] shadow-2xl shadow-black/60"
+              className="relative max-h-[94vh] w-full max-w-md animate-[popIn_0.25s_ease-out] overflow-y-auto rounded-3xl border-2 border-white/15 bg-surface-2 shadow-2xl shadow-black/60"
             >
               <button
                 type="button"
@@ -235,7 +235,7 @@ export function JoinCard({
                     <span className="absolute bottom-6 left-[1.0625rem] top-9 w-0.5 bg-white/15" aria-hidden="true" />
 
                     <li className="relative flex gap-4">
-                      <span className="z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-500 text-base font-extrabold text-white">
+                      <span className="z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-base font-extrabold text-white">
                         1
                       </span>
                       <div className="min-w-0 flex-1">
@@ -256,7 +256,7 @@ export function JoinCard({
                     </li>
 
                     <li className="relative flex gap-4">
-                      <span className="z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-500 text-base font-extrabold text-white">
+                      <span className="z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-base font-extrabold text-white">
                         2
                       </span>
                       <div className="min-w-0 flex-1">
@@ -273,12 +273,12 @@ export function JoinCard({
                             maxLength={40}
                             autoComplete="off"
                             aria-label={`Código de ${kind === "whatsapp" ? "WhatsApp" : "Skool"}`}
-                            className="min-w-0 flex-1 rounded-xl border-2 border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white placeholder-white/35 outline-none focus:border-fuchsia-400"
+                            className="min-w-0 flex-1 rounded-xl border-2 border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white placeholder-white/35 outline-none focus:border-violet-400"
                           />
                           <button
                             type="submit"
                             disabled={pending || code.trim().length === 0}
-                            className="shrink-0 rounded-xl bg-fuchsia-500 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wide text-white transition hover:bg-fuchsia-400 disabled:opacity-50"
+                            className="shrink-0 rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wide text-white transition hover:bg-violet-400 disabled:opacity-50"
                           >
                             {pending ? "..." : "Canjear"}
                           </button>

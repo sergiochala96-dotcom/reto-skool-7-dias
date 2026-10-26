@@ -112,7 +112,7 @@ function Fullscreen({
       role="dialog"
       aria-modal="true"
       aria-label={label}
-      className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_70%)] px-4 pb-6 pt-3 md:hidden"
+      className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-ink px-4 pb-6 pt-3 md:hidden"
     >
       <div className="flex justify-end">
         <button

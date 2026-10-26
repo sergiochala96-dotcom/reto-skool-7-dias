@@ -40,7 +40,7 @@ export default function ConfirmDialog({
   const confirmStyle =
     tone === "amber"
       ? "border-amber-600 bg-amber-400 text-amber-950 hover:bg-amber-300"
-      : "border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 text-white hover:brightness-110";
+      : "border-purple-900 bg-violet-500 text-white hover:brightness-110";
 
   return createPortal(
     <div
@@ -52,7 +52,7 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-title"
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-sm rounded-3xl border-2 border-white/15 bg-[#1c0c35] p-6 text-center shadow-2xl shadow-black/60"
+        className="relative w-full max-w-sm rounded-3xl border-2 border-white/15 bg-surface-2 p-6 text-center shadow-2xl shadow-black/60"
       >
         <button
           type="button"

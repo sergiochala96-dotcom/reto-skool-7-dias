@@ -16,7 +16,7 @@ function PushBanner({ userKey }: { userKey: string }) {
   const { state, busy, enable } = usePush(userKey);
   if (state !== "off") return null;
   return (
-    <div className="flex items-center gap-3 border-b border-white/10 bg-[#2a1150] px-4 py-3 md:hidden">
+    <div className="flex items-center gap-3 border-b border-white/10 bg-surface-2 px-4 py-3 md:hidden">
       <BellFilledIcon className="h-9 w-9 shrink-0" />
       <p className="min-w-0 flex-1 text-sm font-bold leading-snug text-white">
         Te estás perdiendo los recordatorios de Skooly
@@ -25,7 +25,7 @@ function PushBanner({ userKey }: { userKey: string }) {
         type="button"
         onClick={() => void enable()}
         disabled={busy}
-        className="shrink-0 rounded-xl border-b-4 border-slate-300 bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-fuchsia-700 transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60"
+        className="shrink-0 rounded-xl border-b-4 border-slate-300 bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-violet-700 transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60"
       >
         {busy ? "..." : "Permitir"}
       </button>
@@ -53,7 +53,7 @@ export function MobileTopBar({
   return (
     <>
       <PushBanner userKey={userKey} />
-      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-white/10 bg-[#150826]/95 px-3 backdrop-blur md:hidden">
+      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-white/10 bg-surface/95 px-3 backdrop-blur md:hidden">
         <StatsBar
           completedDays={completedDays}
           coins={coins}
@@ -89,7 +89,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Menú principal"
-      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/10 bg-[#150826]/95 px-2 pt-3 backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/10 bg-surface/95 px-2 pt-3 backdrop-blur md:hidden"
       style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
     >
       {ITEMS.map((item) => {
@@ -102,7 +102,7 @@ export function MobileBottomNav() {
             aria-current={active ? "page" : undefined}
             className={`flex h-14 w-16 items-center justify-center rounded-2xl border-2 transition ${
               active
-                ? "border-fuchsia-400/60 bg-fuchsia-500/15"
+                ? "border-violet-400/60 bg-violet-500/15"
                 : "border-transparent hover:bg-white/5"
             }`}
           >

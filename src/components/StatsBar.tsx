@@ -99,7 +99,7 @@ export default function StatsBar({
       {open && (
         <div
           role="dialog"
-          className={`absolute top-full z-50 mt-2 ${sheet ? "inset-x-0" : "right-0 w-[19rem]"} rounded-2xl border-2 border-white/15 bg-[#1c0c35] p-5 text-white shadow-2xl shadow-black/50`}
+          className={`absolute top-full z-50 mt-2 ${sheet ? "inset-x-0" : "right-0 w-[19rem]"} rounded-2xl border-2 border-white/15 bg-surface-2 p-5 text-white shadow-2xl shadow-black/50`}
         >
           {open === "racha" && (
             <>

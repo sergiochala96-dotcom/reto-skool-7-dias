@@ -5,7 +5,7 @@ import ResetPasswordForm from "@/components/ResetPasswordForm";
 // sin la sesión que abre ese enlace, el sistema manda a /login).
 export default function RestablecerPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-12">
+    <main className="flex min-h-screen items-center justify-center bg-ink px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
           <Image

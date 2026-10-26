@@ -164,7 +164,7 @@ export default async function AdminUserPage({
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
@@ -179,7 +179,7 @@ export default async function AdminUserPage({
 
       <main className="flex-1 px-4 py-10">
         <div className="mx-auto max-w-3xl">
-          <a href="/admin" className="text-sm text-fuchsia-300 hover:underline">
+          <a href="/admin" className="text-sm text-violet-300 hover:underline">
             ← Volver a usuarios
           </a>
 
@@ -248,7 +248,7 @@ export default async function AdminUserPage({
                         const display = formatAnswer(f, v);
                         return (
                           <div key={f.id}>
-                            <p className="text-xs font-medium uppercase tracking-wide text-fuchsia-300/80">
+                            <p className="text-xs font-medium uppercase tracking-wide text-violet-300/80">
                               {f.label}
                             </p>
                             <p className="whitespace-pre-wrap text-sm text-white/80">{display}</p>

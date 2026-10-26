@@ -27,8 +27,8 @@ export default function PromptBox({
   };
 
   return (
-    <div className="rounded-xl border border-dashed border-fuchsia-300 bg-fuchsia-50 p-4">
-      <p className="mb-2 text-sm font-semibold text-fuchsia-700">💡 {title}</p>
+    <div className="rounded-xl border border-dashed border-violet-300 bg-violet-50 p-4">
+      <p className="mb-2 text-sm font-semibold text-violet-700">💡 {title}</p>
       <p className="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 font-mono text-xs leading-relaxed text-gray-700">
         {text}
       </p>
@@ -39,7 +39,7 @@ export default function PromptBox({
       >
         {copied ? "Copiado ✓" : buttonLabel}
       </button>
-      {hint && <p className="mt-2 text-xs text-fuchsia-700/70">{hint}</p>}
+      {hint && <p className="mt-2 text-xs text-violet-700/70">{hint}</p>}
     </div>
   );
 }

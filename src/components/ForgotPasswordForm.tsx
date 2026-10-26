@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { requestPasswordReset, type ResetState } from "@/app/actions";
 
 const INPUT =
-  "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400";
+  "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-violet-400";
 
 export default function ForgotPasswordForm({ expiredLink = false }: { expiredLink?: boolean }) {
   const [state, formAction, pending] = useActionState<ResetState, FormData>(
@@ -59,7 +59,7 @@ export default function ForgotPasswordForm({ expiredLink = false }: { expiredLin
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:brightness-110 disabled:opacity-60"
+        className="w-full rounded-xl bg-violet-500 px-4 py-3 font-semibold text-white shadow-lg shadow-black/30 transition hover:brightness-110 disabled:opacity-60"
       >
         {pending ? "Enviando..." : "Enviarme el enlace"}
       </button>

@@ -57,7 +57,7 @@ export default async function AdminNotificationsPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}

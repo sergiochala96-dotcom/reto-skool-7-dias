@@ -26,7 +26,7 @@ export default function AuthForm({ action, mode }: Props) {
             name="nombre"
             type="text"
             placeholder="Tu nombre"
-            className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400"
+            className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-violet-400"
           />
         </div>
       )}
@@ -40,7 +40,7 @@ export default function AuthForm({ action, mode }: Props) {
           type="email"
           required
           placeholder="tucorreo@email.com"
-          className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400"
+          className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-violet-400"
         />
       </div>
 
@@ -54,13 +54,13 @@ export default function AuthForm({ action, mode }: Props) {
           required
           minLength={6}
           placeholder="••••••••"
-          className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-fuchsia-400"
+          className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-violet-400"
         />
         {mode === "login" && (
           <div className="mt-2 text-right">
             <Link
               href="/olvide-contrasena"
-              className="text-sm font-medium text-fuchsia-400 hover:underline"
+              className="text-sm font-medium text-violet-400 hover:underline"
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -77,7 +77,7 @@ export default function AuthForm({ action, mode }: Props) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:brightness-110 disabled:opacity-60"
+        className="mt-2 w-full rounded-xl bg-violet-500 px-4 py-3 font-semibold text-white shadow-lg shadow-black/30 transition hover:brightness-110 disabled:opacity-60"
       >
         {pending
           ? "Cargando..."

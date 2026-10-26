@@ -65,7 +65,7 @@ export default function TreasureChest({ nombre }: Props) {
           <p className="max-w-md text-white/80">
             Completaste el Reto de 7 Días. Este es tu premio final:
           </p>
-          <div className="w-full max-w-2xl rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-fuchsia-500/10 p-6 md:max-w-5xl">
+          <div className="w-full max-w-2xl rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-violet-500/10 p-6 md:max-w-5xl">
             <div className="overflow-hidden rounded-xl">
               <iframe
                 className="aspect-video w-full"
@@ -104,7 +104,7 @@ export default function TreasureChest({ nombre }: Props) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex w-full max-w-md flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl md:max-w-xl md:p-12"
+            className="relative flex w-full max-w-md flex-col items-center rounded-3xl bg-surface-2 p-8 text-center shadow-2xl md:max-w-xl md:p-12"
           >
             <button
               type="button"

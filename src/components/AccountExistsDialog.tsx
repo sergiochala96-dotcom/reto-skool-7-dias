@@ -29,7 +29,7 @@ export default function AccountExistsDialog({ onClose }: { onClose: () => void }
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl bg-white p-6 pt-8 text-center shadow-2xl shadow-purple-950/40"
+        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl bg-white p-6 pt-8 text-center shadow-2xl shadow-black/40"
       >
         <button
           type="button"

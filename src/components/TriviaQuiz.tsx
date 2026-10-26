@@ -132,7 +132,7 @@ export default function TriviaQuiz({
   // En computadora la partida ocupa toda la pantalla, con una X arriba a la derecha para salir.
   function shell(children: ReactNode) {
     return (
-      <div className="md:fixed md:inset-0 md:z-[90] md:overflow-y-auto md:bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_70%)] md:px-6 md:py-10">
+      <div className="md:fixed md:inset-0 md:z-[90] md:overflow-y-auto md:bg-ink md:px-6 md:py-10">
         <button
           type="button"
           onClick={leave}
@@ -153,7 +153,7 @@ export default function TriviaQuiz({
     return (
       <div className="rounded-3xl border-2 border-white/10 bg-white/[0.03] p-6 text-center sm:p-8">
         <p className="text-6xl">{emoji}</p>
-        <p className="mt-3 text-sm font-bold uppercase tracking-wide text-fuchsia-300">{title}</p>
+        <p className="mt-3 text-sm font-bold uppercase tracking-wide text-violet-300">{title}</p>
         <h2 className="mt-1 text-2xl font-extrabold leading-snug text-white">
           ¿Listo para la trivia de hoy?
         </h2>
@@ -170,7 +170,7 @@ export default function TriviaQuiz({
         <button
           type="button"
           onClick={() => setStarted(true)}
-          className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2"
+          className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-violet-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2"
         >
           Empezar trivia
         </button>
@@ -255,7 +255,7 @@ export default function TriviaQuiz({
         <Hearts lives={lives} />
       </div>
 
-      <p className="text-sm font-bold uppercase tracking-wide text-fuchsia-300">
+      <p className="text-sm font-bold uppercase tracking-wide text-violet-300">
         {emoji} {title}
       </p>
       <h2 className="mt-2 text-2xl font-extrabold leading-snug text-white">{q.q}</h2>
@@ -278,8 +278,8 @@ export default function TriviaQuiz({
             style = "border-red-400/60 bg-red-500/10 text-white/45 line-through";
             badge = "bg-red-500/70 text-white";
           } else if (selected === i) {
-            style = "border-fuchsia-400 bg-fuchsia-500/20 text-white";
-            badge = "bg-fuchsia-500 text-white";
+            style = "border-violet-400 bg-violet-500/20 text-white";
+            badge = "bg-violet-500 text-white";
           }
           return (
             <button
@@ -343,7 +343,7 @@ export default function TriviaQuiz({
           type="button"
           onClick={check}
           disabled={selected === null || pending}
-          className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-gradient-to-b from-fuchsia-500 to-purple-600 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-none disabled:bg-white/10 disabled:text-white/40"
+          className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-violet-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-none disabled:bg-white/10 disabled:text-white/40"
         >
           {pending ? "Comprobando..." : "Comprobar"}
         </button>

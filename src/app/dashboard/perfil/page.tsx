@@ -18,7 +18,7 @@ export default async function PerfilPage() {
   const completedList = Array.from(completedDays);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
@@ -39,7 +39,7 @@ export default async function PerfilPage() {
 
         <div className="mx-auto max-w-xl">
           <header className="mb-6 text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-fuchsia-300">Perfil</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-violet-300">Perfil</p>
             <h1 className="mt-1 text-3xl font-extrabold text-white">Tu perfil</h1>
           </header>
           <ProfileForm nombre={nombre} email={user.email ?? ""} avatarUrl={avatarUrl} />

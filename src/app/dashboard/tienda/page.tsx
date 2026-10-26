@@ -122,7 +122,7 @@ export default async function TiendaPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
@@ -185,7 +185,7 @@ export default async function TiendaPage() {
 
           <p className="mt-8 text-center text-xs text-white/35">
             ¿Quieres más recursos?{" "}
-            <Link href="/dashboard/planes" className="font-semibold text-fuchsia-300 hover:underline">
+            <Link href="/dashboard/planes" className="font-semibold text-violet-300 hover:underline">
               Mira los planes
             </Link>
             .

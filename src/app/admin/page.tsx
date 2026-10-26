@@ -96,7 +96,7 @@ export default async function AdminPage({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       <Sidebar
         nombre={nombre}
         email={user.email ?? ""}
@@ -154,7 +154,7 @@ export default async function AdminPage({
                   href={`/admin?pageSize=${size}`}
                   className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                     pageSize === size
-                      ? "bg-fuchsia-500 text-white"
+                      ? "bg-violet-500 text-white"
                       : "border border-white/15 text-white/60 hover:bg-white/10"
                   }`}
                 >
@@ -206,7 +206,7 @@ export default async function AdminPage({
                         const current = effectivePlan(p?.plan, p?.plan_expires_at);
                         const style: Record<PlanId, string> = {
                           standard: "bg-white/10 text-white/60",
-                          premium: "bg-fuchsia-400/20 text-fuchsia-200",
+                          premium: "bg-violet-400/20 text-violet-200",
                           vip: "bg-amber-400/20 text-amber-300",
                         };
                         const label: Record<PlanId, string> = {
@@ -262,7 +262,7 @@ export default async function AdminPage({
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${
                           row.completed_days >= TOTAL_DAYS
                             ? "bg-emerald-400/20 text-emerald-300"
-                            : "bg-fuchsia-400/20 text-fuchsia-300"
+                            : "bg-violet-400/20 text-violet-300"
                         }`}
                       >
                         {row.completed_days}/{TOTAL_DAYS}
@@ -307,7 +307,7 @@ export default async function AdminPage({
                     <td className="px-3 py-3 xl:px-4">
                       <a
                         href={`/admin/${row.id}`}
-                        className="font-medium text-fuchsia-300 hover:underline"
+                        className="font-medium text-violet-300 hover:underline"
                       >
                         Ver
                       </a>
@@ -339,7 +339,7 @@ export default async function AdminPage({
                   href={`/admin?pageSize=${pageSize}&page=${p}`}
                   className={`h-9 w-9 rounded-lg text-center text-sm leading-9 transition ${
                     p === page
-                      ? "bg-fuchsia-500 text-white"
+                      ? "bg-violet-500 text-white"
                       : "border border-white/15 text-white/60 hover:bg-white/10"
                   }`}
                 >

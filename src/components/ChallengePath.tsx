@@ -67,9 +67,9 @@ export default function ChallengePath({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="relative mx-4 overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] pb-6 pt-8 shadow-2xl shadow-fuchsia-900/40">
+      <div className="relative mx-4 overflow-hidden rounded-3xl border-2 border-white/10 bg-surface pb-6 pt-8 shadow-2xl shadow-black/40">
         <h2 className="mb-1 px-4 text-center text-base">
-          <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
+          <span className="font-bold text-violet-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
@@ -116,9 +116,9 @@ export default function ChallengePath({
             <div
               className={`relative flex items-center justify-center rounded-full border-4 text-3xl shadow-lg transition ${
                 isDone
-                  ? "border-amber-300 bg-gradient-to-br from-fuchsia-500 to-amber-400"
+                  ? "border-amber-300 bg-gradient-to-br from-violet-500 to-amber-400"
                   : isCurrent
-                  ? "animate-pulse border-fuchsia-300 bg-gradient-to-br from-fuchsia-500 to-purple-600"
+                  ? "animate-pulse border-violet-300 bg-violet-500"
                   : unlocked
                   ? "border-white/30 bg-white/10 hover:bg-white/20"
                   : "border-white/10 bg-white/5 grayscale"
@@ -138,7 +138,7 @@ export default function ChallengePath({
             <div className="mt-2 w-28 text-center">
               <p
                 className={`text-[10px] font-bold uppercase tracking-wide ${
-                  isDone ? "text-amber-300" : isCurrent ? "text-fuchsia-300" : "text-white/40"
+                  isDone ? "text-amber-300" : isCurrent ? "text-violet-300" : "text-white/40"
                 }`}
               >
                 Día {p.mission.day}

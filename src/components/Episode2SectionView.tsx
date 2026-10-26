@@ -26,7 +26,7 @@ export default function Episode2SectionView({
           </Link>
 
           <header className="mb-6 text-center">
-            <p className="text-sm font-bold text-fuchsia-300">
+            <p className="text-sm font-bold text-violet-300">
               {EPISODE_2_LABEL} <span className="font-normal text-white/50">{EPISODE_2_NAME}</span>
             </p>
             <div className="mt-3 text-5xl">{section.emoji}</div>

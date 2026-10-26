@@ -23,7 +23,7 @@ export default function JoinCodesForm({ whatsapp, skool }: { whatsapp: string; s
         maxLength={40}
         autoComplete="off"
         placeholder="Ej: SKOOLY-ORO-1"
-        className="w-full rounded-xl border border-white/20 bg-white px-4 py-3 font-mono text-gray-900 placeholder-gray-400 outline-none focus:border-fuchsia-400"
+        className="w-full rounded-xl border border-white/20 bg-white px-4 py-3 font-mono text-gray-900 placeholder-gray-400 outline-none focus:border-violet-400"
       />
       <p className="mt-1 text-xs text-white/40">{hint}</p>
     </div>

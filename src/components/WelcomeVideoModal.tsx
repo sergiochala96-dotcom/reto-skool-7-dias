@@ -232,7 +232,7 @@ export default function WelcomeVideoModal({
 
       <div className="flex w-full max-w-5xl flex-col items-center gap-6 md:flex-row md:justify-center md:gap-14">
         {/* Video vertical */}
-        <div className="relative aspect-[9/16] w-[min(20rem,calc(82dvh*0.5625))] shrink-0 overflow-hidden rounded-2xl bg-black shadow-2xl shadow-purple-950/50 md:w-[min(24rem,calc(86dvh*0.5625))]">
+        <div className="relative aspect-[9/16] w-[min(20rem,calc(82dvh*0.5625))] shrink-0 overflow-hidden rounded-2xl bg-black shadow-2xl shadow-black/40 md:w-[min(24rem,calc(86dvh*0.5625))]">
           {/* X para cerrar dentro del video, arriba a la derecha, también mientras se reproduce
               (computadora y celular). Además hay otra X en la esquina de la pantalla. */}
           <button

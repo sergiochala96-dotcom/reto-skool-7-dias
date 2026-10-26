@@ -26,7 +26,7 @@ function Linkified({ text }: { text: string }) {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="break-all font-medium text-fuchsia-700 underline"
+            className="break-all font-medium text-violet-700 underline"
           >
             {part}
           </a>
@@ -222,7 +222,7 @@ export default function NotificationsMenu({
               className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 text-gray-900 shadow-2xl sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-700">
                 🔔 Comunicado · {formatDate(selected.created_at)}
               </p>
               <h2 id="notification-title" className="mt-1 text-xl font-extrabold text-purple-950">

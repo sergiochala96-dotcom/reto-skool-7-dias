@@ -21,9 +21,9 @@ export default function ChallengePathHorizontal({
 
   return (
     <div className="mx-auto mb-5 hidden md:block lg:mb-8">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-fuchsia-400/30 bg-gradient-to-br from-[#2a1150] to-[#1a0b2e] px-6 pb-5 pt-7 shadow-2xl shadow-fuchsia-900/40 lg:px-8 lg:pb-9 lg:pt-10">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-white/10 bg-surface px-6 pb-5 pt-7 shadow-2xl shadow-black/40 lg:px-8 lg:pb-9 lg:pt-10">
         <h2 className="mb-0 text-center text-lg lg:text-xl">
-          <span className="font-bold text-fuchsia-300">{CURRENT_EPISODE_LABEL}</span>{" "}
+          <span className="font-bold text-violet-300">{CURRENT_EPISODE_LABEL}</span>{" "}
           <span className="font-normal text-white/50">{CURRENT_EPISODE_NAME}</span>
         </h2>
 
@@ -43,9 +43,9 @@ export default function ChallengePathHorizontal({
                 <div
                   className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-4 text-xl shadow-lg transition lg:h-14 lg:w-14 lg:text-2xl ${
                     isDone
-                      ? "border-amber-300 bg-gradient-to-br from-fuchsia-500 to-amber-400"
+                      ? "border-amber-300 bg-gradient-to-br from-violet-500 to-amber-400"
                       : isCurrent
-                      ? "animate-pulse border-fuchsia-300 bg-gradient-to-br from-fuchsia-500 to-purple-600"
+                      ? "animate-pulse border-violet-300 bg-violet-500"
                       : unlocked
                       ? "border-white/30 bg-white/10 hover:bg-white/20"
                       : "border-white/10 bg-white/5 grayscale"
@@ -64,7 +64,7 @@ export default function ChallengePathHorizontal({
                 <div className="-mx-2 mt-3 w-[4.5rem] text-center">
                   <p
                     className={`text-[10px] font-bold uppercase tracking-wide ${
-                      isDone ? "text-amber-300" : isCurrent ? "text-fuchsia-300" : "text-white/40"
+                      isDone ? "text-amber-300" : isCurrent ? "text-violet-300" : "text-white/40"
                     }`}
                   >
                     Día {mission.day}
@@ -84,7 +84,7 @@ export default function ChallengePathHorizontal({
                   <div
                     className={`mt-7 h-1.5 min-w-7 max-w-10 flex-1 rounded-full ${
                       isDone
-                        ? "bg-gradient-to-r from-fuchsia-500 to-amber-400"
+                        ? "bg-gradient-to-r from-violet-500 to-amber-400"
                         : "bg-white/10"
                     }`}
                   />

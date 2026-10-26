@@ -10,7 +10,7 @@ export default async function OlvideContrasenaPage({
   const { error } = await searchParams;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-12">
+    <main className="flex min-h-screen items-center justify-center bg-ink px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
           <Image
@@ -30,7 +30,7 @@ export default async function OlvideContrasenaPage({
         <ForgotPasswordForm expiredLink={error === "enlace"} />
 
         <p className="mt-6 text-center text-sm text-white/60">
-          <Link href="/login" className="font-medium text-fuchsia-400 hover:underline">
+          <Link href="/login" className="font-medium text-violet-400 hover:underline">
             ← Volver a iniciar sesión
           </Link>
         </p>

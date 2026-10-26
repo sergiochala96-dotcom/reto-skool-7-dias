@@ -28,7 +28,7 @@ import WorkshopMenuButton from "@/components/WorkshopModal";
 // el que está activo (estilo Duolingo).
 const NAV_ITEM =
   "flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-[13px] font-extrabold uppercase tracking-wider transition md:text-sm";
-const NAV_ACTIVE = "border-fuchsia-400/50 bg-fuchsia-500/15 text-fuchsia-100";
+const NAV_ACTIVE = "border-violet-400/50 bg-violet-500/15 text-violet-100";
 const NAV_IDLE = "border-transparent text-white/70 hover:bg-white/5 hover:text-white";
 
 // Botones del menú: cristal translúcido; el de planes lleva un degradado fucsia para destacar.
@@ -152,7 +152,7 @@ export default function Sidebar({
             "--sidebar-w": effectiveCollapsed ? "80px" : `${width}px`,
           } as React.CSSProperties
         }
-        className={`max-md:hidden fixed inset-y-0 left-0 z-50 flex h-screen w-72 flex-shrink-0 flex-col border-r border-white/10 bg-[#150826] transition-transform duration-200 md:sticky md:top-0 md:z-auto md:w-[var(--sidebar-w)] md:translate-x-0 ${
+        className={`max-md:hidden fixed inset-y-0 left-0 z-50 flex h-screen w-72 flex-shrink-0 flex-col border-r border-white/10 bg-surface transition-transform duration-200 md:sticky md:top-0 md:z-auto md:w-[var(--sidebar-w)] md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -392,20 +392,20 @@ export default function Sidebar({
                   title={sidebarPlanLabel(plan)}
                   aria-label={sidebarPlanLabel(plan)}
                   className={`${PREMIUM_BTN} h-10 w-10 rounded-full ${
-                    pathname === "/dashboard/planes" ? "ring-2 ring-fuchsia-300/70" : ""
+                    pathname === "/dashboard/planes" ? "ring-2 ring-violet-300/70" : ""
                   }`}
                 >
-                  <GemIcon className="h-5 w-5 shrink-0 text-fuchsia-200" />
+                  <GemIcon className="h-5 w-5 shrink-0 text-violet-200" />
                 </Link>
               ) : (
                 <Link
                   href="/dashboard/planes"
                   onClick={() => setMobileOpen(false)}
                   className={`group block rounded-2xl border bg-white/[0.04] p-3.5 transition hover:bg-white/[0.07] ${
-                    pathname === "/dashboard/planes" ? "border-fuchsia-300/60" : "border-white/10"
+                    pathname === "/dashboard/planes" ? "border-violet-300/60" : "border-white/10"
                   }`}
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-300/90">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-violet-300/90">
                     {plan === "standard" ? "Premium" : "VIP"}
                   </span>
                   <p className="mt-1 text-[15px] font-bold leading-tight text-white">
@@ -438,7 +438,7 @@ export default function Sidebar({
                     : "rounded-xl px-3 py-2 text-sm md:text-base"
                 }`}
               >
-                <InstallIcon className="h-5 w-5 shrink-0 text-fuchsia-300" />
+                <InstallIcon className="h-5 w-5 shrink-0 text-violet-300" />
                 {!effectiveCollapsed && <span>Instalar la app en mi celular</span>}
               </button>
             )}

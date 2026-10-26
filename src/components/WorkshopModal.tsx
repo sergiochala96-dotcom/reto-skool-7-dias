@@ -168,7 +168,7 @@ export default function WorkshopMenuButton({
                   className="h-3 w-full overflow-hidden rounded-full bg-gray-200"
                 >
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-purple-700"
+                    className="h-full rounded-full bg-violet-500"
                     style={{ width: `${WORKSHOP_SOLD_PERCENT}%` }}
                   />
                 </div>

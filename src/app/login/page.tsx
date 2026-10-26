@@ -14,7 +14,7 @@ export default async function LoginPage({
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex w-full items-center justify-center bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] px-4 py-12 md:w-1/2">
+      <div className="flex w-full items-center justify-center bg-ink px-4 py-12 md:w-1/2">
         <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
           <div className="mb-8 text-center">
             <Image
@@ -53,7 +53,7 @@ export default async function LoginPage({
 
           <p className="mt-6 text-center text-sm text-white/60">
             ¿Aún no tienes cuenta?{" "}
-            <Link href="/registro" className="font-medium text-fuchsia-400 hover:underline">
+            <Link href="/registro" className="font-medium text-violet-400 hover:underline">
               Regístrate
             </Link>
           </p>

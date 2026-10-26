@@ -5,6 +5,13 @@
   --foreground: #171717;
 }
 
+/* Paleta de la app: fondo oscuro neutro con un leve tono de marca; el color vive solo en los acentos. */
+@theme {
+  --color-ink: #0f0d15; /* fondo de página */
+  --color-surface: #17141f; /* tarjetas, menú y barras */
+  --color-surface-2: #201c2b; /* ventanas y menús flotantes */
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -20,7 +27,7 @@
 }
 
 body {
-  background: #0f0721;
+  background: #0f0d15;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

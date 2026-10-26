@@ -19,7 +19,7 @@ import { playSuccessDing, playVictoryFanfare } from "@/lib/successSound";
 import { trackCustomEvent } from "@/lib/metaPixel";
 
 const inputBase =
-  "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-fuchsia-500";
+  "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-violet-500";
 
 const blackButton =
   "rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition hover:bg-black";
@@ -101,8 +101,8 @@ function PromptField({ field }: { field: MissionField }) {
   };
 
   return (
-    <div className="rounded-xl border border-dashed border-fuchsia-300 bg-fuchsia-50 p-4">
-      <p className="mb-2 text-sm font-semibold text-fuchsia-700">💡 {field.label}</p>
+    <div className="rounded-xl border border-dashed border-violet-300 bg-violet-50 p-4">
+      <p className="mb-2 text-sm font-semibold text-violet-700">💡 {field.label}</p>
 
       {field.promptVars && field.promptVars.length > 0 && (
         <div className="mb-3 flex flex-col gap-2">
@@ -111,7 +111,7 @@ function PromptField({ field }: { field: MissionField }) {
             const isLocked = value.trim().length > 0 && !editing[v.id] && !v.noLock;
             return (
               <div key={v.id}>
-                <label className="mb-1 block text-xs font-medium text-fuchsia-700">
+                <label className="mb-1 block text-xs font-medium text-violet-700">
                   {v.label}
                 </label>
                 {isLocked ? (
@@ -332,11 +332,11 @@ function ListField({
   const row = (item: string, i: number) => (
     <div key={i} className="flex items-center gap-2">
       {field.badgeLabel ? (
-        <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">
+        <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-700">
           {field.badgeLabel} {i + 1}
         </span>
       ) : (
-        <span className="text-fuchsia-500">•</span>
+        <span className="text-violet-500">•</span>
       )}
       <input
         name={`field_${field.id}`}
@@ -360,7 +360,7 @@ function ListField({
   );
 
   return (
-    <div className={field.emphasis ? "rounded-xl bg-[#2a1150] p-4" : undefined}>
+    <div className={field.emphasis ? "rounded-xl bg-surface-2 p-4" : undefined}>
       {field.emphasis ? (
         <>
           <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
@@ -407,7 +407,7 @@ function ListField({
           type="button"
           onClick={addItem}
           className={`mt-2 text-sm font-medium hover:underline ${
-            field.emphasis ? "text-fuchsia-300" : "text-fuchsia-600"
+            field.emphasis ? "text-violet-300" : "text-violet-600"
           }`}
         >
           {field.addLabel ?? "+ Añadir"}
@@ -511,7 +511,7 @@ function SliderField({
             step={field.sliderStep ?? 1}
             value={current}
             onChange={(e) => onChange(field.id, e.target.value)}
-            className="slider-big w-full accent-fuchsia-500"
+            className="slider-big w-full accent-violet-500"
           />
         </div>
         <div className="mt-1 flex justify-between text-[11px] text-gray-400">
@@ -568,7 +568,7 @@ function CelebrationModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="celebration-card relative flex w-full max-w-2xl flex-col items-center rounded-3xl bg-gradient-to-b from-[#3b0764] to-[#0f0721] p-8 text-center shadow-2xl sm:p-12"
+        className="celebration-card relative flex w-full max-w-2xl flex-col items-center rounded-3xl bg-surface-2 p-8 text-center shadow-2xl sm:p-12"
       >
         <button
           type="button"
@@ -718,7 +718,7 @@ function FieldInput({
     return (
       <div>
         <div className="flex items-center gap-3">
-          <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-fuchsia-100 px-3 py-1.5 text-xs font-bold text-fuchsia-700">
+          <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-violet-100 px-3 py-1.5 text-xs font-bold text-violet-700">
             {field.badgeLabel ?? field.label}
           </span>
           <input
@@ -737,7 +737,7 @@ function FieldInput({
 
   if (field.emphasis && (field.type === "text" || field.type === "textarea")) {
     return (
-      <div className="rounded-xl bg-[#2a1150] p-4">
+      <div className="rounded-xl bg-surface-2 p-4">
         <p className="text-lg font-extrabold text-white sm:text-xl">{field.label}</p>
         <p className="mb-3 mt-0.5 text-xs font-semibold text-white/60">
           Escríbelo a continuación
@@ -856,14 +856,14 @@ function FieldInput({
                   onClick={() => onChange(field.id, opt.value)}
                   className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-3 text-center transition ${
                     selected
-                      ? "border-fuchsia-400 bg-fuchsia-50"
+                      ? "border-violet-400 bg-violet-50"
                       : "border-gray-200 bg-white hover:bg-gray-50"
                   }`}
                 >
                   {opt.icon && (
                     <span
                       className={`flex h-11 w-11 items-center justify-center rounded-full ${
-                        selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+                        selected ? "bg-violet-100 text-violet-600" : "bg-gray-100 text-gray-400"
                       }`}
                     >
                       <PlatformIcon id={opt.icon} className="h-6 w-6" />
@@ -871,7 +871,7 @@ function FieldInput({
                   )}
                   <span
                     className={`text-xs font-bold uppercase tracking-wide ${
-                      selected ? "text-fuchsia-700" : "text-gray-500"
+                      selected ? "text-violet-700" : "text-gray-500"
                     }`}
                   >
                     {opt.label}
@@ -943,7 +943,7 @@ function FieldInput({
                 }}
                 className={`rounded-xl border-2 px-4 py-3 text-sm font-bold transition ${
                   selected
-                    ? "border-fuchsia-400 bg-fuchsia-50 text-fuchsia-700"
+                    ? "border-violet-400 bg-violet-50 text-violet-700"
                     : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
                 }`}
               >
@@ -1012,19 +1012,19 @@ function FieldInput({
                 }}
                 className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-3 text-center transition ${
                   selected
-                    ? "border-fuchsia-400 bg-fuchsia-50"
+                    ? "border-violet-400 bg-violet-50"
                     : "border-gray-200 bg-white hover:bg-gray-50"
                 }`}
               >
                 {selected && (
-                  <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-fuchsia-500 text-[10px] font-bold text-white">
+                  <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-violet-500 text-[10px] font-bold text-white">
                     ✓
                   </span>
                 )}
                 {opt.icon && (
                   <span
                     className={`flex h-11 w-11 items-center justify-center rounded-full ${
-                      selected ? "bg-fuchsia-100 text-fuchsia-600" : "bg-gray-100 text-gray-400"
+                      selected ? "bg-violet-100 text-violet-600" : "bg-gray-100 text-gray-400"
                     }`}
                   >
                     <PlatformIcon id={opt.icon} className="h-6 w-6" />
@@ -1032,7 +1032,7 @@ function FieldInput({
                 )}
                 <span
                   className={`text-xs font-bold uppercase tracking-wide ${
-                    selected ? "text-fuchsia-700" : "text-gray-500"
+                    selected ? "text-violet-700" : "text-gray-500"
                   }`}
                 >
                   {opt.label}
@@ -1195,7 +1195,7 @@ export default function MissionForm({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex-shrink-0 text-4xl sm:text-5xl">{emoji}</span>
-          <span className="flex-shrink-0 rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-fuchsia-700">
+          <span className="flex-shrink-0 rounded-full bg-violet-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-violet-700">
             Día {day}
           </span>
           <h1 className="truncate text-xl font-bold text-gray-900 sm:text-2xl">{title}</h1>
@@ -1230,7 +1230,7 @@ export default function MissionForm({
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-amber-400 transition-all"
               style={{ width: `${total ? (done / total) * 100 : 0}%` }}
             />
           </div>
@@ -1313,7 +1313,7 @@ export default function MissionForm({
             )}
             {section.imagePosition === "above-heading" && sectionImage}
             {section.emphasis ? (
-              <div className="rounded-xl bg-[#2a1150] p-4 lg:p-6">
+              <div className="rounded-xl bg-surface-2 p-4 lg:p-6">
                 <p className="mb-4 text-lg font-extrabold text-white sm:text-xl">
                   {section.heading}
                 </p>
@@ -1322,7 +1322,7 @@ export default function MissionForm({
               </div>
             ) : (
               <>
-                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-fuchsia-600">
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-violet-600">
                   {section.heading}
                 </h2>
                 {section.imagePosition !== "above-heading" && sectionImage}
@@ -1359,7 +1359,7 @@ export default function MissionForm({
                 </span>
                 <span
                   aria-hidden="true"
-                  className="text-lg leading-none text-fuchsia-600 transition-transform group-open:rotate-180"
+                  className="text-lg leading-none text-violet-600 transition-transform group-open:rotate-180"
                 >
                   ⌄
                 </span>

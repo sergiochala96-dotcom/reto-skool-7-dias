@@ -60,7 +60,7 @@ export default function TriviaCalendar({
                   : day > todayDay
                   ? "bg-white/[0.03] text-white/20"
                   : "bg-white/[0.08] text-white/40"
-              } ${isToday ? "ring-2 ring-fuchsia-400" : ""}`}
+              } ${isToday ? "ring-2 ring-violet-400" : ""}`}
             >
               {isDone ? (
                 <svg

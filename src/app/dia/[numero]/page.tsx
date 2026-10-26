@@ -40,7 +40,7 @@ export default async function DiaPage({
   const introVideo = getDayIntroVideo(day);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#3b0764,#0f0721_65%)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
       {introVideo && (
         <DayIntroVideo
           key={day}
