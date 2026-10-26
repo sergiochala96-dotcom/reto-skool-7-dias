@@ -22,7 +22,6 @@ import NotificationsMenu from "@/components/NotificationsMenu";
 import SkoolyLogo from "@/components/SkoolyLogo";
 import { MobileBottomNav, MobileTopBar } from "@/components/MobileChrome";
 import WelcomeVideoReplayButton from "@/components/WelcomeVideoReplayButton";
-import WorkshopMenuButton from "@/components/WorkshopModal";
 
 // Elementos del menú: etiquetas en mayúsculas y negrita, esquinas redondeadas y borde de color en
 // el que está activo (estilo Duolingo).
@@ -223,7 +222,15 @@ export default function Sidebar({
             </span>
             {!effectiveCollapsed && <span>Tienda</span>}
           </Link>
-          <WorkshopMenuButton collapsed={effectiveCollapsed} className={`${NAV_ITEM} ${NAV_IDLE}`} />
+          <Link
+            href="/dashboard/workshop"
+            onClick={() => setMobileOpen(false)}
+            title={effectiveCollapsed ? "Workshop EN VIVO" : undefined}
+            className={`${NAV_ITEM} ${pathname === "/dashboard/workshop" ? NAV_ACTIVE : NAV_IDLE}`}
+          >
+            <span className="flex h-7 w-7 items-center justify-center text-2xl">🔴</span>
+            {!effectiveCollapsed && <span>Workshop EN VIVO</span>}
+          </Link>
           <Link
             href="/dashboard/perfil"
             onClick={() => setMobileOpen(false)}
