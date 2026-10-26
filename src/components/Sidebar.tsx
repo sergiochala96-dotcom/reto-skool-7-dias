@@ -205,11 +205,11 @@ export default function Sidebar({
           <Link
             href="/dashboard/trivia"
             onClick={() => setMobileOpen(false)}
-            title={effectiveCollapsed ? "Trivia del día" : undefined}
+            title={effectiveCollapsed ? "Trivias" : undefined}
             className={`${NAV_ITEM} ${pathname === "/dashboard/trivia" ? NAV_ACTIVE : NAV_IDLE}`}
           >
             <span className="flex h-7 w-7 items-center justify-center text-2xl">🧠</span>
-            {!effectiveCollapsed && <span>Trivia del día</span>}
+            {!effectiveCollapsed && <span>Trivias</span>}
           </Link>
           <Link
             href="/dashboard/tienda"
@@ -225,11 +225,11 @@ export default function Sidebar({
           <Link
             href="/dashboard/workshop"
             onClick={() => setMobileOpen(false)}
-            title={effectiveCollapsed ? "Workshop EN VIVO" : undefined}
+            title={effectiveCollapsed ? "Workshop" : undefined}
             className={`${NAV_ITEM} ${pathname === "/dashboard/workshop" ? NAV_ACTIVE : NAV_IDLE}`}
           >
             <span className="flex h-7 w-7 items-center justify-center text-2xl">🔴</span>
-            {!effectiveCollapsed && <span>Workshop EN VIVO</span>}
+            {!effectiveCollapsed && <span>Workshop</span>}
           </Link>
           <Link
             href="/dashboard/perfil"
