@@ -4,7 +4,13 @@ import { useState, useTransition } from "react";
 import { adminSendTestPush } from "@/app/actions";
 
 // Manda un aviso de prueba a un dispositivo de la lista.
-export default function TestPushButton({ subscriptionId }: { subscriptionId: string }) {
+export default function TestPushButton({
+  subscriptionId,
+  compact = false,
+}: {
+  subscriptionId: string;
+  compact?: boolean;
+}) {
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -27,9 +33,11 @@ export default function TestPushButton({ subscriptionId }: { subscriptionId: str
             );
           })
         }
-        className="rounded-lg border border-white/20 px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/10 disabled:opacity-60"
+        className={`rounded-lg border border-white/20 font-semibold text-white/80 transition hover:bg-white/10 disabled:opacity-60 ${
+          compact ? "px-2.5 py-1 text-[11px]" : "px-3 py-1.5 text-xs"
+        }`}
       >
-        {pending ? "Enviando..." : "Enviar prueba"}
+        {pending ? "Enviando..." : compact ? "Probar" : "Enviar prueba"}
       </button>
       {msg && <p className={`text-xs ${msg.ok ? "text-emerald-300" : "text-red-300"}`}>{msg.text}</p>}
     </div>

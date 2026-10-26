@@ -9,6 +9,19 @@ import JoinCodesForm from "@/components/JoinCodesForm";
 import { pushConfigured } from "@/lib/push";
 import { DEVICE_ICON, DEVICE_LABEL, detectDevice } from "@/lib/device";
 
+// Fecha corta para la lista compacta (sin año).
+function formatShort(iso: string) {
+  return new Date(iso).toLocaleString("es", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// Cuántos dispositivos se dibujan en la lista (el resto solo cuenta en el resumen).
+const MAX_LISTED = 100;
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("es", {
     day: "numeric",
@@ -39,12 +52,19 @@ export default async function AdminNotificationsPage() {
       .order("created_at", { ascending: false }),
   ]);
   const pushUsers = new Set((pushRows ?? []).map((r) => r.user_id as string)).size;
-  const { data: pushProfiles } = pushUsers
+  const listedRows = (pushRows ?? []).slice(0, MAX_LISTED);
+  const { data: pushProfiles } = listedRows.length
     ? await supabase
         .from("profiles")
         .select("id, email")
-        .in("id", [...new Set((pushRows ?? []).map((r) => r.user_id as string))])
+        .in("id", [...new Set(listedRows.map((r) => r.user_id as string))])
     : { data: [] };
+  // Resumen por tipo de dispositivo (de todos, no solo de los que aparecen en la lista).
+  const deviceCounts = new Map<string, number>();
+  for (const r of pushRows ?? []) {
+    const d = detectDevice(r.user_agent as string | null);
+    deviceCounts.set(d, (deviceCounts.get(d) ?? 0) + 1);
+  }
   const emailById = new Map((pushProfiles ?? []).map((p) => [p.id as string, p.email as string]));
   const pushReady = pushConfigured();
   const { data: codeRows } = await supabase.from("join_codes").select("kind, code");
@@ -94,28 +114,54 @@ export default async function AdminNotificationsPage() {
               </p>
             )}
             {pushReady && (pushRows ?? []).length > 0 && (
-              <ul className="mt-3 flex flex-col gap-2">
-                {(pushRows ?? []).map((r) => {
-                  const device = detectDevice(r.user_agent as string | null);
-                  return (
-                    <li
-                      key={r.id as string}
-                      className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2"
+              <>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[...deviceCounts.entries()].map(([device, n]) => (
+                    <span
+                      key={device}
+                      className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-white">
-                          {DEVICE_ICON[device]} {DEVICE_LABEL[device]} ·{" "}
-                          {emailById.get(r.user_id as string) ?? "cuenta eliminada"}
-                        </p>
-                        <p className="text-xs text-white/40">
-                          Activado el {formatDateTime(r.created_at as string)}
-                        </p>
-                      </div>
-                      <TestPushButton subscriptionId={r.id as string} />
-                    </li>
-                  );
-                })}
-              </ul>
+                      {DEVICE_ICON[device as keyof typeof DEVICE_ICON]}{" "}
+                      {DEVICE_LABEL[device as keyof typeof DEVICE_LABEL]} · {n}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Lista plegada: se abre solo cuando se necesita (por ejemplo, para mandar una prueba). */}
+                <details className="group mt-3">
+                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-violet-300 transition hover:text-violet-200 [&::-webkit-details-marker]:hidden">
+                    <span className="inline-block transition group-open:rotate-90" aria-hidden="true">
+                      ▸
+                    </span>
+                    <span className="group-open:hidden">Ver dispositivos ({(pushRows ?? []).length})</span>
+                    <span className="hidden group-open:inline">Ocultar dispositivos</span>
+                  </summary>
+                  <ul className="mt-2 max-h-72 divide-y divide-white/5 overflow-y-auto rounded-xl bg-white/5">
+                    {listedRows.map((r) => {
+                      const device = detectDevice(r.user_agent as string | null);
+                      return (
+                        <li key={r.id as string} className="flex items-center gap-3 px-3 py-1.5">
+                          <span className="text-base" title={DEVICE_LABEL[device]}>
+                            {DEVICE_ICON[device]}
+                          </span>
+                          <p className="min-w-0 flex-1 truncate text-sm text-white">
+                            {emailById.get(r.user_id as string) ?? "cuenta eliminada"}
+                          </p>
+                          <span className="hidden shrink-0 text-xs text-white/40 sm:block">
+                            {formatShort(r.created_at as string)}
+                          </span>
+                          <TestPushButton subscriptionId={r.id as string} compact />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {(pushRows ?? []).length > MAX_LISTED && (
+                    <p className="mt-2 text-xs text-white/40">
+                      Mostrando los {MAX_LISTED} más recientes de {(pushRows ?? []).length}.
+                    </p>
+                  )}
+                </details>
+              </>
             )}
           </div>
 
