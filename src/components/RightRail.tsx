@@ -42,9 +42,10 @@ export default function RightRail({
   return (
     <aside
       // Solo en pantallas de 1400 px o más (el centro necesita espacio para el camino del reto); por
-      // debajo, el panel muestra solo la barra de estadísticas arriba a la derecha. Sin altura fija
-      // ni barra propia: se desplaza junto con la página.
-      className="hidden min-[1400px]:flex w-[22rem] shrink-0 flex-col gap-4 px-5 py-6"
+      // debajo, el panel muestra solo la barra de estadísticas arriba a la derecha. Queda fija a la
+      // vista mientras se baja por la página (como el menú de la izquierda); si el contenido es más alto
+      // que la pantalla, se desplaza por dentro sin mostrar barra.
+      className="hidden min-[1400px]:flex sticky top-0 max-h-screen w-[22rem] shrink-0 flex-col gap-4 self-start overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {/* Los cuatro iconos (racha, monedas, vidas y notificaciones) dentro de una tarjeta del mismo ancho que las demás. */}
       <section className="rounded-2xl border-2 border-white/10 bg-white/[0.03] p-1.5">
