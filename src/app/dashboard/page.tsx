@@ -128,6 +128,14 @@ export default async function DashboardPage() {
             {/* El Episodio 2 lo ve todo el mundo; está bloqueado salvo con plan Premium/VIP o acceso
                 abierto a mano desde el panel de admin. */}
             <div id="episodio-2">
+              {/* Separador entre episodios (computadora): una línea con el nombre del siguiente. */}
+              <div className="mx-auto mt-20 flex max-w-3xl items-center gap-4 max-md:hidden" role="separator">
+                <span className="h-px flex-1 bg-gradient-to-r from-transparent to-sky-400/70" />
+                <span className="rounded-full border border-sky-400/40 bg-sky-400/10 px-6 py-2 text-sm font-extrabold uppercase tracking-widest text-sky-300">
+                  Episodio 2
+                </span>
+                <span className="h-px flex-1 bg-gradient-to-l from-transparent to-sky-400/70" />
+              </div>
               <Episode2Card locked={episode2Locked} admin={admin} />
             </div>
           </div>

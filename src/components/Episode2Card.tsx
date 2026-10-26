@@ -84,7 +84,7 @@ export default function Episode2Card({
 }) {
   return (
     <div
-      className={`relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-sky-400/30 bg-surface px-4 pb-8 pt-8 shadow-xl shadow-black/30 max-md:mx-4 max-md:max-w-2xl sm:px-6 md:mt-10 md:max-w-3xl md:border-0 md:bg-transparent md:px-0 md:pt-0 md:shadow-none ${
+      className={`relative mx-auto mt-5 overflow-hidden rounded-3xl border-2 border-sky-400/30 bg-surface px-4 pb-8 pt-8 shadow-xl shadow-black/30 max-md:mx-4 max-md:max-w-2xl sm:px-6 md:mt-6 md:max-w-3xl md:border-0 md:bg-transparent md:px-0 md:pt-0 md:shadow-none ${
         locked ? "min-h-[17rem]" : ""
       }`}
     >

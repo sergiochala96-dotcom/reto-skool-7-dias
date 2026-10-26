@@ -27,6 +27,8 @@ const EPISODES = {
 // Fracción de la altura de la pantalla: cuando el Episodio 2 sube por encima de esta línea ya se
 // considera que se está en él (el Episodio 2 es lo último de la página y puede no llegar más arriba).
 const SWITCH_LINE = 0.6;
+// En computadora el separador de episodios se ve arriba, así que el cambio ocurre un poco después.
+const SWITCH_LINE_DESKTOP = 0.4;
 
 export default function EpisodeStickyHeader({
   completed,
@@ -42,7 +44,7 @@ export default function EpisodeStickyHeader({
     const update = () => {
       frame = 0;
       const second = document.getElementById("episodio-2");
-      const reached = second ? second.getBoundingClientRect().top <= window.innerHeight * SWITCH_LINE : false;
+      const reached = second ? second.getBoundingClientRect().top <= window.innerHeight * (window.innerWidth >= 768 ? SWITCH_LINE_DESKTOP : SWITCH_LINE) : false;
       setEpisode(reached ? 2 : 1);
     };
     const onScroll = () => {
@@ -61,7 +63,7 @@ export default function EpisodeStickyHeader({
   const current = EPISODES[episode];
 
   return (
-    <div className="sticky top-16 z-30 mb-4 md:top-3 md:mb-6">
+    <div className="sticky top-16 z-30 mb-4 md:top-3 md:mx-auto md:mb-6 md:max-w-3xl">
       <div
         className={`flex items-center justify-between gap-3 rounded-2xl border-b-4 px-4 py-3 shadow-lg shadow-black/30 md:border-b-0 md:px-5 md:py-3.5 ${current.card}`}
       >
