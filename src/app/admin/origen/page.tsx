@@ -26,7 +26,7 @@ type Lead = {
 const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "organico", label: "Orgánico" },
-  { key: "pagado", label: "Pagado" },
+  { key: "pagado", label: "Anuncios" },
   { key: "otro", label: "Otro" },
   { key: "sin_etiqueta", label: "Sin etiqueta" },
 ];
@@ -84,7 +84,7 @@ export default async function OrigenPage({
 
   const cards: { type: TrafficType; label: string }[] = [
     { type: "organico", label: "Orgánico" },
-    { type: "pagado", label: "Pagado" },
+    { type: "pagado", label: "Anuncios" },
     { type: "otro", label: "Otro" },
     { type: "sin_etiqueta", label: "Sin etiqueta" },
   ];
@@ -111,7 +111,7 @@ export default async function OrigenPage({
             <p className="mt-1 text-sm text-white/60">
               De dónde llegan las personas que dejan su correo en /reto. Se mide con la etiqueta{" "}
               <code className="text-violet-300">utm_medium</code> del enlace (organic = orgánico,
-              paid = pagado).
+              paid = anuncios).
             </p>
           </header>
 

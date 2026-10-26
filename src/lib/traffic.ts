@@ -24,16 +24,16 @@ export function classifyTraffic(medium?: string | null): TrafficType {
 }
 
 export const TRAFFIC_LABEL: Record<TrafficType, string> = {
-  pagado: "Pagado",
+  pagado: "Anuncios",
   organico: "Orgánico",
   otro: "Otro",
   sin_etiqueta: "Sin etiqueta",
 };
 
 export const TRAFFIC_STYLE: Record<TrafficType, string> = {
-  pagado: "bg-amber-400/20 text-amber-300",
+  pagado: "bg-cyan-400/20 text-cyan-300",
   organico: "bg-emerald-400/20 text-emerald-300",
-  otro: "bg-sky-400/20 text-sky-300",
+  otro: "bg-violet-400/20 text-violet-300",
   sin_etiqueta: "bg-white/10 text-white/50",
 };
 
