@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { CoinIcon } from "@/components/StatIcons";
+import { INSTALL_REWARD } from "@/lib/captacion";
 import { trackCustomEvent } from "@/lib/metaPixel";
 
 // Instalar Skooly como aplicación en el celular (se ve como un icono en la pantalla de inicio
@@ -260,7 +262,7 @@ function DotsIcon() {
 
 function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="mx-0.5 inline-flex translate-y-1 items-center justify-center rounded-md bg-purple-100 px-1.5 py-0.5 text-purple-900">
+    <span className="mx-0.5 inline-flex translate-y-1 items-center justify-center rounded-md bg-white/15 px-1.5 py-0.5 text-violet-200">
       {children}
     </span>
   );
@@ -269,10 +271,10 @@ function Chip({ children }: { children: ReactNode }) {
 function Step({ n, children }: { n: number; children: ReactNode }) {
   return (
     <li className="flex items-start gap-3 text-left">
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-purple-700 text-sm font-extrabold text-white">
+      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500 text-sm font-extrabold text-white">
         {n}
       </span>
-      <p className="text-sm leading-relaxed text-purple-950/80">{children}</p>
+      <p className="text-sm leading-relaxed text-white/80">{children}</p>
     </li>
   );
 }
@@ -319,17 +321,17 @@ export function InstallInstructions({
       aria-modal="true"
       aria-labelledby="install-title"
       onClick={onClose}
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-purple-950/80 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-4 sm:items-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl bg-white p-6 pt-7 shadow-2xl shadow-purple-950/40"
+        className="relative w-full max-w-sm animate-[popIn_0.25s_ease-out] rounded-3xl border border-white/10 bg-surface-2 p-6 pt-7 text-white shadow-2xl shadow-black/60"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold text-purple-950/50 transition hover:bg-purple-100 hover:text-purple-950"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold text-white/50 transition hover:bg-white/10 hover:text-white"
         >
           ✕
         </button>
@@ -343,14 +345,19 @@ export function InstallInstructions({
             height={64}
             className="mx-auto h-16 w-16 rounded-2xl shadow-lg"
           />
-          <h2 id="install-title" className="mt-3 text-xl font-extrabold leading-tight text-purple-950">
+          <h2 id="install-title" className="mt-3 text-xl font-extrabold leading-tight text-white">
             Instala Skooly en tu celular
           </h2>
-          <p className="mt-1 text-sm text-purple-950/60">
+          <p className="mt-1 text-sm text-white/60">
             {kind === "inapp"
               ? "Esta página está abierta dentro de otra app. Ábrela en tu navegador para instalar."
               : "Queda como un icono en tu pantalla y se abre como una app, sin navegador."}
           </p>
+          {/* Premio por instalar: se da la primera vez que se abre la app desde su icono. */}
+          <p className="mx-auto mt-3 inline-flex items-center gap-2 rounded-2xl bg-black/30 px-4 py-2 text-sm font-extrabold text-amber-300">
+            <CoinIcon className="h-5 w-5" /> Gana +{INSTALL_REWARD} monedas de oro
+          </p>
+          <p className="mt-1 text-xs text-white/45">Se suman la primera vez que abras Skooly desde su icono.</p>
         </div>
 
         <ol className="mt-5 flex flex-col gap-3.5">
@@ -421,14 +428,14 @@ export function InstallInstructions({
           <button
             type="button"
             onClick={copyLink}
-            className="mt-5 w-full rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm font-bold text-purple-900 transition hover:bg-purple-100"
+            className="mt-5 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
           >
             {copied ? "✓ ¡Enlace copiado!" : "Copiar el enlace para abrirlo en el navegador"}
           </button>
         )}
 
         {kind === "ios" && (
-          <p className="mt-4 text-center text-xs text-purple-950/50">
+          <p className="mt-4 text-center text-xs text-white/50">
             Al tocar el botón, una flecha te mostrará dónde está. ¿No ves la opción? Prueba abriendo
             esta página en Safari.
           </p>
