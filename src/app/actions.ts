@@ -573,7 +573,7 @@ export async function adminCreateNotification(
   // Además de la campanita, el aviso puede salir en la pantalla de bloqueo de quienes lo activaron.
   const alsoPush = formData.get("push") === "on" && pushConfigured();
   if (alsoPush) {
-    const preview = body.replace(/s+/g, " ");
+    const preview = body.replace(/\s+/g, " ");
     after(async () => {
       const service = createServiceClient();
       if (!service) return;
