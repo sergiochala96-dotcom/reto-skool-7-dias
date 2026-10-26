@@ -33,6 +33,22 @@ function plain(v: unknown) {
     .toLowerCase();
 }
 
+// Columnas de "Correos captados" por las que se puede ordenar. Al primer clic, los textos van de A a Z
+// y la fecha del más reciente al más antiguo; otro clic invierte el sentido.
+const SORT_KEYS = ["nombre", "email", "tipo", "fuente", "campana", "contenido", "dispositivo", "fecha"] as const;
+type SortKey = (typeof SORT_KEYS)[number];
+const FIRST_DIR: Record<SortKey, "asc" | "desc"> = {
+  nombre: "asc",
+  email: "asc",
+  tipo: "asc",
+  fuente: "asc",
+  campana: "asc",
+  contenido: "asc",
+  dispositivo: "asc",
+  fecha: "desc",
+};
+const TYPE_RANK: Record<TrafficType, number> = { pagado: 0, organico: 1, reto_skool: 2, otro: 3, sin_etiqueta: 4 };
+
 const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "organico", label: "Orgánico" },
@@ -45,13 +61,25 @@ const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
 export default async function OrigenPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tipo?: string; pageSize?: string; page?: string; q?: string }>;
+  searchParams: Promise<{
+    tipo?: string;
+    pageSize?: string;
+    page?: string;
+    q?: string;
+    sort?: string;
+    dir?: string;
+  }>;
 }) {
   const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =
     await getSidebarData();
   if (!admin) redirect("/dashboard");
 
-  const { tipo, pageSize: pageSizeParam, page: pageParam, q: qParam } = await searchParams;
+  const { tipo, pageSize: pageSizeParam, page: pageParam, q: qParam, sort: sortParam, dir: dirParam } =
+    await searchParams;
+  const sort: SortKey = (SORT_KEYS as readonly string[]).includes(sortParam ?? "")
+    ? (sortParam as SortKey)
+    : "fecha";
+  const dir: "asc" | "desc" = dirParam === "asc" || dirParam === "desc" ? dirParam : FIRST_DIR[sort];
   const filter = FILTERS.some((f) => f.key === tipo) ? (tipo as TrafficType | "todos") : "todos";
   const pageSize = PAGE_SIZES.includes(Number(pageSizeParam) as (typeof PAGE_SIZES)[number])
     ? Number(pageSizeParam)
@@ -102,20 +130,84 @@ export default async function OrigenPage({
       (filter === "todos" || l.type === filter) &&
       (!needle || plain(l.name).includes(needle) || plain(l.email).includes(needle))
   );
-  const totalPages = Math.max(1, Math.ceil(matching.length / pageSize));
+  const sortValue = (l: (typeof leads)[number]): string | number | null => {
+    switch (sort) {
+      case "nombre":
+        return l.name ? plain(l.name) : null;
+      case "email":
+        return plain(l.email);
+      case "tipo":
+        return TYPE_RANK[l.type];
+      case "fuente":
+        return l.utm_source ? plain(l.utm_source) : null;
+      case "campana":
+        return l.utm_campaign ? plain(l.utm_campaign) : null;
+      case "contenido":
+        return l.utm_content ? plain(l.utm_content) : null;
+      case "dispositivo":
+        return isDevice(l.device) ? plain(DEVICE_LABEL[l.device]) : null;
+      default:
+        return new Date(l.created_at).getTime();
+    }
+  };
+  const sorted = matching
+    .map((l) => ({ l, v: sortValue(l) }))
+    .sort((a, b) => {
+      // Los que no tienen dato quedan siempre al final.
+      if (a.v === null && b.v === null) return 0;
+      if (a.v === null) return 1;
+      if (b.v === null) return -1;
+      const cmp =
+        typeof a.v === "string" && typeof b.v === "string"
+          ? a.v.localeCompare(b.v, "es")
+          : Number(a.v) - Number(b.v);
+      return dir === "asc" ? cmp : -cmp;
+    })
+    .map((x) => x.l);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const page = Math.min(totalPages, Math.max(1, Number(pageParam) || 1));
-  const shown = matching.slice((page - 1) * pageSize, page * pageSize);
+  const shown = sorted.slice((page - 1) * pageSize, page * pageSize);
 
   // Enlace a esta pantalla cambiando solo lo indicado (se conservan filtro, búsqueda y tamaño).
-  const href = (over: { tipo?: string; pageSize?: number; page?: number; q?: string }) => {
-    const v = { tipo: filter as string, pageSize, page: 1, q, ...over };
+  const href = (over: {
+    tipo?: string;
+    pageSize?: number;
+    page?: number;
+    q?: string;
+    sort?: SortKey;
+    dir?: "asc" | "desc";
+  }) => {
+    const v = { tipo: filter as string, pageSize, page: 1, q, sort, dir, ...over };
     const p = new URLSearchParams();
+    if (v.sort !== "fecha" || v.dir !== FIRST_DIR.fecha) {
+      p.set("sort", v.sort);
+      p.set("dir", v.dir);
+    }
     if (v.tipo !== "todos") p.set("tipo", v.tipo);
     if (v.pageSize !== 25) p.set("pageSize", String(v.pageSize));
     if (v.q) p.set("q", v.q);
     if (v.page > 1) p.set("page", String(v.page));
     const qs = p.toString();
     return `/admin/origen${qs ? `?${qs}` : ""}#correos`;
+  };
+  const sortHead = (key: SortKey, label: string) => {
+    const active = sort === key;
+    return (
+      <th
+        className="px-3 py-3 xl:px-4 font-medium"
+        aria-sort={active ? (dir === "asc" ? "ascending" : "descending") : "none"}
+      >
+        <a
+          href={href({ sort: key, dir: active ? (dir === "asc" ? "desc" : "asc") : FIRST_DIR[key], page: 1 })}
+          className={`inline-flex items-center gap-1 transition hover:text-white ${active ? "text-white" : ""}`}
+        >
+          {label}
+          <span className={`text-[10px] ${active ? "text-violet-300" : "text-white/25"}`} aria-hidden="true">
+            {active ? (dir === "asc" ? "▲" : "▼") : "↕"}
+          </span>
+        </a>
+      </th>
+    );
   };
 
   const cards: { type: TrafficType; label: string }[] = [
@@ -265,6 +357,12 @@ export default async function OrigenPage({
               <form action="/admin/origen#correos" method="get" role="search" className="relative">
                 {filter !== "todos" && <input type="hidden" name="tipo" value={filter} />}
                 {pageSize !== 25 && <input type="hidden" name="pageSize" value={pageSize} />}
+                {(sort !== "fecha" || dir !== FIRST_DIR.fecha) && (
+                  <>
+                    <input type="hidden" name="sort" value={sort} />
+                    <input type="hidden" name="dir" value={dir} />
+                  </>
+                )}
                 <label htmlFor="origen-search" className="sr-only">
                   Buscar por nombre o correo
                 </label>
@@ -291,14 +389,14 @@ export default async function OrigenPage({
               <p className="text-sm text-white/60">
                 {q ? (
                   <>
-                    {matching.length} resultado{matching.length === 1 ? "" : "s"} ·{" "}
+                    {sorted.length} resultado{sorted.length === 1 ? "" : "s"} ·{" "}
                     <a href={href({ q: "", page: 1 })} className="text-violet-300 hover:underline">
                       Quitar búsqueda
                     </a>
                   </>
                 ) : (
                   <>
-                    {matching.length} contacto{matching.length === 1 ? "" : "s"}
+                    {sorted.length} contacto{sorted.length === 1 ? "" : "s"}
                   </>
                 )}
               </p>
@@ -324,14 +422,14 @@ export default async function OrigenPage({
             <table className="w-full whitespace-nowrap text-left text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-white/50">
-                  <th className="px-3 py-3 xl:px-4 font-medium">Nombre</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Email</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Tipo</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Fuente</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Campaña</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Contenido</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Dispositivo</th>
-                  <th className="px-3 py-3 xl:px-4 font-medium">Fecha</th>
+                  {sortHead("nombre", "Nombre")}
+                  {sortHead("email", "Email")}
+                  {sortHead("tipo", "Tipo")}
+                  {sortHead("fuente", "Fuente")}
+                  {sortHead("campana", "Campaña")}
+                  {sortHead("contenido", "Contenido")}
+                  {sortHead("dispositivo", "Dispositivo")}
+                  {sortHead("fecha", "Fecha")}
                 </tr>
               </thead>
               <tbody>
