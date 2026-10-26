@@ -128,7 +128,13 @@ export default async function DashboardPage() {
         </div>
       </main>
 
-      <RightRail completedDays={completedList} coins={coins} lives={lives} claimed={claimed} />
+      <RightRail
+        completedDays={completedList}
+        coins={coins}
+        lives={lives}
+        claimed={claimed}
+        notifications={notifications}
+      />
     </>
   );
 }

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import JoinRewards from "@/components/JoinRewards";
+import NotificationsMenu from "@/components/NotificationsMenu";
 import StatsBar from "@/components/StatsBar";
 import { CoinIcon } from "@/components/StatIcons";
 import TreasureChestIcon from "@/components/TreasureChestIcon";
 import { TOTAL_DAYS, isDayUnlocked } from "@/lib/challenge";
 import { SUPPORT_EMAIL } from "@/lib/legal";
+import type { SidebarNotification } from "@/lib/sidebar-data";
 
 const card = "rounded-2xl border-2 border-white/10 bg-white/[0.03] p-4";
 const cardHead = "flex items-center justify-between gap-2";
@@ -19,11 +21,13 @@ export default function RightRail({
   coins,
   lives,
   claimed,
+  notifications,
 }: {
   completedDays: number[];
   coins: number;
   lives: number;
   claimed: { whatsapp: boolean; skool: boolean };
+  notifications: SidebarNotification[];
 }) {
   const done = new Set(completedDays);
   const count = done.size;
@@ -42,7 +46,16 @@ export default function RightRail({
       // ni barra propia: se desplaza junto con la página.
       className="hidden min-[1400px]:flex w-[22rem] shrink-0 flex-col gap-4 px-5 py-6"
     >
-      <StatsBar completedDays={completedDays} coins={coins} lives={lives} />
+      {/* Los cuatro iconos (racha, monedas, vidas y notificaciones) dentro de una tarjeta del mismo ancho que las demás. */}
+      <section className="rounded-2xl border-2 border-white/10 bg-white/[0.03] p-1.5">
+        <StatsBar
+          completedDays={completedDays}
+          coins={coins}
+          lives={lives}
+          size="compact"
+          extra={<NotificationsMenu variant="bar" notifications={notifications} collapsed={false} />}
+        />
+      </section>
 
       <section className={card}>
         <div className={cardHead}>
