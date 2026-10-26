@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Trivia del día | Skooly",
 };
 
-// Trivia del día: 5 preguntas, una trivia nueva cada día (a las 6:00 a. m., GMT-5). Cada
+// Trivia del día: 3 preguntas, una trivia nueva cada día (a las 6:00 a. m., GMT-5). Cada
 // respuesta fallada cuesta una vida; sin vidas no se puede terminar y se pierden las monedas.
 export default async function TriviaPage() {
   const { nombre, user, avatarUrl, admin, completedDays, notifications, plan, coins, lives } =

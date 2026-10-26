@@ -1,4 +1,4 @@
-// Trivia del día: cada día de juego (empieza a las 6:00 a. m. de Colombia) toca una trivia nueva de 5
+// Trivia del día: cada día de juego (empieza a las 6:00 a. m. de Colombia) toca una trivia nueva de 3
 // preguntas. Cada respuesta fallada cuesta una vida; sin vidas no se puede terminar y se pierden las
 // monedas. Quien la completa gana monedas de oro una sola vez por día. Las trivias rotan en el orden de esta lista y,
 // al terminarla, vuelven a empezar: para variar basta con agregar más al final.
@@ -15,12 +15,13 @@ export type TriviaQuestion = {
 
 export type Trivia = { id: string; title: string; emoji: string; questions: TriviaQuestion[] };
 
+export const QUESTIONS_PER_TRIVIA = 3; // preguntas por trivia del día
 export const TRIVIA_REWARD = 5; // monedas de oro por completar la trivia del día
 
 // Día 0 de la rotación (la primera trivia sale este día).
 const FIRST_DAY = "2026-10-26";
 
-export const TRIVIAS: Trivia[] = [
+const RAW_TRIVIAS: Trivia[] = [
   {
     id: "comunidades",
     title: "Comunidades online: lo básico",
@@ -80,6 +81,17 @@ export const TRIVIAS: Trivia[] = [
         ],
         answer: 1,
         explain: "Lo primero que ve alguien nuevo debe orientarlo.",
+      },
+      {
+        q: "¿Qué ayuda más a que un miembro nuevo se quede en tu comunidad?",
+        options: [
+          "Que nadie le escriba al entrar",
+          "Una bienvenida personal y un primer paso claro",
+          "Mandarle 20 enlaces de golpe",
+          "Pedirle que compre otra membresía enseguida",
+        ],
+        answer: 1,
+        explain: "Una bienvenida cercana y una primera acción sencilla hacen que la persona se sienta parte desde el primer día.",
       },
     ],
   },
@@ -143,6 +155,17 @@ export const TRIVIAS: Trivia[] = [
         answer: 1,
         explain: "Retener suele costar bastante menos que captar a alguien nuevo.",
       },
+      {
+        q: "Un miembro lleva semanas sin entrar. ¿Qué es lo más útil?",
+        options: [
+          "Ignorarlo, ya volverá solo",
+          "Eliminarlo de la comunidad",
+          "Escribirle con interés real y una razón concreta para volver",
+          "Subirle el precio",
+        ],
+        answer: 2,
+        explain: "Un mensaje cercano con un motivo concreto para volver recupera más gente que el silencio.",
+      },
     ],
   },
   {
@@ -204,6 +227,17 @@ export const TRIVIAS: Trivia[] = [
         ],
         answer: 0,
         explain: "Un lead es un posible cliente que mostró interés dejando sus datos.",
+      },
+      {
+        q: "En marketing digital, ¿qué es un embudo?",
+        options: [
+          "Un tipo de anuncio",
+          "El camino que recorre una persona desde que te conoce hasta que compra",
+          "Una herramienta para editar videos",
+          "El número de seguidores que tienes",
+        ],
+        answer: 1,
+        explain: "El embudo describe las etapas por las que pasa alguien: conocerte, confiar y comprar.",
       },
     ],
   },
@@ -267,6 +301,17 @@ export const TRIVIAS: Trivia[] = [
         answer: 2,
         explain: "Cambiando una sola variable sabes qué fue lo que mejoró el resultado.",
       },
+      {
+        q: "En Meta Ads, ¿para qué sirve el público (audiencia) de un anuncio?",
+        options: [
+          "Para elegir el color del anuncio",
+          "Para escribir el texto",
+          "Para medir los me gusta",
+          "Para decidir a qué personas se les muestra",
+        ],
+        answer: 3,
+        explain: "El público define quién ve tu anuncio; elegirlo bien evita gastar en personas que no te interesan.",
+      },
     ],
   },
   {
@@ -328,6 +373,17 @@ export const TRIVIAS: Trivia[] = [
         ],
         answer: 0,
         explain: "Lo que ya funciona te indica qué repetir y qué cambiar.",
+      },
+      {
+        q: "¿Qué da mejores resultados al crear contenido?",
+        options: [
+          "Copiar lo que hacen los demás",
+          "Publicar solo cuando tengas ganas",
+          "Publicar con constancia, mejorando poco a poco",
+          "Publicar una vez al año algo perfecto",
+        ],
+        answer: 2,
+        explain: "La constancia construye confianza y te da práctica; la perfección total casi nunca llega.",
       },
     ],
   },
@@ -391,6 +447,17 @@ export const TRIVIAS: Trivia[] = [
         answer: 2,
         explain: "Muestra que otras personas confían, siempre que sea verdadera.",
       },
+      {
+        q: "¿Qué hace más atractiva una oferta?",
+        options: [
+          "Que sea muy larga y confusa",
+          "Que no diga el precio",
+          "Que se parezca a todas las demás",
+          "Que deje claro el resultado que la persona va a lograr",
+        ],
+        answer: 3,
+        explain: "La gente compra un resultado: cuanto más claro, más fácil es decidir.",
+      },
     ],
   },
   {
@@ -452,6 +519,17 @@ export const TRIVIAS: Trivia[] = [
         ],
         answer: 0,
         explain: "Agradecer y orientar hace que la persona se sienta bien recibida.",
+      },
+      {
+        q: "¿Qué parte de un correo decide en gran medida si lo abren?",
+        options: [
+          "El asunto",
+          "La firma",
+          "El color del fondo",
+          "El pie de página",
+        ],
+        answer: 0,
+        explain: "El asunto es lo primero que se ve en la bandeja de entrada y decide si abren o no.",
       },
     ],
   },
@@ -515,6 +593,17 @@ export const TRIVIAS: Trivia[] = [
         answer: 2,
         explain: "Por eso conviene verificar los datos importantes.",
       },
+      {
+        q: "Al usar IA para escribir, ¿qué mejora más el resultado?",
+        options: [
+          "Escribir un pedido muy corto y vago",
+          "Pedirle que adivine qué necesitas",
+          "Darle contexto: quién eres, a quién le hablas y qué quieres lograr",
+          "Usar siempre la primera respuesta sin revisarla",
+        ],
+        answer: 2,
+        explain: "Cuanto más contexto le des, más útil y específica será la respuesta.",
+      },
     ],
   },
   {
@@ -576,6 +665,17 @@ export const TRIVIAS: Trivia[] = [
         ],
         answer: 0,
         explain: "Cumplir lo que dices es la base de la confianza.",
+      },
+      {
+        q: "¿Para qué sirve una lista de espera antes de un lanzamiento?",
+        options: [
+          "Juntar personas interesadas que quieran comprar cuando abras",
+          "Esconder el lanzamiento",
+          "Bajar el precio sin avisar",
+          "Cancelar el lanzamiento",
+        ],
+        answer: 0,
+        explain: "La lista reúne a quienes ya levantaron la mano, así llegas al lanzamiento con gente lista para comprar.",
       },
     ],
   },
@@ -639,8 +739,31 @@ export const TRIVIAS: Trivia[] = [
         answer: 2,
         explain: "Los primeros miembros ayudan a dar forma y confianza a la comunidad.",
       },
+      {
+        q: "¿Para qué sirven los niveles en una comunidad?",
+        options: [
+          "Para que los miembros se sientan reconocidos y quieran participar más",
+          "Para ocultar el contenido",
+          "Para cobrar más",
+          "Para que nadie participe",
+        ],
+        answer: 0,
+        explain: "Los niveles reconocen la participación y dan una meta visible a quien quiere avanzar.",
+      },
     ],
   },
+];
+
+// Cada tema tiene 6 preguntas y se reparte en dos trivias de 3: los días 1 a 10 salen las
+// primeras partes y los días 11 a 20, las segundas (20 días de material; después vuelve a empezar).
+export const TRIVIAS: Trivia[] = [
+  ...RAW_TRIVIAS.map((t) => ({ ...t, questions: t.questions.slice(0, QUESTIONS_PER_TRIVIA) })),
+  ...RAW_TRIVIAS.map((t) => ({
+    ...t,
+    id: `${t.id}-2`,
+    title: `${t.title} II`,
+    questions: t.questions.slice(QUESTIONS_PER_TRIVIA, QUESTIONS_PER_TRIVIA * 2),
+  })),
 ];
 
 // Fecha del "día de juego" (YYYY-MM-DD): el día cambia a las 6:00 a. m. de Colombia, la misma hora a
