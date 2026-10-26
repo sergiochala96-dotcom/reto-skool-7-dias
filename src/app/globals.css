@@ -32,6 +32,24 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Salto suave y corto de los iconos de misiones del celular (cada pocos segundos, para llamar la atención sin cansar). */
+@keyframes tileBounce {
+  0%,
+  55%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  65% {
+    transform: translateY(-7px) scale(1.06);
+  }
+  75% {
+    transform: translateY(0) scale(1);
+  }
+  85% {
+    transform: translateY(-3px) scale(1.03);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -15,8 +15,16 @@ type Kind = "whatsapp" | "skool";
 type Claimed = { whatsapp: boolean; skool: boolean; install: boolean };
 
 const TILE = {
-  whatsapp: { label: "Unirme al boletín de WhatsApp", top: "bg-[#25D366]", bar: "bg-emerald-700" },
-  skool: { label: "Unirme al curso de Skool", top: "bg-amber-400", bar: "bg-amber-600" },
+  whatsapp: {
+    label: "Unirme al boletín de WhatsApp",
+    top: "bg-[#25D366]",
+    bar: "bg-emerald-700",
+  },
+  skool: {
+    label: "Unirme al curso de Skool",
+    top: "bg-amber-400",
+    bar: "bg-amber-600",
+  },
   install: { label: "Instalar la app", top: "bg-sky-400", bar: "bg-blue-800" },
 };
 
@@ -44,43 +52,59 @@ function Tile({
   claimed,
   reward,
   onOpen,
+  delay,
 }: {
   kind: keyof typeof TILE;
   claimed: boolean;
   reward: number;
   onOpen: () => void;
+  delay: string;
 }) {
   const t = TILE[kind];
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label={t.label}
-      className="w-[4.25rem] overflow-hidden rounded-2xl shadow-lg shadow-black/40 ring-1 ring-black/20 transition active:scale-95"
+    // El salto va en esta caja para no chocar con el efecto de pulsar del botón; cada icono salta un
+    // poco después del anterior.
+    <div
+      className="animate-[tileBounce_3s_ease-in-out_infinite] motion-reduce:animate-none"
+      style={{ animationDelay: delay }}
     >
-      <span className={`flex h-11 items-center justify-center text-white ${t.top}`}>
-        {kind === "whatsapp" ? (
-          <svg viewBox="0 0 32 32" fill="currentColor" className="h-8 w-8" aria-hidden="true">
-            <path d={WHATSAPP_PATH} />
-          </svg>
-        ) : kind === "skool" ? (
-          <CourseIcon className="h-8 w-8" />
-        ) : (
-          <DownloadIcon className="h-8 w-8" />
-        )}
-      </span>
-      <span
-        className={`flex h-[1.375rem] items-center justify-center gap-0.5 text-xs font-extrabold text-white ${t.bar}`}
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={t.label}
+        className="w-[4.25rem] overflow-hidden rounded-2xl shadow-lg shadow-black/40 ring-1 ring-black/20 transition active:scale-95"
       >
-        {claimed ? (
-          "✓"
-        ) : (
-          <>
-            <CoinIcon className="h-3.5 w-3.5" /> +{reward}
-          </>
-        )}
-      </span>
-    </button>
+        <span
+          className={`flex h-11 items-center justify-center text-white ${t.top}`}
+        >
+          {kind === "whatsapp" ? (
+            <svg
+              viewBox="0 0 32 32"
+              fill="currentColor"
+              className="h-8 w-8"
+              aria-hidden="true"
+            >
+              <path d={WHATSAPP_PATH} />
+            </svg>
+          ) : kind === "skool" ? (
+            <CourseIcon className="h-8 w-8" />
+          ) : (
+            <DownloadIcon className="h-8 w-8" />
+          )}
+        </span>
+        <span
+          className={`flex h-[1.375rem] items-center justify-center gap-0.5 text-xs font-extrabold text-white ${t.bar}`}
+        >
+          {claimed ? (
+            "✓"
+          ) : (
+            <>
+              <CoinIcon className="h-3.5 w-3.5" /> +{reward}
+            </>
+          )}
+        </span>
+      </button>
+    </div>
   );
 }
 
@@ -124,9 +148,11 @@ function Fullscreen({
           ×
         </button>
       </div>
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col pt-1">{children}</div>
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col pt-1">
+        {children}
+      </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
@@ -151,8 +177,11 @@ function InstallStatusCard({ claimed }: { claimed: boolean }) {
             <CoinIcon className="h-6 w-6" /> +{INSTALL_REWARD} monedas de oro
           </span>
           <p className="mt-5 text-base leading-relaxed text-white/70">
-            Si ya la instalaste, ciérrala aquí y ábrela desde el <strong className="text-white">icono de tu
-            pantalla de inicio</strong>. Al entrar así, tus {INSTALL_REWARD} monedas llegan solas.
+            Si ya la instalaste, ciérrala aquí y ábrela desde el{" "}
+            <strong className="text-white">
+              icono de tu pantalla de inicio
+            </strong>
+            . Al entrar así, tus {INSTALL_REWARD} monedas llegan solas.
           </p>
         </>
       )}
@@ -199,13 +228,31 @@ export default function JoinTiles({ claimed }: { claimed: Claimed }) {
         <div className="sticky top-[9rem] z-20 h-0 md:hidden">
           <div className="absolute -left-2 top-0 flex flex-col gap-3">
             {!claimed.whatsapp && (
-              <Tile kind="whatsapp" claimed={false} reward={50} onOpen={() => setOpen("whatsapp")} />
+              <Tile
+                kind="whatsapp"
+                claimed={false}
+                reward={50}
+                delay="0s"
+                onOpen={() => setOpen("whatsapp")}
+              />
             )}
             {!claimed.skool && (
-              <Tile kind="skool" claimed={false} reward={50} onOpen={() => setOpen("skool")} />
+              <Tile
+                kind="skool"
+                claimed={false}
+                reward={50}
+                delay="0.35s"
+                onOpen={() => setOpen("skool")}
+              />
             )}
             {!claimed.install && (
-              <Tile kind="install" claimed={false} reward={INSTALL_REWARD} onOpen={openInstallTile} />
+              <Tile
+                kind="install"
+                claimed={false}
+                reward={INSTALL_REWARD}
+                delay="0.7s"
+                onOpen={openInstallTile}
+              />
             )}
           </div>
         </div>
