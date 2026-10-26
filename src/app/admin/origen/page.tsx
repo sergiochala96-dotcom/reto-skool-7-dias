@@ -37,6 +37,7 @@ const FILTERS: { key: TrafficType | "todos"; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "organico", label: "Orgánico" },
   { key: "pagado", label: "Anuncios" },
+  { key: "reto_skool", label: "Reto Skool" },
   { key: "otro", label: "Otro" },
   { key: "sin_etiqueta", label: "Sin etiqueta" },
 ];
@@ -65,9 +66,9 @@ export default async function OrigenPage({
     .limit(5000);
   const { data: profileDevices } = await supabase.from("profiles").select("last_device").limit(10000);
 
-  const leads = ((data ?? []) as Lead[]).map((l) => ({ ...l, type: classifyTraffic(l.utm_medium) }));
+  const leads = ((data ?? []) as Lead[]).map((l) => ({ ...l, type: classifyTraffic(l.utm_medium, l.utm_campaign) }));
 
-  const counts: Record<TrafficType, number> = { pagado: 0, organico: 0, otro: 0, sin_etiqueta: 0 };
+  const counts: Record<TrafficType, number> = { pagado: 0, organico: 0, reto_skool: 0, otro: 0, sin_etiqueta: 0 };
   for (const l of leads) counts[l.type]++;
 
   // Dispositivos: con cuál se registró cada correo y con cuál entró por última vez cada usuario.
@@ -120,6 +121,7 @@ export default async function OrigenPage({
   const cards: { type: TrafficType; label: string }[] = [
     { type: "organico", label: "Orgánico" },
     { type: "pagado", label: "Anuncios" },
+    { type: "reto_skool", label: "Reto Skool" },
     { type: "otro", label: "Otro" },
     { type: "sin_etiqueta", label: "Sin etiqueta" },
   ];
@@ -156,7 +158,7 @@ export default async function OrigenPage({
             </p>
           )}
 
-          <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-white/40">Total</p>
               <p className="mt-1 text-3xl font-extrabold text-white">{leads.length}</p>

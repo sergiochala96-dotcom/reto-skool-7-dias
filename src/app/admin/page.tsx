@@ -38,7 +38,7 @@ const FIRST_DIR: Record<SortKey, "asc" | "desc"> = {
   nivel2: "desc",
 };
 const PLAN_RANK: Record<PlanId, number> = { standard: 0, premium: 1, vip: 2 };
-const ORIGIN_RANK: Record<string, number> = { pagado: 0, organico: 1, otro: 2, sin_etiqueta: 3 };
+const ORIGIN_RANK: Record<string, number> = { pagado: 0, organico: 1, reto_skool: 2, otro: 3, sin_etiqueta: 4 };
 
 // Sin tildes y en minúsculas, para que la búsqueda encuentre "Ríchard" escribiendo "richard".
 function plain(v: unknown) {
@@ -135,7 +135,7 @@ export default async function AdminPage({
       }
       case "origen": {
         const lead = leadByEmail.get(String(row.email ?? "").toLowerCase());
-        return lead ? ORIGIN_RANK[classifyTraffic(lead.utm_medium)] : 4;
+        return lead ? ORIGIN_RANK[classifyTraffic(lead.utm_medium, lead.utm_campaign)] : 5;
       }
       case "progreso":
         return Number(row.completed_days ?? 0);
@@ -414,7 +414,7 @@ export default async function AdminPage({
                     <td className="px-3 py-3 xl:px-4">
                       {(() => {
                         const lead = leadByEmail.get(String(row.email ?? "").toLowerCase());
-                        const type = classifyTraffic(lead?.utm_medium);
+                        const type = classifyTraffic(lead?.utm_medium, lead?.utm_campaign);
                         return (
                           <span
                             title={
