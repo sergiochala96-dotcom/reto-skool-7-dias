@@ -3,7 +3,6 @@ import Link from "next/link";
 import AvatarIcon, { avatarIconKey, isAvatarIconKey } from "@/components/AvatarIcon";
 import PromptBox from "@/components/PromptBox";
 import RedeemButton from "@/components/RedeemButton";
-import Sidebar from "@/components/Sidebar";
 import StatsBar from "@/components/StatsBar";
 import { CoinIcon } from "@/components/StatIcons";
 import UseAvatarButton from "@/components/UseAvatarButton";
@@ -122,18 +121,7 @@ export default async function TiendaPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
-      <Sidebar
-        nombre={nombre}
-        email={user.email ?? ""}
-        avatarUrl={avatarUrl}
-        admin={admin}
-        completedDays={completedList}
-        notifications={notifications}
-        plan={plan}
-        coins={coins}
-        lives={lives}
-      />
+    <>
 
       <main className="min-w-0 flex-1 px-4 py-10 md:px-6 md:py-5">
         {/* Estadísticas en la esquina superior derecha de la pantalla. */}
@@ -192,6 +180,6 @@ export default async function TiendaPage() {
           </p>
         </div>
       </main>
-    </div>
+    </>
   );
 }

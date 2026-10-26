@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { after } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { detectDevice } from "@/lib/device";
@@ -32,7 +34,8 @@ export type SidebarData = {
   startMissions: { skool: boolean; whatsapp: boolean };
 };
 
-export async function getSidebarData(): Promise<SidebarData> {
+// "cache" hace que el menú (layout) y la página compartan una sola lectura por petición.
+export const getSidebarData = cache(async (): Promise<SidebarData> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -40,35 +43,18 @@ export async function getSidebarData(): Promise<SidebarData> {
 
   if (!user) redirect("/login");
 
-  const { data: progress } = await supabase
-    .from("challenge_progress")
-    .select("day")
-    .eq("user_id", user.id);
-
-  // La foto se lee de la tabla profiles (no de user_metadata): al iniciar
-  // sesión con Google, Supabase re-sincroniza user_metadata con los datos
-  // de Google en cada login y sobreescribía la foto que el usuario había
-  // subido. profiles.avatar_url solo lo escribe nuestra propia función.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at, coins, lives, lives_refilled_at")
-    .eq("id", user.id)
-    .single();
-
-  // Última visita: solo se guarda la FECHA y únicamente cuando cambia el día, así que es
-  // como máximo una escritura pequeña por persona al día (no se acumula ningún historial).
-  // El dispositivo (computadora, Android, iPhone) se actualiza solo cuando cambia.
-  const today = new Date().toISOString().slice(0, 10);
-  const device = detectDevice((await headers()).get("user-agent"));
-  if (profile && (profile.last_seen_date !== today || profile.last_device !== device)) {
-    await supabase
+  // Las lecturas son independientes entre sí: van todas a la vez (antes eran en fila, una tras otra).
+  const [{ data: progress }, { data: profile }, { data: notifs }, { data: reads }] = await Promise.all([
+    supabase.from("challenge_progress").select("day").eq("user_id", user.id),
+    // La foto se lee de la tabla profiles (no de user_metadata): al iniciar sesión con Google,
+    // Supabase re-sincroniza user_metadata con los datos de Google en cada login y sobreescribía
+    // la foto que el usuario había subido. profiles.avatar_url solo lo escribe nuestra propia función.
+    supabase
       .from("profiles")
-      .update({ last_seen_date: today, last_device: device })
-      .eq("id", user.id);
-  }
-
-  // Notificaciones del admin (más recientes primero) y cuáles ya leyó este usuario.
-  const [{ data: notifs }, { data: reads }] = await Promise.all([
+      .select("avatar_url, welcome_video_seen, last_seen_date, last_device, joined_skool_at, joined_whatsapp_at, plan, plan_expires_at, coins, lives, lives_refilled_at")
+      .eq("id", user.id)
+      .single(),
+    // Notificaciones del admin (más recientes primero) y cuáles ya leyó este usuario.
     supabase
       .from("notifications")
       .select("id, title, body, created_at")
@@ -76,6 +62,21 @@ export async function getSidebarData(): Promise<SidebarData> {
       .limit(50),
     supabase.from("notification_reads").select("notification_id").eq("user_id", user.id),
   ]);
+
+  // Última visita: solo se guarda la FECHA y únicamente cuando cambia el día, así que es
+  // como máximo una escritura pequeña por persona al día (no se acumula ningún historial).
+  // El dispositivo (computadora, Android, iPhone) se actualiza solo cuando cambia.
+  const today = new Date().toISOString().slice(0, 10);
+  const device = detectDevice((await headers()).get("user-agent"));
+  if (profile && (profile.last_seen_date !== today || profile.last_device !== device)) {
+    // Se guarda después de responder: la persona no espera por esta escritura.
+    after(async () => {
+      await supabase
+        .from("profiles")
+        .update({ last_seen_date: today, last_device: device })
+        .eq("id", user.id);
+    });
+  }
   const readIds = new Set((reads ?? []).map((r) => r.notification_id as string));
   const notifications: SidebarNotification[] = (notifs ?? []).map((n) => ({
     id: n.id as string,
@@ -108,4 +109,4 @@ export async function getSidebarData(): Promise<SidebarData> {
     coins: Number(profile?.coins ?? 0),
     lives: effectiveLives(Number(profile?.lives ?? 3), profile?.lives_refilled_at),
   };
-}
+});

@@ -1,7 +1,7 @@
+import { after } from "next/server";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { TOTAL_DAYS, WELCOME_VIDEO_URL } from "@/lib/challenge";
 import { createClient } from "@/lib/supabase/server";
-import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
 import ChallengePathDesktop from "@/components/ChallengePathDesktop";
 import Episode2Card from "@/components/Episode2Card";
@@ -34,27 +34,24 @@ export default async function DashboardPage() {
 
   const supabase = await createClient();
 
+  // Marcar el video de bienvenida como visto no hace esperar a la persona: se guarda después.
   if (!welcomeVideoSeen) {
-    await supabase
-      .from("profiles")
-      .update({ welcome_video_seen: true })
-      .eq("id", user.id);
+    after(async () => {
+      await supabase.from("profiles").update({ welcome_video_seen: true }).eq("id", user.id);
+    });
   }
 
-  // El Episodio 2 está bloqueado salvo con plan Premium/VIP o si el admin lo abre usuario por
-  // usuario desde el panel de admin: episode2_locked_override = false => desbloqueado.
-  const { data: profileRow } = await supabase
-    .from("profiles")
-    .select("episode2_locked_override")
-    .eq("id", user.id)
-    .single();
-  // Los planes Premium y VIP incluyen el Episodio 2: se abre solo, sin tocar nada.
-  // Qué comunidades ya verificó (las recompensas de 50 monedas se canjean con un código).
-  const { data: verifiedRows } = await supabase
-    .from("coin_transactions")
-    .select("ref")
-    .eq("user_id", user.id)
-    .in("reason", ["verificado", "instalar"]);
+  // Las dos lecturas van a la vez. El Episodio 2 está bloqueado salvo con plan Premium/VIP o si el
+  // admin lo abre usuario por usuario desde el panel: episode2_locked_override = false => desbloqueado.
+  // Y qué recompensas ya cobró (las de 50 monedas de las comunidades se canjean con un código).
+  const [{ data: profileRow }, { data: verifiedRows }] = await Promise.all([
+    supabase.from("profiles").select("episode2_locked_override").eq("id", user.id).single(),
+    supabase
+      .from("coin_transactions")
+      .select("ref")
+      .eq("user_id", user.id)
+      .in("reason", ["verificado", "instalar"]),
+  ]);
   const verified = new Set((verifiedRows ?? []).map((r) => r.ref as string));
   const claimed = {
     whatsapp: verified.has("whatsapp"),
@@ -65,24 +62,13 @@ export default async function DashboardPage() {
   const episode2Locked = profileRow?.episode2_locked_override !== false && plan === "standard";
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
+    <>
       {!welcomeVideoSeen && (
         <WelcomeVideoModal src={WELCOME_VIDEO_URL} />
       )}
       <MetaRegistrationEvent
         userId={user.id}
         isNew={Date.now() - new Date(user.created_at).getTime() < 15 * 60 * 1000}
-      />
-      <Sidebar
-        nombre={nombre}
-        email={user.email ?? ""}
-        avatarUrl={avatarUrl}
-        admin={admin}
-        completedDays={completedList}
-        notifications={notifications}
-        plan={plan}
-        coins={coins}
-        lives={lives}
       />
 
       <main className="min-w-0 flex-1 px-4 pb-10 pt-6 md:py-5">
@@ -143,6 +129,6 @@ export default async function DashboardPage() {
       </main>
 
       <RightRail completedDays={completedList} coins={coins} lives={lives} claimed={claimed} />
-    </div>
+    </>
   );
 }

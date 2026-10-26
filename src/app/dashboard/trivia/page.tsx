@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Sidebar from "@/components/Sidebar";
 import StatsBar from "@/components/StatsBar";
 import TriviaCalendar from "@/components/TriviaCalendar";
 import TriviaQuiz from "@/components/TriviaQuiz";
@@ -20,22 +19,23 @@ export default async function TriviaPage() {
 
   const { trivia, date } = getTodayTrivia();
   const supabase = await createClient();
-  const { data: attempt } = await supabase
-    .from("trivia_attempts")
-    .select("answers, wrong, status")
-    .eq("user_id", user.id)
-    .eq("play_date", date)
-    .maybeSingle();
-
   // Días de este mes en que completó la trivia (para el calendario de la racha).
   const monthStart = `${date.slice(0, 7)}-01`;
-  const { data: monthRows } = await supabase
-    .from("trivia_attempts")
-    .select("play_date")
-    .eq("user_id", user.id)
-    .eq("status", "completed")
-    .gte("play_date", monthStart)
-    .lte("play_date", date);
+  const [{ data: attempt }, { data: monthRows }] = await Promise.all([
+    supabase
+      .from("trivia_attempts")
+      .select("answers, wrong, status")
+      .eq("user_id", user.id)
+      .eq("play_date", date)
+      .maybeSingle(),
+    supabase
+      .from("trivia_attempts")
+      .select("play_date")
+      .eq("user_id", user.id)
+      .eq("status", "completed")
+      .gte("play_date", monthStart)
+      .lte("play_date", date),
+  ]);
   const completedDates = (monthRows ?? []).map((r) => r.play_date as string);
 
   const answered = (attempt?.answers as number[] | undefined)?.length ?? 0;
@@ -87,18 +87,7 @@ export default async function TriviaPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink md:flex-row">
-      <Sidebar
-        nombre={nombre}
-        email={user.email ?? ""}
-        avatarUrl={avatarUrl}
-        admin={admin}
-        completedDays={completedList}
-        notifications={notifications}
-        plan={plan}
-        coins={coins}
-        lives={lives}
-      />
+    <>
 
       <main className="min-w-0 flex-1 px-4 py-10 md:px-6 md:py-5">
         {/* Estadísticas en la esquina superior derecha de la pantalla. */}
@@ -118,6 +107,6 @@ export default async function TriviaPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }
