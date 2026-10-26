@@ -126,7 +126,7 @@ export default function NotificationsMenu({
         >
           {bar ? <BellFilledIcon className="h-7 w-7" /> : "🔔"}
           {unread.length > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-[#150826]">
+            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-surface">
               {badge}
             </span>
           )}
