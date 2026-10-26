@@ -3,7 +3,7 @@ import { TOTAL_DAYS, WELCOME_VIDEO_URL } from "@/lib/challenge";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import ChallengePath from "@/components/ChallengePath";
-import ChallengePathHorizontal from "@/components/ChallengePathHorizontal";
+import ChallengePathDesktop from "@/components/ChallengePathDesktop";
 import Episode2Card from "@/components/Episode2Card";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
@@ -116,9 +116,11 @@ export default async function DashboardPage() {
           {/* Los episodios. En el celular, la tarjeta amarilla de arriba se queda pegada mientras se ven
               sus puntos y cambia al llegar al Episodio 2 (por eso van juntos en este bloque). */}
           <div>
-            <EpisodeStickyHeader />
+            <EpisodeStickyHeader completed={completedCount} total={TOTAL_DAYS} />
             <JoinTiles claimed={claimed} />
-            <ChallengePathHorizontal completedDays={completedList} />
+            <div className="max-md:hidden">
+              <ChallengePathDesktop completedDays={completedList} />
+            </div>
             <div id="episodio-1" className="md:hidden">
               <ChallengePath completedDays={completedList} />
             </div>

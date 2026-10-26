@@ -28,7 +28,13 @@ const EPISODES = {
 // considera que se está en él (el Episodio 2 es lo último de la página y puede no llegar más arriba).
 const SWITCH_LINE = 0.6;
 
-export default function EpisodeStickyHeader() {
+export default function EpisodeStickyHeader({
+  completed,
+  total,
+}: {
+  completed: number;
+  total: number;
+}) {
   const [episode, setEpisode] = useState<1 | 2>(1);
 
   useEffect(() => {
@@ -55,10 +61,20 @@ export default function EpisodeStickyHeader() {
   const current = EPISODES[episode];
 
   return (
-    <div className="sticky top-16 z-30 mb-4 md:hidden">
-      <div className={`rounded-2xl border-b-4 px-4 py-3 shadow-lg shadow-black/30 ${current.card}`}>
-        <p className={`text-xs font-extrabold uppercase tracking-wide ${current.kickerColor}`}>{current.kicker}</p>
-        <p className="mt-0.5 text-lg font-extrabold leading-tight">{current.title}</p>
+    <div className="sticky top-16 z-30 mb-4 md:top-3 md:mb-6">
+      <div
+        className={`flex items-center justify-between gap-3 rounded-2xl border-b-4 px-4 py-3 shadow-lg shadow-black/30 md:border-b-0 md:px-5 md:py-3.5 ${current.card}`}
+      >
+        <div className="min-w-0">
+          <p className={`text-xs font-extrabold uppercase tracking-wide ${current.kickerColor}`}>{current.kicker}</p>
+          <p className="mt-0.5 text-lg font-extrabold leading-tight md:text-xl">{current.title}</p>
+        </div>
+        {/* En computadora, el avance del Episodio 1 a la derecha. */}
+        {episode === 1 && (
+          <span className="hidden shrink-0 rounded-full bg-black/15 px-3 py-1.5 text-xs font-extrabold md:block">
+            {completed} de {total} días
+          </span>
+        )}
       </div>
     </div>
   );
