@@ -4,15 +4,24 @@ import EpisodeLockToggle from "@/components/EpisodeLockToggle";
 
 // Camino vertical con curvas del celular (como el del Episodio 1, pero en azul).
 const AMPLITUDE = 55;
-const SPACING = 150;
+const SPACING = 150; // celular
+const SPACING_DESKTOP = 210; // computadora: más aire entre puntos
 const NODE = 76;
 const TOP_BUFFER = 12;
 const OFFSETS = [0, 1.2, 0, -1.2]; // zigzag por sección
 
-function Episode2Path({ locked }: { locked: boolean }) {
+function Episode2Path({
+  locked,
+  spacing,
+  className,
+}: {
+  locked: boolean;
+  spacing: number;
+  className: string;
+}) {
   const points = EPISODE_2_CHECKPOINTS.map((cp, i) => ({
     x: OFFSETS[i % OFFSETS.length] * AMPLITUDE,
-    y: i * SPACING + NODE / 2 + TOP_BUFFER,
+    y: i * spacing + NODE / 2 + TOP_BUFFER,
     cp,
   }));
   const width = AMPLITUDE * 2 * 1.2 + NODE + 100;
@@ -26,7 +35,7 @@ function Episode2Path({ locked }: { locked: boolean }) {
   });
 
   return (
-    <div className="mt-6 overflow-x-auto">
+    <div className={`mt-6 overflow-x-auto ${className}`}>
       <div className="relative mx-auto" style={{ width, height }}>
         <svg width={width} height={height} className="absolute inset-0" aria-hidden>
           {segments.map((d, i) => (
@@ -98,7 +107,8 @@ export default function Episode2Card({
 
       <div className={locked ? "pointer-events-none select-none opacity-40 blur-[1px] grayscale" : ""}>
         {/* Camino vertical con curvas (celular y computadora). */}
-        <Episode2Path locked={locked} />
+        <Episode2Path locked={locked} spacing={SPACING} className="md:hidden" />
+        <Episode2Path locked={locked} spacing={SPACING_DESKTOP} className="max-md:hidden" />
       </div>
 
       {locked && (
