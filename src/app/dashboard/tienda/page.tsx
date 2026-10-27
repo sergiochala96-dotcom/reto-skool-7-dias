@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AvatarIcon, { avatarIconKey, isAvatarIconKey } from "@/components/AvatarIcon";
+import BuyLivesPacks from "@/components/BuyLivesPacks";
 import PromptBox from "@/components/PromptBox";
 import RedeemButton from "@/components/RedeemButton";
 import StatsBar from "@/components/StatsBar";
-import { CoinIcon } from "@/components/StatIcons";
+import { CoinIcon, HeartIcon } from "@/components/StatIcons";
 import UseAvatarButton from "@/components/UseAvatarButton";
 import { getSidebarData } from "@/lib/sidebar-data";
 import { createClient } from "@/lib/supabase/server";
@@ -147,6 +148,26 @@ export default async function TiendaPage() {
               <strong className="text-white/80">5</strong> por la trivia de cada día.
             </p>
           </header>
+
+          {/* Vidas: 1 por 15 monedas o 3 por 40 (máximo 3). */}
+          <section className="mb-10 rounded-3xl border-2 border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-extrabold uppercase tracking-wide text-rose-300">Vidas</h2>
+                <p className="mt-1 text-sm leading-relaxed text-white/60">
+                  Si te quedas sin vidas en la trivia, compra más para seguir jugando. Máximo 3; se reinician a
+                  3 cada día a las 6:00 a. m. (GMT-5).
+                </p>
+              </div>
+              <span className="flex items-center gap-1.5 rounded-2xl bg-black/25 px-3 py-1.5 text-sm font-bold text-white/80">
+                Tienes <HeartIcon className="h-5 w-5" />
+                <span className="text-rose-300">{lives}</span> de 3
+              </span>
+            </div>
+            <div className="mt-4">
+              <BuyLivesPacks coins={coins} lives={lives} confirm />
+            </div>
+          </section>
 
           {items.length === 0 ? (
             <p className="rounded-2xl border border-white/10 bg-white/5 px-5 py-8 text-center text-sm text-white/50">

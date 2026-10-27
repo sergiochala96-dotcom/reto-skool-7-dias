@@ -171,13 +171,20 @@ export default function StatsBar({
                 </div>
               </div>
               <p className="mt-4 text-sm leading-snug text-white/70">
-                Pierdes una vida cada vez que fallas una pregunta de la trivia del día. Sin vidas no
-                puedes terminarla y pierdes las monedas.
+                Pierdes una vida cada vez que fallas una pregunta de la trivia del día. Si te quedas sin
+                vidas, puedes comprar más con monedas de oro para seguir: 1 por 15 o 3 por 40.
               </p>
               <p className="mt-2 text-sm leading-snug text-white/70">
                 Todos los días a las <strong className="text-white">6:00 a. m. (GMT-5)</strong> tus
                 vidas se reinician a 3.
               </p>
+              <Link
+                href="/dashboard/tienda"
+                onClick={() => setOpen(null)}
+                className="mt-4 block text-sm font-extrabold uppercase tracking-wide text-sky-400 hover:text-sky-300"
+              >
+                Comprar vidas
+              </Link>
             </>
           )}
         </div>

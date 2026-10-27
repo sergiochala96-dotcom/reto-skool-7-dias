@@ -25,3 +25,10 @@ export function effectiveLives(
   }
   return lives;
 }
+
+// Paquetes de vidas que se compran con monedas de oro (la base de datos aplica los mismos precios en
+// la función buy_lives, migración 0024). Las vidas nunca pasan del máximo.
+export const LIFE_PACKS = [
+  { qty: 1, cost: 15 },
+  { qty: 3, cost: 40 },
+] as const;

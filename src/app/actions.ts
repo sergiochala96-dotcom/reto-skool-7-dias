@@ -753,6 +753,7 @@ export async function upgradeMySubscription(
 export type TriviaAnswerResult = {
   ok: boolean;
   error?: string;
+  noLives?: boolean; // se quedó (o ya estaba) sin vidas: puede comprar más para continuar
   correct?: boolean; // ¿acertó esta pregunta? (no viene si ya no tenía vidas)
   correctIndex?: number; // la opción correcta, que se revela al responder
   explanation?: string;
@@ -765,9 +766,9 @@ export type TriviaAnswerResult = {
 
 // Responde la pregunta que sigue de la trivia del día. El servidor califica con las respuestas que
 // NO están en el navegador. Cada respuesta fallada cuesta una vida y obliga a repetir la MISMA
-// pregunta (la correcta no se revela); solo avanza con un acierto. Si se queda sin vidas la trivia
-// queda como fallida (sin monedas) hasta el día siguiente (6:00 a. m. de Colombia). Al acertar la
-// última (con vidas), se dan las monedas una sola vez.
+// pregunta (la correcta no se revela); solo avanza con un acierto. Si se queda sin vidas, la trivia
+// sigue abierta: puede comprar más con monedas (buyLives) y continuar, o dejarla hasta el día
+// siguiente (6:00 a. m. de Colombia). Al acertar la última se dan las monedas una sola vez.
 export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> {
   const supabase = await createClient();
   const {
@@ -796,32 +797,35 @@ export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> 
     .eq("play_date", date)
     .single();
   if (!attempt) return unavailable;
-  if (attempt.status !== "in_progress") {
+  if (attempt.status === "completed") {
     return { ok: false, error: "La trivia de hoy ya terminó.", status: attempt.status };
+  }
+  if (attempt.status === "failed") {
+    // Intentos de antes de poder comprar vidas: se reabren para que puedan continuar.
+    await service
+      .from("trivia_attempts")
+      .update({ status: "in_progress", updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("play_date", date);
   }
 
   const index = (attempt.answers as number[]).length;
   if (index >= total) return { ok: false, error: "La trivia de hoy ya terminó." };
 
-  // Sin vidas no se puede seguir: la trivia queda fallida y no hay monedas.
+  // Sin vidas no se puede responder, pero la trivia sigue abierta: se pueden comprar vidas con
+  // monedas (buyLives) y continuar en la misma pregunta.
   const { data: currentLives } = await service.rpc("sync_lives", { p_user: user.id });
   let lives = Number(currentLives ?? 0);
   if (lives <= 0) {
-    await service
-      .from("trivia_attempts")
-      .update({ status: "failed", updated_at: new Date().toISOString() })
-      .eq("user_id", user.id)
-      .eq("play_date", date);
-    revalidatePath("/", "layout");
-    return { ok: true, status: "failed", lives: 0, wrong: attempt.wrong, total };
+    return { ok: false, noLives: true, error: "Te quedaste sin vidas.", lives: 0, wrong: attempt.wrong, total };
   }
 
   const question = trivia.questions[index];
   const correct = choice === question.answer;
 
   // Respuesta incorrecta: pierde una vida y tiene que volver a responder ESTA misma pregunta (no se
-  // avanza). La respuesta correcta no se revela mientras le queden vidas. Con 0 vidas, la trivia
-  // queda fallida hasta el día siguiente.
+  // avanza). La respuesta correcta no se revela. Si era la última vida (lives = 0), la trivia queda
+  // abierta: puede comprar más vidas para seguir, o dejarla hasta el día siguiente.
   if (!correct) {
     const wrong = attempt.wrong + 1;
     await service
@@ -832,14 +836,6 @@ export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> 
       .eq("status", "in_progress");
     const { data: left } = await service.rpc("lose_life", { p_user: user.id });
     lives = Number(left ?? 0);
-    const failed = lives <= 0;
-    if (failed) {
-      await service
-        .from("trivia_attempts")
-        .update({ status: "failed", updated_at: new Date().toISOString() })
-        .eq("user_id", user.id)
-        .eq("play_date", date);
-    }
     revalidatePath("/", "layout");
     return {
       ok: true,
@@ -847,7 +843,8 @@ export async function answerTrivia(choice: number): Promise<TriviaAnswerResult> 
       lives,
       wrong,
       total,
-      status: failed ? "failed" : "in_progress",
+      noLives: lives <= 0,
+      status: "in_progress",
     };
   }
 
@@ -1053,6 +1050,34 @@ export async function redeemShopItem(itemId: string): Promise<{ ok: boolean; err
 
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+// Compra vidas con monedas de oro: 1 por 15 o 3 por 40. La base de datos hace todo o nada y no deja
+// pasar del máximo de 3 vidas.
+export async function buyLives(
+  pack: number
+): Promise<{ ok: boolean; error?: string; lives?: number; coins?: number }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase.rpc("buy_lives", { p_pack: pack });
+  if (error) return { ok: false, error: "No se pudo comprar. Inténtalo de nuevo." };
+
+  const result = data as { ok?: boolean; error?: string; lives?: number; coins?: number } | null;
+  if (!result?.ok) {
+    const messages: Record<string, string> = {
+      insufficient: "Aún no tienes monedas suficientes.",
+      full: "Esas vidas no caben: el máximo es 3.",
+      invalid: "Ese paquete no existe.",
+    };
+    return { ok: false, error: messages[result?.error ?? ""] ?? "No se pudo comprar.", lives: result?.lives };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true, lives: result.lives, coins: result.coins };
 }
 
 // ---------------------------------------------------------------------------

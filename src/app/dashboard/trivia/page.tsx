@@ -40,9 +40,9 @@ export default async function TriviaPage() {
 
   const answered = (attempt?.answers as number[] | undefined)?.length ?? 0;
   const status = (attempt?.status as "in_progress" | "completed" | "failed" | undefined) ?? "in_progress";
-  const outOfLives = lives <= 0;
 
-  // Tarjeta de "hoy ya no se puede jugar" (completada o sin vidas); la muestra TriviaQuiz fuera de una partida.
+  // Tarjeta de "hoy ya no se puede jugar" (completada); la muestra TriviaQuiz fuera de una partida.
+  // Sin vidas ya no cierra la trivia: se pueden comprar más para continuar.
   let blocked: React.ReactNode = null;
   if (status === "completed") {
     const wrong = attempt?.wrong ?? 0;
@@ -57,19 +57,6 @@ export default async function TriviaPage() {
         </p>
       </div>
     );
-  } else if (status === "failed" || outOfLives) {
-    blocked = (
-      <div className="rounded-2xl border-2 border-red-400/40 bg-red-400/[0.06] p-8 text-center">
-        <p className="text-5xl">💔</p>
-        <p className="mt-3 text-2xl font-extrabold text-white">Sin vidas por hoy</p>
-        <p className="mt-2 text-sm text-white/70">
-          {status === "failed"
-            ? `Te quedaste sin vidas durante la trivia, así que hoy no ganas las ${TRIVIA_REWARD} monedas. `
-            : "No te quedan vidas para jugar la trivia de hoy. "}
-          Tus vidas se reinician a 3 mañana a las 6:00 a. m. (GMT-5).
-        </p>
-      </div>
-    );
   }
 
   const body = (
@@ -80,6 +67,7 @@ export default async function TriviaPage() {
       initialStep={answered}
       initialLives={lives}
       initialWrong={attempt?.wrong ?? 0}
+      coins={coins}
       blocked={blocked}
       // Las respuestas correctas NO se envían al navegador: el servidor revela cada una al responder.
       questions={trivia.questions.map((q) => ({ q: q.q, options: [...q.options] }))}

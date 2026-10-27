@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { answerTrivia, type TriviaAnswerResult } from "@/app/actions";
+import BuyLivesPacks from "@/components/BuyLivesPacks";
 import { CoinIcon, HeartIcon } from "@/components/StatIcons";
-import { MAX_LIVES } from "@/lib/lives";
+import { LIFE_PACKS, MAX_LIVES } from "@/lib/lives";
 
 type PublicQuestion = { q: string; options: string[] };
-type Final = { status: "completed" | "failed"; awarded: number };
+type Final = { status: "completed"; awarded: number };
 type Feedback = { correct: boolean; correctIndex: number; explanation: string; picked: number };
 
 const LETTERS = ["A", "B", "C", "D"];
@@ -19,6 +21,79 @@ function Hearts({ lives }: { lives: number }) {
         <HeartIcon key={i} className={`h-7 w-7 transition ${i < lives ? "" : "opacity-20 grayscale"}`} />
       ))}
     </div>
+  );
+}
+
+// Ventana que sale al quedarse sin vidas: invita a comprar más (15 monedas cada una) para seguir.
+function NoLivesDialog({
+  coins,
+  lives,
+  onClose,
+  onBought,
+}: {
+  coins: number;
+  lives: number;
+  onClose: () => void;
+  onBought: (r: { lives: number; coins: number }) => void;
+}) {
+  const cheapest = LIFE_PACKS[0].cost;
+  // Solo en el navegador (la ventana se dibuja en el body y el servidor no tiene "document").
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-[2px]"
+      onClick={onClose}
+    >
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="nolives-title"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-3xl border-2 border-white/15 bg-surface-2 p-6 text-center shadow-2xl shadow-black/60"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-xl font-bold leading-none text-white transition hover:bg-white/20"
+        >
+          ×
+        </button>
+        <p className="text-5xl">💔</p>
+        <h2 id="nolives-title" className="mt-2 text-2xl font-extrabold leading-tight text-white">
+          Te quedaste sin vidas
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-white/70">
+          Si quieres continuar con la trivia, compra más vidas. Cada vida cuesta{" "}
+          <strong className="text-amber-300">{cheapest} monedas de oro</strong>.
+        </p>
+        <p className="mx-auto mt-3 inline-flex items-center gap-2 rounded-2xl bg-black/30 px-4 py-1.5 text-sm font-bold text-white/80">
+          Tienes <CoinIcon className="h-5 w-5" />
+          <span className="text-amber-300">{coins}</span> monedas
+        </p>
+
+        <div className="mt-5">
+          <BuyLivesPacks coins={coins} lives={lives} onBought={onBought} />
+        </div>
+
+        {coins < cheapest && (
+          <p className="mt-4 text-xs leading-relaxed text-white/55">
+            Gana monedas completando los días del reto, uniéndote a WhatsApp y a Skool o instalando la
+            app. Tus vidas también se reinician a 3 mañana a las 6:00 a. m. (GMT-5).
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-4 text-sm font-semibold text-white/60 underline decoration-white/20 underline-offset-2 transition hover:text-white"
+        >
+          Ahora no
+        </button>
+      </div>
+    </div>,
+    document.body
   );
 }
 
@@ -37,6 +112,7 @@ export default function TriviaQuiz({
   initialStep,
   initialLives,
   initialWrong,
+  coins: initialCoins,
   blocked,
 }: {
   title: string;
@@ -46,12 +122,17 @@ export default function TriviaQuiz({
   initialStep: number;
   initialLives: number;
   initialWrong: number;
+  /** Monedas de oro de la persona (para comprar vidas cuando se acaban). */
+  coins: number;
   blocked?: ReactNode;
 }) {
   // Paso previo: confirmar que quiere empezar. Si ya había respondido preguntas hoy, sigue donde iba.
   const [started, setStarted] = useState(initialStep > 0 && !blocked);
   const [step, setStep] = useState(initialStep);
   const [lives, setLives] = useState(initialLives);
+  const [coins, setCoins] = useState(initialCoins);
+  // Ventana "te quedaste sin vidas": se abre sola al perder la última (o al entrar sin vidas).
+  const [buying, setBuying] = useState(initialStep > 0 && !blocked && initialLives <= 0);
   const [wrong, setWrong] = useState(initialWrong);
   const [selected, setSelected] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -72,6 +153,12 @@ export default function TriviaQuiz({
     const picked = selected;
     startTransition(async () => {
       const r: TriviaAnswerResult = await answerTrivia(picked);
+      if (r.noLives && !r.ok) {
+        // Ya no tenía vidas: se ofrece comprar más para seguir en esta misma pregunta.
+        setLives(0);
+        setBuying(true);
+        return;
+      }
       if (!r.ok) {
         setError(r.error ?? "No se pudo comprobar tu respuesta. Inténtalo de nuevo.");
         return;
@@ -79,20 +166,14 @@ export default function TriviaQuiz({
       setLives(r.lives ?? lives);
       setWrong(r.wrong ?? wrong);
       const end: Final | null =
-        r.status === "completed" || r.status === "failed"
-          ? { status: r.status, awarded: r.awarded ?? 0 }
-          : null;
-      if (r.status === "failed") {
-        // Se quedó sin vidas: la trivia terminó sin monedas.
-        setFinal(end ?? { status: "failed", awarded: 0 });
-        router.refresh();
-        return;
-      }
+        r.status === "completed" ? { status: "completed", awarded: r.awarded ?? 0 } : null;
       if (r.correct === false) {
-        // Falló: pierde una vida y repite esta misma pregunta (sin ver la respuesta correcta).
+        // Falló: pierde una vida y repite esta misma pregunta (sin ver la respuesta correcta). Si era
+        // la última vida, se abre la ventana para comprar más.
         setWrongPicks((p) => [...p, picked]);
         setSelected(null);
         setRetry(true);
+        if (r.noLives) setBuying(true);
         router.refresh();
         return;
       }
@@ -169,7 +250,10 @@ export default function TriviaQuiz({
         </div>
         <button
           type="button"
-          onClick={() => setStarted(true)}
+          onClick={() => {
+            setStarted(true);
+            if (lives <= 0) setBuying(true);
+          }}
           className="mt-6 w-full rounded-2xl border-b-4 border-purple-900 bg-violet-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:brightness-110 active:translate-y-0.5 active:border-b-2"
         >
           Empezar trivia
@@ -208,34 +292,23 @@ export default function TriviaQuiz({
     );
   }
 
-  if (final?.status === "failed") {
-    return shell(
-      <div className="rounded-2xl border-2 border-red-400/40 bg-red-400/[0.06] p-8 text-center">
-        <p className="text-5xl">💔</p>
-        <p className="mt-2 text-2xl font-extrabold text-white">Te quedaste sin vidas</p>
-        <p className="mt-2 text-white/70">
-          No puedes terminar la trivia de hoy y pierdes las {reward} monedas. Tus vidas se reinician a
-          3 mañana a las 6:00 a. m. (GMT-5).
-        </p>
-        <div className="mt-4 flex justify-center">
-          <Hearts lives={0} />
-        </div>
-        <button
-          type="button"
-          onClick={leave}
-          className="mt-6 hidden w-full rounded-2xl border-b-4 border-red-800 bg-red-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-red-400 active:translate-y-0.5 active:border-b-2 md:block"
-        >
-          Volver
-        </button>
-      </div>
-    );
-  }
-
   const q = questions[step];
   const showing = feedback !== null;
 
   return shell(
     <div>
+      {buying && (
+        <NoLivesDialog
+          coins={coins}
+          lives={lives}
+          onClose={() => setBuying(false)}
+          onBought={(r) => {
+            setLives(r.lives);
+            setCoins(r.coins);
+            setBuying(false);
+          }}
+        />
+      )}
       <div className="mb-6 flex items-center gap-3">
         <div
           className="flex h-3 flex-1 overflow-hidden rounded-full bg-white/10"
@@ -339,6 +412,15 @@ export default function TriviaQuiz({
           {pendingFinal ? "Ver resultado" : "Continuar"}
         </button>
       ) : (
+        lives <= 0 ? (
+          <button
+            type="button"
+            onClick={() => setBuying(true)}
+            className="mt-6 w-full rounded-2xl border-b-4 border-rose-800 bg-rose-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-rose-400 active:translate-y-0.5 active:border-b-2"
+          >
+            Sin vidas · Comprar vidas
+          </button>
+        ) : (
         <button
           type="button"
           onClick={check}
@@ -347,6 +429,7 @@ export default function TriviaQuiz({
         >
           {pending ? "Comprobando..." : "Comprobar"}
         </button>
+        )
       )}
     </div>
   );
