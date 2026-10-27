@@ -134,8 +134,8 @@ export default async function TiendaPage() {
 
         <div className="mx-auto max-w-6xl">
           <header className="mb-8 text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Tienda</p>
-            <h1 className="mt-1 text-3xl font-extrabold text-white">Canjea tus monedas de oro</h1>
+            <h1 className="text-4xl font-extrabold leading-tight text-white md:text-5xl">Tienda de Skooly</h1>
+            <p className="mt-2 text-sm font-bold uppercase tracking-wide text-amber-300">Canjea tus monedas de oro</p>
             <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-2">
               <CoinIcon className="h-7 w-7" />
               <span className="text-2xl font-extrabold text-amber-300">{coins}</span>
