@@ -90,6 +90,12 @@ export default function Sidebar({
 
   const effectiveCollapsed = collapsed && isDesktop;
 
+  // El ancho del menú se comparte con toda la página (--sidebar-w) para poder colocar elementos
+  // flotantes junto a él, como la invitación a la guía de inicio.
+  useEffect(() => {
+    document.documentElement.style.setProperty("--sidebar-w", effectiveCollapsed ? "80px" : `${width}px`);
+  }, [effectiveCollapsed, width]);
+
   const toggleCollapsed = () => {
     setCollapsed((v) => {
       const next = !v;
