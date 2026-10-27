@@ -96,7 +96,7 @@ export default async function DashboardPage({
 
           {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
               Su invitación es una tarjeta flotante en la esquina inferior derecha, con X para cerrarla. */}
-          <GuidedTour open={!welcomeVideoSeen || guia === "1"} />
+          <GuidedTour open={!welcomeVideoSeen || guia === "1"} userKey={user.id} forced={guia === "1"} />
 
           {/* Con pantalla grande estas recompensas están en la columna derecha; en el celular son los
               dos iconos cuadrados fijos bajo la tarjeta del episodio (JoinTiles). */}

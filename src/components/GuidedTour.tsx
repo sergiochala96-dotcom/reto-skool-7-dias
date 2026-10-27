@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 // Guía de inicio de 3 pasos. La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
 // pequeña, sin bloquear nada: "¿Quieres una guía rápida?". Si la acepta, comienza un recorrido de foco:
@@ -76,15 +77,52 @@ function Arrow({ up }: { up: boolean }) {
   );
 }
 
-export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
+export default function GuidedTour({
+  open: initiallyOpen,
+  userKey,
+  forced = false,
+}: {
+  open: boolean;
+  /** Identifica a la persona para recordar, en este navegador, que ya se le mostró la invitación. */
+  userKey: string;
+  /** Pedida a propósito (desde el Perfil): se muestra aunque ya se haya visto. */
+  forced?: boolean;
+}) {
   // "intro": invitación pequeña · "tour": recorrido de 3 pasos · "off": cerrada
   const [mode, setMode] = useState<"intro" | "tour" | "off">(initiallyOpen ? "intro" : "off");
+  const router = useRouter();
+  const checked = useRef(false);
   const [step, setStep] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [vp, setVp] = useState({ w: 0, h: 0 });
 
   useEffect(() => setMounted(true), []);
+
+  // La invitación se muestra una sola vez por persona: se anota en este navegador apenas aparece, así
+  // que si la cierran (o la pantalla se vuelve a cargar, por ejemplo al volver atrás) no reaparece.
+  // Solo se vuelve a ver si la piden desde el Perfil.
+  useEffect(() => {
+    if (checked.current) return;
+    checked.current = true;
+    if (!initiallyOpen) return;
+    const key = `guia_vista_${userKey}`;
+    try {
+      if (!forced && window.sessionStorage.getItem(key)) {
+        setMode("off");
+        return;
+      }
+      window.sessionStorage.setItem(key, "1");
+    } catch {
+      // sin almacenamiento: se confía en la marca del servidor (solo se muestra la primera vez)
+    }
+  }, [initiallyOpen, userKey, forced]);
+
+  // Al terminar o cerrar: si venía pedida con ?guia=1, se quita de la dirección para que no reaparezca.
+  function finish() {
+    setMode("off");
+    if (forced) router.replace("/dashboard", { scroll: false });
+  }
 
   // Durante el recorrido: sin desplazamiento, el elemento del paso a la vista y su posición al día.
   useEffect(() => {
@@ -124,7 +162,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   useEffect(() => {
     if (mode === "off") return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMode("off");
+      if (e.key === "Escape") finish();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -144,7 +182,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
       >
         <button
           type="button"
-          onClick={() => setMode("off")}
+          onClick={finish}
           aria-label="Cerrar la guía"
           className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-lg font-bold leading-none text-white/70 transition hover:bg-white/20 hover:text-white"
         >
@@ -237,7 +275,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
         <div className="mt-4 flex items-center justify-center gap-4 [text-shadow:none]">
           <button
             type="button"
-            onClick={() => (last ? setMode("off") : setStep(step + 1))}
+            onClick={() => (last ? finish() : setStep(step + 1))}
             className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 shadow-lg shadow-black/40 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
           >
             {last ? "Finalizar guía" : "Siguiente"}
@@ -246,7 +284,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
         {!last && (
           <button
             type="button"
-            onClick={() => setMode("off")}
+            onClick={finish}
             className="mt-3 text-xs font-semibold text-white/60 underline decoration-white/25 underline-offset-2 transition hover:text-white [text-shadow:none]"
           >
             Saltar guía
