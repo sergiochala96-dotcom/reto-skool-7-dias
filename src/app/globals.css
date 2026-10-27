@@ -70,16 +70,16 @@ body {
   }
 }
 
-/* Latido suave de la invitación a la guía de inicio. */
+/* Latido bien visible de la invitación a la guía de inicio (crece y suelta un halo amarillo). */
 @keyframes introPulse {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
+    box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.65), 0 20px 40px -12px rgba(0, 0, 0, 0.6);
   }
   50% {
-    transform: scale(1.025);
-    box-shadow: 0 0 0 12px rgba(252, 211, 77, 0);
+    transform: scale(1.06);
+    box-shadow: 0 0 0 16px rgba(252, 211, 77, 0), 0 20px 40px -12px rgba(0, 0, 0, 0.6);
   }
 }
 

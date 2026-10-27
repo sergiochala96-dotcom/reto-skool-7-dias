@@ -135,30 +135,33 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   // --- Invitación inicial (no bloquea nada) ---------------------------------------------------
   if (mode === "intro") {
     return (
+      // Tarjeta flotante en la esquina inferior derecha (en pantallas grandes se corre a la izquierda de la
+      // columna derecha del panel para no taparla). Se puede cerrar con la X.
       <div
         role="region"
         aria-label="Guía rápida"
-        className="mx-auto mb-6 max-w-md animate-[introPulse_2.2s_ease-in-out_infinite] rounded-3xl border-2 border-amber-300/40 bg-surface-2 p-5 text-center motion-reduce:animate-none"
+        className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-4 z-[60] w-[15.5rem] animate-[introPulse_1.8s_ease-in-out_infinite] rounded-3xl border-2 border-amber-300/60 bg-surface-2 p-4 pt-3.5 text-center shadow-2xl shadow-black/60 motion-reduce:animate-none md:bottom-6 md:max-[1399px]:right-6 md:w-72 md:p-5 min-[1400px]:right-[calc(22rem_+_1.5rem)]"
       >
-        <p className="text-3xl">👋</p>
-        <h2 className="mt-1 text-xl font-extrabold leading-tight text-white">¡Bienvenido!</h2>
-        <p className="mt-1 text-sm text-white/70">Aprende a usar Skooly en tan solo 3 pasos.</p>
+        <button
+          type="button"
+          onClick={() => setMode("off")}
+          aria-label="Cerrar la guía"
+          className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-lg font-bold leading-none text-white/70 transition hover:bg-white/20 hover:text-white"
+        >
+          ×
+        </button>
+        <p className="text-2xl">👋</p>
+        <h2 className="mt-0.5 text-lg font-extrabold leading-tight text-white">¡Bienvenido!</h2>
+        <p className="mt-1 text-sm leading-snug text-white/70">Aprende a usar Skooly en tan solo 3 pasos.</p>
         <button
           type="button"
           onClick={() => {
             setStep(0);
             setMode("tour");
           }}
-          className="mx-auto mt-4 block rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-8 py-3 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
+          className="mx-auto mt-3 block w-full rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-4 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
         >
           Iniciar guía
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("off")}
-          className="mt-3 text-xs font-semibold text-white/50 transition hover:text-white"
-        >
-          Ahora no
         </button>
       </div>
     );

@@ -95,7 +95,7 @@ export default async function DashboardPage({
           </div>
 
           {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
-              Su invitación va aquí, en el flujo de la página, para no tapar nada. */}
+              Su invitación es una tarjeta flotante en la esquina inferior derecha, con X para cerrarla. */}
           <GuidedTour open={!welcomeVideoSeen || guia === "1"} />
 
           {/* Con pantalla grande estas recompensas están en la columna derecha; en el celular son los
