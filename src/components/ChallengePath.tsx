@@ -152,6 +152,7 @@ export default function ChallengePath({
           return (
             <div
               key={p.mission.day}
+              data-tour={isCurrent ? "day" : undefined}
               className="absolute flex flex-col items-center"
               style={{
                 left: cx + p.x - NODE / 2 - 26,
@@ -160,7 +161,7 @@ export default function ChallengePath({
               }}
             >
               {unlocked ? (
-                <Link href={`/dia/${p.mission.day}`} data-tour={isCurrent ? "day" : undefined}>
+                <Link href={`/dia/${p.mission.day}`}>
                   {node}
                 </Link>
               ) : (

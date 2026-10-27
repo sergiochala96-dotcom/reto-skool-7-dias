@@ -113,6 +113,7 @@ export default function ChallengePathDesktop({ completedDays }: { completedDays:
           return (
             <div key={m.day}>
               <div
+                data-tour={isCurrent ? "day" : undefined}
                 className="absolute"
                 style={{ left: cx + p.x - NODE / 2, top: p.y - NODE / 2, width: NODE, height: NODE }}
               >
@@ -120,6 +121,7 @@ export default function ChallengePathDesktop({ completedDays }: { completedDays:
               </div>
 
               <div
+                data-tour={isCurrent ? "day" : undefined}
                 className={`absolute rounded-2xl border p-4 ${
                   isCurrent ? "border-violet-300/50 bg-surface-2" : "border-white/10 bg-surface"
                 } ${!unlocked ? "opacity-60" : ""}`}
@@ -134,7 +136,6 @@ export default function ChallengePathDesktop({ completedDays }: { completedDays:
                 ) : unlocked ? (
                   <Link
                     href={`/dia/${m.day}`}
-                    data-tour={isCurrent ? "day" : undefined}
                     className="mt-3 inline-block rounded-xl bg-amber-300 px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
                   >
                     Empezar día {m.day}

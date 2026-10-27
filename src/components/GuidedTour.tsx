@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-// Guía de inicio de 3 pasos: aparece la primera vez que alguien entra al panel (o con ?guia=1).
-// Es un recorrido de "foco": toda la pantalla se pone borrosa y oscura, salvo el elemento del paso
-// (que queda nítido y con un aro amarillo), y junto a él aparece un texto blanco con una flecha que
-// lo señala. Se avanza con "Siguiente"; se puede saltar en cualquier momento.
+// Guía de inicio de 3 pasos. La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
+// pequeña, sin bloquear nada: "¿Quieres una guía rápida?". Si la acepta, comienza un recorrido de foco:
+// la pantalla se pone borrosa y oscura salvo el elemento del paso (con un aro amarillo) y junto a él va
+// un texto breve en blanco con una flecha. Se puede saltar en cualquier momento.
 
 type Step = {
   key: "day" | "whatsapp" | "install";
@@ -16,42 +16,33 @@ type Step = {
 const STEPS: Step[] = [
   {
     key: "day",
-    title: "Empieza el Día 1",
-    body: {
-      mobile: "Tu reto de 7 días arranca aquí. Toca el primer punto del camino y completa la misión de hoy.",
-      desktop: "Tu reto de 7 días arranca aquí. Pulsa «Empezar día 1» y completa la misión de hoy.",
-    },
+    title: "Inicia el reto",
+    body: { mobile: "Aquí empieza tu Día 1.", desktop: "Aquí empieza tu Día 1." },
   },
   {
     key: "whatsapp",
     title: "Únete a WhatsApp",
-    body: {
-      mobile: "Ahí te avisamos de todo y resolvemos dudas. Toca el icono verde y gana 50 monedas de oro.",
-      desktop: "Ahí te avisamos de todo y resolvemos dudas. Usa esta tarjeta y gana 50 monedas de oro.",
-    },
+    body: { mobile: "Gana 50 monedas.", desktop: "Gana 50 monedas." },
   },
   {
     key: "install",
-    title: "Instala la app en tu celular",
-    body: {
-      mobile: "Toca el icono azul y sigue los pasos para tener Skooly en tu pantalla. Ganas 100 monedas de oro.",
-      desktop:
-        "Entra a Skooly desde tu celular y toca el icono azul de instalar: queda en tu pantalla como una app y ganas 100 monedas de oro.",
-    },
+    title: "Instala la app",
+    body: { mobile: "Gana 100 monedas.", desktop: "Desde tu celular. Gana 100 monedas." },
   },
 ];
 
 type Rect = { x: number; y: number; w: number; h: number };
 
-const PAD = 8; // aire alrededor del elemento resaltado
+const PAD = 10; // aire alrededor del elemento resaltado
 const ARROW = 40; // alto de la flecha entre el elemento y el texto
-const CALLOUT_MAX = 380;
+const CALLOUT_MAX = 340;
 
-// Primer elemento visible con esa marca (en el panel hay dos copias de algunas tarjetas y una se oculta
-// según el ancho de la pantalla).
-function findTarget(key: string): HTMLElement | null {
-  const all = Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${key}"]`));
-  return all.find((el) => el.getClientRects().length > 0) ?? null;
+// Elementos visibles con esa marca. Puede haber varios (el punto del día y su tarjeta) y entonces se
+// resaltan juntos; además, en el panel hay dos copias de algunas tarjetas y una se oculta según el ancho.
+function findTargets(key: string): HTMLElement[] {
+  return Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${key}"]`)).filter(
+    (el) => el.getClientRects().length > 0
+  );
 }
 
 // Recorte de la capa borrosa: toda la pantalla menos un rectángulo redondeado (el hueco por el que se
@@ -86,7 +77,8 @@ function Arrow({ up }: { up: boolean }) {
 }
 
 export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
-  const [open, setOpen] = useState(initiallyOpen);
+  // "intro": invitación pequeña · "tour": recorrido de 3 pasos · "off": cerrada
+  const [mode, setMode] = useState<"intro" | "tour" | "off">(initiallyOpen ? "intro" : "off");
   const [step, setStep] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [mobile, setMobile] = useState(false);
@@ -103,25 +95,29 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Mientras dura la guía: sin desplazamiento, el elemento del paso a la vista y su posición al día.
+  // Durante el recorrido: sin desplazamiento, el elemento del paso a la vista y su posición al día.
   useEffect(() => {
-    if (!open || !mounted) return;
+    if (mode !== "tour" || !mounted) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const measure = () => {
       setVp({ w: window.innerWidth, h: window.innerHeight });
-      const el = findTarget(STEPS[step].key);
-      if (!el) {
+      const els = findTargets(STEPS[step].key);
+      if (els.length === 0) {
         setRect(null);
         return;
       }
-      const b = el.getBoundingClientRect();
-      setRect({ x: b.left - PAD, y: b.top - PAD, w: b.width + PAD * 2, h: b.height + PAD * 2 });
+      // Rectángulo que abarca todos los elementos del paso.
+      const boxes = els.map((el) => el.getBoundingClientRect());
+      const left = Math.min(...boxes.map((b) => b.left));
+      const top = Math.min(...boxes.map((b) => b.top));
+      const right = Math.max(...boxes.map((b) => b.right));
+      const bottom = Math.max(...boxes.map((b) => b.bottom));
+      setRect({ x: left - PAD, y: top - PAD, w: right - left + PAD * 2, h: bottom - top + PAD * 2 });
     };
 
-    const target = findTarget(STEPS[step].key);
-    target?.scrollIntoView({ block: "center", behavior: "auto" });
+    findTargets(STEPS[step].key)[0]?.scrollIntoView({ block: "center", behavior: "auto" });
     measure();
     const settle = window.setTimeout(measure, 150); // por si la pantalla acomoda algo después
     window.addEventListener("resize", measure);
@@ -132,18 +128,55 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
       window.removeEventListener("scroll", measure, true);
       document.body.style.overflow = previousOverflow;
     };
-  }, [open, mounted, step, mobile]);
+  }, [mode, mounted, step, mobile]);
 
   useEffect(() => {
-    if (!open) return;
+    if (mode === "off") return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") setMode("off");
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [mode]);
 
-  if (!open || !mounted || vp.w === 0) return null;
+  if (mode === "off" || !mounted) return null;
+
+  // --- Invitación inicial (no bloquea nada) ---------------------------------------------------
+  if (mode === "intro") {
+    return (
+      <div
+        role="dialog"
+        aria-label="Guía rápida"
+        className="fixed inset-x-4 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-sm rounded-3xl border-2 border-white/15 bg-surface-2 p-5 text-center shadow-2xl shadow-black/60 md:inset-x-auto md:bottom-8 md:left-1/2 md:-translate-x-1/2"
+      >
+        <p className="text-3xl">👋</p>
+        <h2 className="mt-1 text-xl font-extrabold leading-tight text-white">¡Bienvenido a Skooly!</h2>
+        <p className="mt-1 text-sm text-white/65">¿Quieres una guía rápida de 3 pasos?</p>
+        <div className="mt-4 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => setMode("off")}
+            className="text-sm font-semibold text-white/55 transition hover:text-white"
+          >
+            Ahora no
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep(0);
+              setMode("tour");
+            }}
+            className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
+          >
+            Iniciar guía
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Recorrido de foco -----------------------------------------------------------------------
+  if (vp.w === 0) return null;
 
   const current = STEPS[step];
   const last = step === STEPS.length - 1;
@@ -153,7 +186,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   // computadora), va al centro.
   const below = rect ? vp.h - (rect.y + rect.h) : 0;
   const above = rect ? rect.y : 0;
-  const placeBelow = rect ? below >= 240 || below >= above : false;
+  const placeBelow = rect ? below >= 200 || below >= above : false;
   const centerX = rect ? rect.x + rect.w / 2 : vp.w / 2;
   const left = Math.min(Math.max(centerX - width / 2, 16), vp.w - width - 16);
   const radius = rect ? (Math.abs(rect.w - rect.h) < 8 ? Math.min(rect.w, rect.h) / 2 : 18) : 0;
@@ -167,7 +200,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   const arrowX = Math.min(Math.max(centerX, 28), vp.w - 28) - 12;
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Guía de inicio">
+    <div role="dialog" aria-modal="true" aria-label="Guía rápida">
       {/* Capa borrosa y oscura con un hueco sobre el elemento del paso */}
       <div
         className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-[6px]"
@@ -207,9 +240,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
           Paso {step + 1} de {STEPS.length}
         </p>
         <h2 className="mt-1 text-2xl font-extrabold leading-tight">{current.title}</h2>
-        <p className="mt-2 text-base leading-snug text-white/90">
-          {mobile ? current.body.mobile : current.body.desktop}
-        </p>
+        <p className="mt-1 text-base text-white/90">{mobile ? current.body.mobile : current.body.desktop}</p>
 
         <div className="mt-4 flex items-center justify-center gap-4 [text-shadow:none]">
           {step > 0 && (
@@ -223,7 +254,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
           )}
           <button
             type="button"
-            onClick={() => (last ? setOpen(false) : setStep(step + 1))}
+            onClick={() => (last ? setMode("off") : setStep(step + 1))}
             className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 shadow-lg shadow-black/40 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
           >
             {last ? "Finalizar guía" : "Siguiente"}
@@ -232,7 +263,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
         {!last && (
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={() => setMode("off")}
             className="mt-3 text-xs font-semibold text-white/60 underline decoration-white/25 underline-offset-2 transition hover:text-white [text-shadow:none]"
           >
             Saltar guía
