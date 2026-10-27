@@ -35,6 +35,19 @@ export default async function DiaPage({
     .eq("day", day)
     .maybeSingle();
 
+  // ¿Ya verificó su unión a WhatsApp (cobró las 50 monedas)? Si no, al terminar el Día 1 se la invita.
+  const { data: whatsappRow } =
+    day === 1
+      ? await supabase
+          .from("coin_transactions")
+          .select("ref")
+          .eq("user_id", user.id)
+          .eq("reason", "verificado")
+          .eq("ref", "whatsapp")
+          .maybeSingle()
+      : { data: null };
+  const whatsappClaimed = Boolean(whatsappRow);
+
   const initialAnswers = (answerRow?.answers ?? {}) as Answers;
   const sections = getMissionSections(day);
   const introVideo = getDayIntroVideo(day);
@@ -78,6 +91,7 @@ export default async function DiaPage({
               title={mission.title}
               intro={mission.intro}
               completed={done}
+              whatsappClaimed={whatsappClaimed}
               sections={sections}
               initialAnswers={initialAnswers}
               saveAction={saveAction}

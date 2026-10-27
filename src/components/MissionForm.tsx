@@ -17,6 +17,9 @@ import PlatformIcon from "@/components/PlatformIcon";
 import CalendarMockup from "@/components/CalendarMockup";
 import { playSuccessDing, playVictoryFanfare } from "@/lib/successSound";
 import { trackCustomEvent } from "@/lib/metaPixel";
+import { completeStartMission } from "@/app/actions";
+import { WHATSAPP_PATH } from "@/components/GraciasCheckpoints";
+import { WHATSAPP_COMMUNITY_URL } from "@/lib/captacion";
 
 const inputBase =
   "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-violet-500";
@@ -548,18 +551,85 @@ function SliderField({
   );
 }
 
+// Invitación a WhatsApp: sale al darle "Continuar al Día 2" tras completar el Día 1, antes de empezar
+// el Día 2. Unirse abre el grupo en otra pestaña; la persona sigue al Día 2 cuando quiera.
+export function WhatsappInviteModal({ nextDay }: { nextDay: number }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="relative flex w-full max-w-md animate-[popIn_0.3s_ease-out] flex-col items-center rounded-3xl border-2 border-white/10 bg-surface-2 p-7 text-center shadow-2xl sm:p-9">
+        <Link
+          href={`/dia/${nextDay}`}
+          aria-label={`Cerrar y continuar al Día ${nextDay}`}
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+        >
+          ✕
+        </Link>
+
+        <Image
+          src="/mascota-whatsapp-gato.png"
+          alt="Skooly con el logo de WhatsApp"
+          width={1254}
+          height={1254}
+          className="h-44 w-44 object-contain sm:h-52 sm:w-52"
+        />
+
+        <h2 className="mt-2 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+          ¡Únete a nuestro boletín de WhatsApp!
+        </h2>
+        <p className="mt-3 text-base leading-relaxed text-white/70">
+          Recibe recordatorios, ayuda y novedades del reto directo en tu WhatsApp, y no te pierdas nada
+          antes de empezar el Día {nextDay}.
+        </p>
+
+        <a
+          href={WHATSAPP_COMMUNITY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => void completeStartMission("whatsapp")}
+          className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl border-b-4 border-emerald-700 bg-[#25D366] px-5 py-4 text-base font-extrabold uppercase tracking-wide text-white transition hover:brightness-105 active:translate-y-0.5 active:border-b-2"
+        >
+          <svg viewBox="0 0 32 32" fill="currentColor" className="h-6 w-6" aria-hidden="true">
+            <path d={WHATSAPP_PATH} />
+          </svg>
+          Unirme al boletín
+        </a>
+
+        <p className="mt-4 flex items-center justify-center gap-1.5 rounded-2xl bg-black/30 px-4 py-1.5 text-base font-extrabold text-amber-300">
+          <CoinIcon className="h-5 w-5" /> Ganarás +50 monedas de oro
+        </p>
+        <p className="mt-2 text-xs leading-snug text-white/50">
+          para canjear en la tienda. Al entrar, busca el código fijado en el grupo y escríbelo en tu panel
+          para reclamarlas.
+        </p>
+
+        <Link
+          href={`/dia/${nextDay}`}
+          className="mt-5 text-sm font-semibold text-white/60 underline decoration-white/25 underline-offset-2 transition hover:text-white"
+        >
+          Continuar al Día {nextDay}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function CelebrationModal({
   day,
   totalDays,
   coins,
+  inviteWhatsapp,
   onClose,
 }: {
   day: number;
   totalDays: number;
   coins: number;
+  inviteWhatsapp: boolean;
   onClose: () => void;
 }) {
   const isLastDay = day >= totalDays;
+  const [inviting, setInviting] = useState(false);
+
+  if (inviting) return <WhatsappInviteModal nextDay={day + 1} />;
 
   return (
     <div
@@ -629,12 +699,22 @@ function CelebrationModal({
           >
             Volver al Día {day}
           </button>
-          <Link
-            href={isLastDay ? "/cofre" : `/dia/${day + 1}`}
-            className="flex-1 rounded-xl bg-amber-400 px-4 py-4 text-center text-base font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
-          >
-            {isLastDay ? "Ir al Cofre del Tesoro" : `Continuar al Día ${day + 1}`}
-          </Link>
+          {inviteWhatsapp && !isLastDay ? (
+            <button
+              type="button"
+              onClick={() => setInviting(true)}
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-4 text-center text-base font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+            >
+              {`Continuar al Día ${day + 1}`}
+            </button>
+          ) : (
+            <Link
+              href={isLastDay ? "/cofre" : `/dia/${day + 1}`}
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-4 text-center text-base font-bold text-black shadow-lg shadow-amber-400/30 transition hover:brightness-105"
+            >
+              {isLastDay ? "Ir al Cofre del Tesoro" : `Continuar al Día ${day + 1}`}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -1059,6 +1139,7 @@ export default function MissionForm({
   sections: allSections,
   initialAnswers,
   saveAction,
+  whatsappClaimed = true,
 }: {
   day: number;
   totalDays: number;
@@ -1069,6 +1150,8 @@ export default function MissionForm({
   sections: MissionSection[];
   initialAnswers: Answers;
   saveAction: (state: MissionState, formData: FormData) => Promise<MissionState>;
+  /** Si ya cobró la recompensa de WhatsApp (en el Día 1, si no, se la invita al continuar). */
+  whatsappClaimed?: boolean;
 }) {
   // Las secciones "collapsible" no son pasos del recorrido: salen como desplegables al final
   // (cerrados al inicio) y no cuentan para completar el día.
@@ -1460,6 +1543,7 @@ export default function MissionForm({
         day={day}
         totalDays={totalDays}
         coins={celebration.coins}
+        inviteWhatsapp={day === 1 && !whatsappClaimed}
         onClose={() => setCelebration(null)}
       />
     )}
