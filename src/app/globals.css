@@ -50,7 +50,7 @@ body {
   }
 }
 
-/* Aro amarillo que resalta, en la guía de inicio, lo que se está explicando. */
+/* Aro amarillo que resalta, en la guía de inicio, el elemento que se está explicando. */
 @keyframes tourPulse {
   0%,
   100% {
@@ -60,13 +60,12 @@ body {
     box-shadow: 0 0 0 5px #fcd34d, 0 0 26px 8px rgba(252, 211, 77, 0.6);
   }
 }
-.tour-highlight {
-  border-radius: 1rem;
-  box-shadow: 0 0 0 4px #fcd34d, 0 0 20px 4px rgba(252, 211, 77, 0.5);
+.tour-ring {
+  border: 3px solid #fcd34d;
   animation: tourPulse 1.4s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .tour-highlight {
+  .tour-ring {
     animation: none;
   }
 }

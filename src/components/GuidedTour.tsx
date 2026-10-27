@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-// Guía de inicio de 3 pasos (reemplaza al video de bienvenida): aparece la primera vez que alguien
-// entra al panel y no bloquea nada. Una tarjeta flotante va explicando, paso a paso, qué tocar
-// (empezar el Día 1, unirse a WhatsApp, instalar la app) y resalta con un aro amarillo el elemento
-// de la pantalla del que habla. Se puede saltar en cualquier momento y volver a abrir desde el Perfil.
+// Guía de inicio de 3 pasos: aparece la primera vez que alguien entra al panel (o con ?guia=1).
+// Es un recorrido de "foco": toda la pantalla se pone borrosa y oscura, salvo el elemento del paso
+// (que queda nítido y con un aro amarillo), y junto a él aparece un texto blanco con una flecha que
+// lo señala. Se avanza con "Siguiente"; se puede saltar en cualquier momento.
 
 type Step = {
   key: "day" | "whatsapp" | "install";
-  emoji: string;
   title: string;
   body: { mobile: string; desktop: string };
 };
@@ -17,7 +16,6 @@ type Step = {
 const STEPS: Step[] = [
   {
     key: "day",
-    emoji: "🚀",
     title: "Empieza el Día 1",
     body: {
       mobile: "Tu reto de 7 días arranca aquí. Toca el primer punto del camino y completa la misión de hoy.",
@@ -26,7 +24,6 @@ const STEPS: Step[] = [
   },
   {
     key: "whatsapp",
-    emoji: "💬",
     title: "Únete a WhatsApp",
     body: {
       mobile: "Ahí te avisamos de todo y resolvemos dudas. Toca el icono verde y gana 50 monedas de oro.",
@@ -35,7 +32,6 @@ const STEPS: Step[] = [
   },
   {
     key: "install",
-    emoji: "📲",
     title: "Instala la app en tu celular",
     body: {
       mobile: "Toca el icono azul y sigue los pasos para tener Skooly en tu pantalla. Ganas 100 monedas de oro.",
@@ -45,7 +41,11 @@ const STEPS: Step[] = [
   },
 ];
 
-const HIGHLIGHT = "tour-highlight";
+type Rect = { x: number; y: number; w: number; h: number };
+
+const PAD = 8; // aire alrededor del elemento resaltado
+const ARROW = 40; // alto de la flecha entre el elemento y el texto
+const CALLOUT_MAX = 380;
 
 // Primer elemento visible con esa marca (en el panel hay dos copias de algunas tarjetas y una se oculta
 // según el ancho de la pantalla).
@@ -54,10 +54,46 @@ function findTarget(key: string): HTMLElement | null {
   return all.find((el) => el.getClientRects().length > 0) ?? null;
 }
 
+// Recorte de la capa borrosa: toda la pantalla menos un rectángulo redondeado (el hueco por el que se
+// ve nítido el elemento del paso).
+function holePath(vw: number, vh: number, r: Rect, radius: number) {
+  const { x, y, w, h } = r;
+  return (
+    `path(evenodd, "M0 0H${vw}V${vh}H0Z ` +
+    `M${x + radius} ${y}H${x + w - radius}A${radius} ${radius} 0 0 1 ${x + w} ${y + radius}` +
+    `V${y + h - radius}A${radius} ${radius} 0 0 1 ${x + w - radius} ${y + h}` +
+    `H${x + radius}A${radius} ${radius} 0 0 1 ${x} ${y + h - radius}` +
+    `V${y + radius}A${radius} ${radius} 0 0 1 ${x + radius} ${y}Z")`
+  );
+}
+
+function Arrow({ up }: { up: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 40"
+      fill="none"
+      stroke="white"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`h-9 w-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] ${up ? "" : "rotate-180"}`}
+      aria-hidden="true"
+    >
+      <path d="M12 38C7 27 17 17 12 6" />
+      <path d="M5 13 12 5l7 8" />
+    </svg>
+  );
+}
+
 export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   const [open, setOpen] = useState(initiallyOpen);
   const [step, setStep] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [rect, setRect] = useState<Rect | null>(null);
+  const [vp, setVp] = useState({ w: 0, h: 0 });
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -67,18 +103,36 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Resalta lo que explica el paso actual y lo trae a la vista.
+  // Mientras dura la guía: sin desplazamiento, el elemento del paso a la vista y su posición al día.
   useEffect(() => {
-    if (!open) return;
-    const clear = () => document.querySelectorAll(`.${HIGHLIGHT}`).forEach((el) => el.classList.remove(HIGHLIGHT));
-    clear();
+    if (!open || !mounted) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const measure = () => {
+      setVp({ w: window.innerWidth, h: window.innerHeight });
+      const el = findTarget(STEPS[step].key);
+      if (!el) {
+        setRect(null);
+        return;
+      }
+      const b = el.getBoundingClientRect();
+      setRect({ x: b.left - PAD, y: b.top - PAD, w: b.width + PAD * 2, h: b.height + PAD * 2 });
+    };
+
     const target = findTarget(STEPS[step].key);
-    if (target) {
-      target.classList.add(HIGHLIGHT);
-      target.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
-    return clear;
-  }, [open, step, mobile]);
+    target?.scrollIntoView({ block: "center", behavior: "auto" });
+    measure();
+    const settle = window.setTimeout(measure, 150); // por si la pantalla acomoda algo después
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open, mounted, step, mobile]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,71 +143,101 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !mounted || vp.w === 0) return null;
 
   const current = STEPS[step];
   const last = step === STEPS.length - 1;
+  const width = Math.min(CALLOUT_MAX, vp.w - 32);
+
+  // El texto va debajo del elemento si ahí hay espacio; si no, arriba. Sin elemento (paso 3 en
+  // computadora), va al centro.
+  const below = rect ? vp.h - (rect.y + rect.h) : 0;
+  const above = rect ? rect.y : 0;
+  const placeBelow = rect ? below >= 240 || below >= above : false;
+  const centerX = rect ? rect.x + rect.w / 2 : vp.w / 2;
+  const left = Math.min(Math.max(centerX - width / 2, 16), vp.w - width - 16);
+  const radius = rect ? (Math.abs(rect.w - rect.h) < 8 ? Math.min(rect.w, rect.h) / 2 : 18) : 0;
+
+  const calloutStyle: React.CSSProperties = rect
+    ? placeBelow
+      ? { top: rect.y + rect.h + ARROW, left, width }
+      : { bottom: vp.h - rect.y + ARROW, left, width }
+    : { top: "50%", left: (vp.w - width) / 2, width, transform: "translateY(-50%)" };
+
+  const arrowX = Math.min(Math.max(centerX, 28), vp.w - 28) - 12;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="false"
-      aria-label="Guía de inicio"
-      className="fixed inset-x-4 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-md rounded-3xl border-2 border-white/15 bg-surface-2 p-5 shadow-2xl shadow-black/60 md:inset-x-auto md:bottom-8 md:left-1/2 md:w-[27rem] md:-translate-x-1/2"
-    >
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        className="absolute right-4 top-4 text-xs font-semibold text-white/45 transition hover:text-white"
-      >
-        Saltar guía
-      </button>
+    <div role="dialog" aria-modal="true" aria-label="Guía de inicio">
+      {/* Capa borrosa y oscura con un hueco sobre el elemento del paso */}
+      <div
+        className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-[6px]"
+        style={rect ? { clipPath: holePath(vp.w, vp.h, rect, radius) } : undefined}
+        aria-hidden="true"
+      />
 
-      <div className="flex items-center gap-1.5" aria-label={`Paso ${step + 1} de ${STEPS.length}`}>
-        {STEPS.map((s, i) => (
-          <span
-            key={s.key}
-            className={`h-1.5 rounded-full transition-all ${
-              i === step ? "w-7 bg-amber-300" : i < step ? "w-3 bg-amber-300/60" : "w-3 bg-white/15"
-            }`}
+      {rect && (
+        <>
+          {/* Aro amarillo alrededor del elemento */}
+          <div
+            className="tour-ring pointer-events-none fixed z-[71]"
+            style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h, borderRadius: radius }}
+            aria-hidden="true"
           />
-        ))}
-        <span className="ml-1 text-[11px] font-bold uppercase tracking-wide text-white/40">
+          {/* Flecha que apunta al elemento */}
+          <div
+            className="pointer-events-none fixed z-[72]"
+            style={
+              placeBelow
+                ? { left: arrowX, top: rect.y + rect.h + 4 }
+                : { left: arrowX, bottom: vp.h - rect.y + 4 }
+            }
+            aria-hidden="true"
+          >
+            <Arrow up={placeBelow} />
+          </div>
+        </>
+      )}
+
+      {/* Texto del paso (sin tarjeta: letras blancas sobre la capa borrosa) */}
+      <div
+        className="fixed z-[72] text-center text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.85)]"
+        style={calloutStyle}
+      >
+        <p className="text-xs font-extrabold uppercase tracking-widest text-amber-300">
           Paso {step + 1} de {STEPS.length}
-        </span>
-      </div>
+        </p>
+        <h2 className="mt-1 text-2xl font-extrabold leading-tight">{current.title}</h2>
+        <p className="mt-2 text-base leading-snug text-white/90">
+          {mobile ? current.body.mobile : current.body.desktop}
+        </p>
 
-      <div className="mt-3 flex items-start gap-3">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-2xl">
-          {current.emoji}
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-lg font-extrabold leading-tight text-white">{current.title}</h2>
-          <p className="mt-1 text-sm leading-snug text-white/70">
-            {mobile ? current.body.mobile : current.body.desktop}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between gap-3">
-        {step > 0 ? (
+        <div className="mt-4 flex items-center justify-center gap-4 [text-shadow:none]">
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={() => setStep(step - 1)}
+              className="text-sm font-semibold text-white/70 transition hover:text-white"
+            >
+              Atrás
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => setStep(step - 1)}
-            className="text-sm font-semibold text-white/55 transition hover:text-white"
+            onClick={() => (last ? setOpen(false) : setStep(step + 1))}
+            className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 shadow-lg shadow-black/40 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
           >
-            Atrás
+            {last ? "Finalizar guía" : "Siguiente"}
           </button>
-        ) : (
-          <span />
+        </div>
+        {!last && (
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="mt-3 text-xs font-semibold text-white/60 underline decoration-white/25 underline-offset-2 transition hover:text-white [text-shadow:none]"
+          >
+            Saltar guía
+          </button>
         )}
-        <button
-          type="button"
-          onClick={() => (last ? setOpen(false) : setStep(step + 1))}
-          className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
-        >
-          {last ? "Finalizar guía" : "Siguiente"}
-        </button>
       </div>
     </div>
   );
