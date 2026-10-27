@@ -411,6 +411,8 @@ export async function adminResetUserProgress(
       push_reminder_for: null,
       plan: "standard",
       plan_expires_at: null,
+      // Marca el reinicio: la guía de inicio la usa para mostrarse otra vez en navegadores que ya la vieron.
+      reset_at: new Date().toISOString(),
     })
     .eq("id", targetUserId);
   if (error) return { ok: false, error: `No se pudo reiniciar el perfil: ${error.message}` };

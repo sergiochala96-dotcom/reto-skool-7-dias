@@ -50,7 +50,7 @@ export default async function DashboardPage({
   // admin lo abre usuario por usuario desde el panel: episode2_locked_override = false => desbloqueado.
   // Y qué recompensas ya cobró (las de 50 monedas de las comunidades se canjean con un código).
   const [{ data: profileRow }, { data: verifiedRows }] = await Promise.all([
-    supabase.from("profiles").select("episode2_locked_override").eq("id", user.id).single(),
+    supabase.from("profiles").select("episode2_locked_override, reset_at").eq("id", user.id).single(),
     supabase
       .from("coin_transactions")
       .select("ref")
@@ -96,7 +96,7 @@ export default async function DashboardPage({
 
           {/* Guía de 5 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
               Su invitación es una tarjeta flotante en la esquina inferior derecha, con X para cerrarla. */}
-          <GuidedTour open={!welcomeVideoSeen || guia === "1"} userKey={user.id} forced={guia === "1"} />
+          <GuidedTour open={!welcomeVideoSeen || guia === "1"} userKey={`${user.id}_${profileRow?.reset_at ?? "0"}`} forced={guia === "1"} />
 
           {/* Con pantalla grande estas recompensas están en la columna derecha; en el celular son los
               dos iconos cuadrados fijos bajo la tarjeta del episodio (JoinTiles). */}
