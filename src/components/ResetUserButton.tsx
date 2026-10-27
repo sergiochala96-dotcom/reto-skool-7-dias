@@ -32,11 +32,17 @@ export default function ResetUserButton({
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleConfirm = () => {
+    setError(null);
     startTransition(async () => {
-      await adminResetUserProgress(userId);
+      const r = await adminResetUserProgress(userId);
+      if (!r.ok) {
+        setError(r.error ?? "No se pudo resetear.");
+        return;
+      }
       setOpen(false);
       router.refresh();
     });
@@ -67,11 +73,17 @@ export default function ResetUserButton({
               <span className="text-3xl">⚠️</span>
               <h3 className="text-lg font-bold text-white">Resetear usuario</h3>
             </div>
-            <p className="mb-6 text-sm leading-relaxed text-white/70">
+            <p className="mb-3 text-sm leading-relaxed text-white/70">
               ¿Estás seguro que quieres resetear la información de{" "}
               <span className="font-semibold text-white">{label}</span>? Esto puede
               conllevar a problemas o malos entendidos con este usuario.
             </p>
+            <p className="mb-6 text-xs leading-relaxed text-white/50">
+              La cuenta queda como recién creada: se borran el progreso, las respuestas, las trivias, las
+              monedas y los canjes, vuelve a ver la guía de inicio, tiene 0 monedas y 3 vidas, sin foto, y
+              su plan vuelve a Standard. Se conservan el correo, el nombre y la contraseña.
+            </p>
+            {error && <p className="mb-4 text-sm font-semibold text-red-300">{error}</p>}
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"

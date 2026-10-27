@@ -358,10 +358,15 @@ export async function adminResetProgress(): Promise<void> {
   redirect("/dashboard");
 }
 
-// Resetea la cuenta de OTRO usuario desde el panel de admin: la deja como
-// si fuera nueva (sin progreso ni respuestas), para pruebas o a pedido del
-// propio usuario.
-export async function adminResetUserProgress(targetUserId: string): Promise<void> {
+// Resetea la cuenta de OTRO usuario desde el panel de admin: la deja como si acabara de crearla, para
+// pruebas o a pedido de la propia persona. Borra todo lo que generó (progreso, respuestas, trivias,
+// monedas y su historial, canjes de la tienda, intentos de códigos, avisos leídos y dispositivos con
+// avisos de pantalla de bloqueo) y devuelve su perfil al estado inicial: guía de inicio otra vez, 0
+// monedas, 3 vidas, sin foto, sin recompensas cobradas, sin acceso al Episodio 2 y plan Standard.
+// Se conservan la cuenta, el nombre, el correo y la contraseña.
+export async function adminResetUserProgress(
+  targetUserId: string
+): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -369,19 +374,49 @@ export async function adminResetUserProgress(targetUserId: string): Promise<void
 
   if (!user || !isAdmin(user.email)) redirect("/dashboard");
 
-  await supabase.from("challenge_progress").delete().eq("user_id", targetUserId);
-  await supabase.from("mission_answers").delete().eq("user_id", targetUserId);
-  await supabase
+  // Con la llave del servidor: varias de estas tablas (monedas, trivias, canjes) no se pueden
+  // escribir desde la sesión del admin.
+  const service = createServiceClient();
+  if (!service) return { ok: false, error: "Falta la llave del servidor para resetear." };
+
+  const tables = [
+    "challenge_progress",
+    "mission_answers",
+    "trivia_attempts",
+    "shop_redemptions",
+    "coin_transactions",
+    "join_attempts",
+    "notification_reads",
+    "push_subscriptions",
+  ];
+  for (const table of tables) {
+    const { error } = await service.from(table).delete().eq("user_id", targetUserId);
+    if (error) return { ok: false, error: `No se pudo borrar ${table}: ${error.message}` };
+  }
+
+  const { error } = await service
     .from("profiles")
     .update({
       welcome_video_seen: false,
       episode2_locked_override: null,
       joined_skool_at: null,
       joined_whatsapp_at: null,
+      episode1_unlocked_at: null,
+      avatar_url: null,
+      coins: 0,
+      lives: 3,
+      lives_refilled_at: null,
+      last_seen_date: null,
+      last_device: null,
+      push_reminder_for: null,
+      plan: "standard",
+      plan_expires_at: null,
     })
     .eq("id", targetUserId);
+  if (error) return { ok: false, error: `No se pudo reiniciar el perfil: ${error.message}` };
 
   revalidatePath("/admin");
+  return { ok: true };
 }
 
 // El Episodio 2 está bloqueado para todos por defecto: solo se desbloquea cuando
