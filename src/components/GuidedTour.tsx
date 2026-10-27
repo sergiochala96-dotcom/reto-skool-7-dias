@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-// Guía de inicio de 3 pasos. La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
+// Guía de inicio de 5 pasos (reto, WhatsApp, instalar la app, trivia del día y tienda). La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
 // pequeña, sin bloquear nada: "¿Quieres una guía rápida?". Si la acepta, comienza un recorrido de foco:
 // la pantalla se pone borrosa y oscura salvo el elemento del paso (con un aro amarillo) y junto a él va
 // un texto breve en blanco con una flecha. Se puede saltar en cualquier momento.
 
 type Step = {
-  key: "day" | "whatsapp" | "install";
+  key: "day" | "whatsapp" | "install" | "trivia" | "tienda";
   title: string;
   body?: string; // línea corta opcional bajo el título
 };
@@ -29,6 +29,16 @@ const STEPS: Step[] = [
     key: "install",
     title: "Instala la app",
     body: "Desde tu celular.",
+  },
+  {
+    key: "trivia",
+    title: "Trivia del día",
+    body: "Responde y gana monedas.",
+  },
+  {
+    key: "tienda",
+    title: "Tienda",
+    body: "Canjea tus monedas.",
   },
 ];
 
@@ -88,7 +98,7 @@ export default function GuidedTour({
   /** Pedida a propósito (desde el Perfil): se muestra aunque ya se haya visto. */
   forced?: boolean;
 }) {
-  // "intro": invitación pequeña · "tour": recorrido de 3 pasos · "off": cerrada
+  // "intro": invitación pequeña · "tour": recorrido de 5 pasos · "off": cerrada
   const [mode, setMode] = useState<"intro" | "tour" | "off">(initiallyOpen ? "intro" : "off");
   const router = useRouter();
   const checked = useRef(false);
@@ -190,7 +200,7 @@ export default function GuidedTour({
         </button>
         <h2 className="pr-5 text-lg font-extrabold leading-tight text-white">👋 ¡Bienvenido a Skooly!</h2>
         <p className="mt-1 text-sm leading-snug text-white/70">
-          Aprende a usar la aplicación en tan solo 3 sencillos pasos.
+          Aprende a usar la aplicación en tan solo 5 sencillos pasos.
         </p>
         <button
           type="button"
@@ -200,7 +210,7 @@ export default function GuidedTour({
           }}
           className="mx-auto mt-3 block w-full rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
         >
-          Iniciar guía de 3 pasos
+          Iniciar guía de 5 pasos
         </button>
       </div>
     );

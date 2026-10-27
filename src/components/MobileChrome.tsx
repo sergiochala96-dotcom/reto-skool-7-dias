@@ -70,8 +70,8 @@ export function MobileTopBar({
 
 const ITEMS = [
   { href: "/dashboard", label: "Inicio", icon: <span className="text-2xl leading-none">🏠</span> },
-  { href: "/dashboard/trivia", label: "Trivias", icon: <span className="text-2xl leading-none">🧠</span> },
-  { href: "/dashboard/tienda", label: "Tienda", icon: <GiftIcon className="h-7 w-7" /> },
+  { href: "/dashboard/trivia", tour: "trivia", label: "Trivias", icon: <span className="text-2xl leading-none">🧠</span> },
+  { href: "/dashboard/tienda", tour: "tienda", label: "Tienda", icon: <GiftIcon className="h-7 w-7" /> },
   { href: "/dashboard/planes", label: "Planes", icon: <CrownIcon className="h-7 w-7" /> },
   { href: "/dashboard/perfil", label: "Perfil", icon: <span className="text-2xl leading-none">👤</span> },
 ];
@@ -98,6 +98,7 @@ export function MobileBottomNav() {
           <Link
             key={item.href}
             href={item.href}
+            data-tour={"tour" in item ? item.tour : undefined}
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
             className={`flex h-14 w-16 items-center justify-center rounded-2xl border-2 transition ${

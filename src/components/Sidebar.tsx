@@ -210,6 +210,7 @@ export default function Sidebar({
           </Link>
           <Link
             href="/dashboard/trivia"
+            data-tour="trivia"
             onClick={() => setMobileOpen(false)}
             title={effectiveCollapsed ? "Trivias" : undefined}
             className={`${NAV_ITEM} ${pathname === "/dashboard/trivia" ? NAV_ACTIVE : NAV_IDLE}`}
@@ -219,6 +220,7 @@ export default function Sidebar({
           </Link>
           <Link
             href="/dashboard/tienda"
+            data-tour="tienda"
             onClick={() => setMobileOpen(false)}
             title={effectiveCollapsed ? "Tienda" : undefined}
             className={`${NAV_ITEM} ${pathname === "/dashboard/tienda" ? NAV_ACTIVE : NAV_IDLE}`}

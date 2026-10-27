@@ -94,7 +94,7 @@ export default async function DashboardPage({
             </p>
           </div>
 
-          {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
+          {/* Guía de 5 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
               Su invitación es una tarjeta flotante en la esquina inferior derecha, con X para cerrarla. */}
           <GuidedTour open={!welcomeVideoSeen || guia === "1"} userKey={user.id} forced={guia === "1"} />
 

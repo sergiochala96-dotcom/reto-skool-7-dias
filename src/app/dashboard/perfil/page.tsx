@@ -41,7 +41,7 @@ export default async function PerfilPage() {
             <span className="flex h-7 w-7 shrink-0 items-center justify-center text-2xl">🧭</span>
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-extrabold text-white">Ver la guía de inicio</span>
-              <span className="block text-xs text-white/55">Los 3 pasos para empezar, otra vez.</span>
+              <span className="block text-xs text-white/55">Los 5 pasos para empezar, otra vez.</span>
             </span>
           </Link>
 
