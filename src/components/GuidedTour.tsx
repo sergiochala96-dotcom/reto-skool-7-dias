@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-// Guía de inicio de 5 pasos (reto, WhatsApp, instalar la app, trivia del día y tienda). La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
+// Guía de inicio de 5 pasos (reto, WhatsApp, trivia del día, tienda e instalar la app). Al terminarla
+// cae un poco de confeti. La primera vez que alguien entra (o con ?guia=1) solo aparece una invitación
 // pequeña, sin bloquear nada: "¿Quieres una guía rápida?". Si la acepta, comienza un recorrido de foco:
 // la pantalla se pone borrosa y oscura salvo el elemento del paso (con un aro amarillo) y junto a él va
 // un texto breve en blanco con una flecha. Se puede saltar en cualquier momento.
@@ -26,11 +27,6 @@ const STEPS: Step[] = [
     // sin línea extra
   },
   {
-    key: "install",
-    title: "Instala la app",
-    body: "Desde tu celular.",
-  },
-  {
     key: "trivia",
     title: "Trivia del día",
     body: "Responde y gana monedas.",
@@ -39,6 +35,11 @@ const STEPS: Step[] = [
     key: "tienda",
     title: "Tienda",
     body: "Canjea tus monedas.",
+  },
+  {
+    key: "install",
+    title: "Instala la app",
+    body: "Desde tu celular.",
   },
 ];
 
@@ -66,6 +67,43 @@ function holePath(vw: number, vh: number, r: Rect, radius: number) {
     `V${y + h - radius}A${radius} ${radius} 0 0 1 ${x + w - radius} ${y + h}` +
     `H${x + radius}A${radius} ${radius} 0 0 1 ${x} ${y + h - radius}` +
     `V${y + radius}A${radius} ${radius} 0 0 1 ${x + radius} ${y}Z")`
+  );
+}
+
+// Confeti breve y liviano (30 piezas con animación de CSS, sin librerías ni cálculos por cuadro).
+const CONFETTI_COLORS = ["#fcd34d", "#a78bfa", "#34d399", "#38bdf8", "#fb7185", "#ffffff"];
+
+function Confetti() {
+  const [pieces] = useState(() =>
+    Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      dx: (Math.random() - 0.5) * 160,
+      delay: Math.random() * 0.35,
+      duration: 1.4 + Math.random() * 0.8,
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      size: 6 + Math.random() * 6,
+    }))
+  );
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[80] overflow-hidden" aria-hidden="true">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="absolute top-0 block rounded-[2px]"
+          style={
+            {
+              left: `${p.left}%`,
+              width: p.size,
+              height: p.size * 0.6,
+              backgroundColor: p.color,
+              animation: `confettiFall ${p.duration}s ease-in ${p.delay}s both`,
+              "--dx": `${p.dx}px`,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </div>
   );
 }
 
@@ -102,6 +140,7 @@ export default function GuidedTour({
   const [mode, setMode] = useState<"intro" | "tour" | "off">(initiallyOpen ? "intro" : "off");
   const router = useRouter();
   const checked = useRef(false);
+  const [confetti, setConfetti] = useState(false);
   const [step, setStep] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -127,6 +166,13 @@ export default function GuidedTour({
       // sin almacenamiento: se confía en la marca del servidor (solo se muestra la primera vez)
     }
   }, [initiallyOpen, userKey, forced]);
+
+  // Al finalizar la guía (último paso) cae un poco de confeti, salvo con "reducir movimiento".
+  function celebrate() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setConfetti(true);
+    window.setTimeout(() => setConfetti(false), 2600);
+  }
 
   // Al terminar o cerrar: si venía pedida con ?guia=1, se quita de la dirección para que no reaparezca.
   function finish() {
@@ -178,7 +224,7 @@ export default function GuidedTour({
     return () => document.removeEventListener("keydown", onKey);
   }, [mode]);
 
-  if (mode === "off" || !mounted) return null;
+  if (mode === "off" || !mounted) return confetti ? <Confetti /> : null;
 
   // --- Invitación inicial (no bloquea nada) ---------------------------------------------------
   if (mode === "intro") {
@@ -286,7 +332,12 @@ export default function GuidedTour({
         <div className="mt-4 flex items-center justify-center gap-4 [text-shadow:none]">
           <button
             type="button"
-            onClick={() => (last ? finish() : setStep(step + 1))}
+            onClick={() => {
+              if (last) {
+                celebrate();
+                finish();
+              } else setStep(step + 1);
+            }}
             className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 shadow-lg shadow-black/40 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
           >
             {last ? "Finalizar guía" : "Siguiente"}
