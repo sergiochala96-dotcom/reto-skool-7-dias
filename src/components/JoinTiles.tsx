@@ -65,6 +65,7 @@ function Tile({
     // El salto va en esta caja para no chocar con el efecto de pulsar del botón; cada icono salta un
     // poco después del anterior.
     <div
+      data-tour={kind}
       className="animate-[tileBounce_3s_ease-in-out_infinite] motion-reduce:animate-none"
       style={{ animationDelay: delay }}
     >

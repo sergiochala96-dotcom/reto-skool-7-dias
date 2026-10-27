@@ -34,6 +34,17 @@ export default async function PerfilPage() {
 
           <InstallAppRow />
 
+          <Link
+            href="/dashboard?guia=1"
+            className="mt-4 flex w-full items-center gap-3 rounded-2xl border-2 border-white/15 bg-white/[0.04] px-4 py-3 text-left transition hover:bg-white/10"
+          >
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center text-2xl">🧭</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-extrabold text-white">Ver la guía de inicio</span>
+              <span className="block text-xs text-white/55">Los 3 pasos para empezar, otra vez.</span>
+            </span>
+          </Link>
+
           {/* En el celular el menú lateral no existe: aquí quedan la administración y cerrar sesión. */}
           {admin && (
             <div className="mt-6 rounded-2xl border-2 border-amber-300/20 bg-amber-400/[0.05] p-4">

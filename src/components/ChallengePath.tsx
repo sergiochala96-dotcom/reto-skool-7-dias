@@ -159,7 +159,13 @@ export default function ChallengePath({
                 width: NODE + 52,
               }}
             >
-              {unlocked ? <Link href={`/dia/${p.mission.day}`}>{node}</Link> : node}
+              {unlocked ? (
+                <Link href={`/dia/${p.mission.day}`} data-tour={isCurrent ? "day" : undefined}>
+                  {node}
+                </Link>
+              ) : (
+                node
+              )}
               {label}
             </div>
           );

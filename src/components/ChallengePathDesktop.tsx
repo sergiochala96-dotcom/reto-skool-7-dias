@@ -134,6 +134,7 @@ export default function ChallengePathDesktop({ completedDays }: { completedDays:
                 ) : unlocked ? (
                   <Link
                     href={`/dia/${m.day}`}
+                    data-tour={isCurrent ? "day" : undefined}
                     className="mt-3 inline-block rounded-xl bg-amber-300 px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
                   >
                     Empezar día {m.day}

@@ -154,6 +154,7 @@ export function JoinCard({
 
   return (
     <section
+      data-tour={kind === "whatsapp" ? "whatsapp" : undefined}
       className={`rounded-2xl border-2 p-4 ${
         claimed ? "border-emerald-400/40 bg-emerald-400/[0.06]" : "border-white/10 bg-white/[0.03]"
       }`}

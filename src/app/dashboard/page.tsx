@@ -1,13 +1,13 @@
 import { after } from "next/server";
 import { getSidebarData } from "@/lib/sidebar-data";
-import { TOTAL_DAYS, WELCOME_VIDEO_URL } from "@/lib/challenge";
+import { TOTAL_DAYS } from "@/lib/challenge";
 import { createClient } from "@/lib/supabase/server";
 import ChallengePath from "@/components/ChallengePath";
 import ChallengePathDesktop from "@/components/ChallengePathDesktop";
 import Episode2Card from "@/components/Episode2Card";
 import Avatar from "@/components/Avatar";
 import SkoolyLogo from "@/components/SkoolyLogo";
-import WelcomeVideoModal from "@/components/WelcomeVideoModal";
+import GuidedTour from "@/components/GuidedTour";
 import MetaRegistrationEvent from "@/components/MetaRegistrationEvent";
 import EpisodeStickyHeader from "@/components/EpisodeStickyHeader";
 import { PushPromptCard } from "@/components/PushNotifications";
@@ -16,7 +16,12 @@ import JoinTiles from "@/components/JoinTiles";
 import RightRail from "@/components/RightRail";
 import StatsBar from "@/components/StatsBar";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ guia?: string }>;
+}) {
+  const { guia } = await searchParams;
   const {
     nombre,
     user,
@@ -63,9 +68,8 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {!welcomeVideoSeen && (
-        <WelcomeVideoModal src={WELCOME_VIDEO_URL} />
-      )}
+      {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1. */}
+      <GuidedTour open={!welcomeVideoSeen || guia === "1"} />
       <MetaRegistrationEvent
         userId={user.id}
         isNew={Date.now() - new Date(user.created_at).getTime() < 15 * 60 * 1000}
