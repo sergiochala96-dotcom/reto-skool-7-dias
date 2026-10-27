@@ -10,24 +10,24 @@ import { useEffect, useState } from "react";
 type Step = {
   key: "day" | "whatsapp" | "install";
   title: string;
-  body: { mobile: string; desktop: string };
+  body?: string; // línea corta opcional bajo el título
 };
 
 const STEPS: Step[] = [
   {
     key: "day",
     title: "Inicia el reto",
-    body: { mobile: "Aquí empieza tu Día 1.", desktop: "Aquí empieza tu Día 1." },
+    body: "Aquí empieza tu Día 1.",
   },
   {
     key: "whatsapp",
     title: "Únete a WhatsApp",
-    body: { mobile: "Gana 50 monedas.", desktop: "Gana 50 monedas." },
+    // sin línea extra
   },
   {
     key: "install",
     title: "Instala la app",
-    body: { mobile: "Gana 100 monedas.", desktop: "Desde tu celular. Gana 100 monedas." },
+    body: "Desde tu celular.",
   },
 ];
 
@@ -81,19 +81,10 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   const [mode, setMode] = useState<"intro" | "tour" | "off">(initiallyOpen ? "intro" : "off");
   const [step, setStep] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const [mobile, setMobile] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [vp, setVp] = useState({ w: 0, h: 0 });
 
   useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => setMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   // Durante el recorrido: sin desplazamiento, el elemento del paso a la vista y su posición al día.
   useEffect(() => {
@@ -128,7 +119,7 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
       window.removeEventListener("scroll", measure, true);
       document.body.style.overflow = previousOverflow;
     };
-  }, [mode, mounted, step, mobile]);
+  }, [mode, mounted, step]);
 
   useEffect(() => {
     if (mode === "off") return;
@@ -240,18 +231,9 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
           Paso {step + 1} de {STEPS.length}
         </p>
         <h2 className="mt-1 text-2xl font-extrabold leading-tight">{current.title}</h2>
-        <p className="mt-1 text-base text-white/90">{mobile ? current.body.mobile : current.body.desktop}</p>
+        {current.body && <p className="mt-1 text-base text-white/90">{current.body}</p>}
 
         <div className="mt-4 flex items-center justify-center gap-4 [text-shadow:none]">
-          {step > 0 && (
-            <button
-              type="button"
-              onClick={() => setStep(step - 1)}
-              className="text-sm font-semibold text-white/70 transition hover:text-white"
-            >
-              Atrás
-            </button>
-          )}
           <button
             type="button"
             onClick={() => (last ? setMode("off") : setStep(step + 1))}
