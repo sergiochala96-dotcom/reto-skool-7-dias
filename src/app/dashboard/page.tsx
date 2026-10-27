@@ -68,8 +68,6 @@ export default async function DashboardPage({
 
   return (
     <>
-      {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1. */}
-      <GuidedTour open={!welcomeVideoSeen || guia === "1"} />
       <MetaRegistrationEvent
         userId={user.id}
         isNew={Date.now() - new Date(user.created_at).getTime() < 15 * 60 * 1000}
@@ -95,6 +93,10 @@ export default async function DashboardPage({
               {completedCount}/{TOTAL_DAYS} días completados
             </p>
           </div>
+
+          {/* Guía de 3 pasos: la primera vez que se entra (reemplaza al video de bienvenida) o con ?guia=1.
+              Su invitación va aquí, en el flujo de la página, para no tapar nada. */}
+          <GuidedTour open={!welcomeVideoSeen || guia === "1"} />
 
           {/* Con pantalla grande estas recompensas están en la columna derecha; en el celular son los
               dos iconos cuadrados fijos bajo la tarjeta del episodio (JoinTiles). */}

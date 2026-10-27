@@ -70,6 +70,19 @@ body {
   }
 }
 
+/* Latido suave de la invitación a la guía de inicio. */
+@keyframes introPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
+  }
+  50% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 12px rgba(252, 211, 77, 0);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

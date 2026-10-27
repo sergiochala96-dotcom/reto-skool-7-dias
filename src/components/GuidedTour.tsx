@@ -136,32 +136,30 @@ export default function GuidedTour({ open: initiallyOpen }: { open: boolean }) {
   if (mode === "intro") {
     return (
       <div
-        role="dialog"
+        role="region"
         aria-label="Guía rápida"
-        className="fixed inset-x-4 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-sm rounded-3xl border-2 border-white/15 bg-surface-2 p-5 text-center shadow-2xl shadow-black/60 md:inset-x-auto md:bottom-8 md:left-1/2 md:-translate-x-1/2"
+        className="mx-auto mb-6 max-w-md animate-[introPulse_2.2s_ease-in-out_infinite] rounded-3xl border-2 border-amber-300/40 bg-surface-2 p-5 text-center motion-reduce:animate-none"
       >
         <p className="text-3xl">👋</p>
-        <h2 className="mt-1 text-xl font-extrabold leading-tight text-white">¡Bienvenido a Skooly!</h2>
-        <p className="mt-1 text-sm text-white/65">¿Quieres una guía rápida de 3 pasos?</p>
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <button
-            type="button"
-            onClick={() => setMode("off")}
-            className="text-sm font-semibold text-white/55 transition hover:text-white"
-          >
-            Ahora no
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setStep(0);
-              setMode("tour");
-            }}
-            className="rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
-          >
-            Iniciar guía
-          </button>
-        </div>
+        <h2 className="mt-1 text-xl font-extrabold leading-tight text-white">¡Bienvenido!</h2>
+        <p className="mt-1 text-sm text-white/70">Aprende a usar Skooly en tan solo 3 pasos.</p>
+        <button
+          type="button"
+          onClick={() => {
+            setStep(0);
+            setMode("tour");
+          }}
+          className="mx-auto mt-4 block rounded-2xl border-b-4 border-amber-600 bg-amber-400 px-8 py-3 text-sm font-extrabold uppercase tracking-wide text-amber-950 transition hover:bg-amber-300 active:translate-y-0.5 active:border-b-2"
+        >
+          Iniciar guía
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("off")}
+          className="mt-3 text-xs font-semibold text-white/50 transition hover:text-white"
+        >
+          Ahora no
+        </button>
       </div>
     );
   }
