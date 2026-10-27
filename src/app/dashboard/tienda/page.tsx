@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AvatarIcon, { avatarIconKey, isAvatarIconKey } from "@/components/AvatarIcon";
 import BuyLivesPacks from "@/components/BuyLivesPacks";
-import PromptBox from "@/components/PromptBox";
+import PurchaseViewer from "@/components/PurchaseViewer";
 import RedeemButton from "@/components/RedeemButton";
 import StatsBar from "@/components/StatsBar";
 import { CoinIcon, HeartIcon } from "@/components/StatIcons";
@@ -50,73 +50,75 @@ export default async function TiendaPage() {
   const resources = items.filter((i) => i.kind !== "avatar");
   const icons = items.filter((i) => i.kind === "avatar");
 
+  // Tarjeta compacta (4 por fila en computadora, 2 en celular). El contenido de lo comprado se abre
+  // en una ventana ("Abrir mi compra") para que la tienda se vea ordenada.
   function renderItem(item: Item) {
     const owned = redeemed.has(item.id);
     const content = contentById.get(item.id);
     const isIcon = item.kind === "avatar";
     // El dibujo se ve antes de canjear: la clave sale del nombre interno (avatar-llama → llama).
     const iconKey = isIcon ? item.slug.replace(/^avatar-/, "") : null;
-    const wide = owned && item.kind !== "link" && !isIcon;
 
     return (
       <li
         key={item.id}
-        className={`flex flex-col gap-4 rounded-2xl border-2 p-5 ${
+        className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-4 text-center ${
           owned ? "border-emerald-400/40 bg-emerald-400/[0.06]" : "border-white/10 bg-white/[0.04]"
-        } ${wide ? "sm:col-span-2" : ""}`}
+        }`}
       >
-        <div className="flex items-start gap-4">
-          {isIcon && iconKey && isAvatarIconKey(iconKey) ? (
-            <AvatarIcon name={iconKey} size={56} />
-          ) : (
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-3xl">
-              {item.emoji}
-            </span>
-          )}
-          <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-extrabold leading-tight text-white">{item.title}</h3>
-            <p className="mt-1 text-sm leading-snug text-white/60">{item.description}</p>
-          </div>
-          {!owned && (
-            <span className="flex shrink-0 items-center gap-1 rounded-xl bg-black/25 px-2.5 py-1 text-sm font-extrabold text-amber-300">
-              <CoinIcon className="h-4 w-4" /> {item.cost}
-            </span>
-          )}
+        {isIcon && iconKey && isAvatarIconKey(iconKey) ? (
+          <AvatarIcon name={iconKey} size={64} />
+        ) : (
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-4xl">
+            {item.emoji}
+          </span>
+        )}
+
+        <div className="min-w-0">
+          <h3 className="line-clamp-2 text-sm font-extrabold leading-tight text-white sm:text-base">
+            {item.title}
+          </h3>
+          <p className="mt-1 line-clamp-3 text-xs leading-snug text-white/55">{item.description}</p>
         </div>
 
-        {owned ? (
-          <div className="space-y-3">
-            <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-300">✓ Desbloqueado</p>
-            {isIcon ? (
-              <UseAvatarButton itemId={item.id} inUse={content !== undefined && content === currentIcon} />
-            ) : (
-              content &&
-              (item.kind === "link" ? (
-                <a
-                  href={content}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block rounded-2xl border-b-4 border-emerald-700 bg-emerald-500 px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-emerald-400"
-                >
-                  Abrir enlace
-                </a>
+        <div className="mt-auto w-full space-y-2">
+          {owned ? (
+            <>
+              <p className="text-[11px] font-extrabold uppercase tracking-wide text-emerald-300">
+                ✓ Desbloqueado
+              </p>
+              {isIcon ? (
+                <UseAvatarButton itemId={item.id} inUse={content !== undefined && content === currentIcon} />
               ) : (
-                <PromptBox
-                  title={item.title}
-                  text={content}
-                  buttonLabel={item.kind === "prompt" ? "📋 Copiar prompt" : "📋 Copiar texto"}
-                  hint={
-                    item.kind === "prompt"
-                      ? "Cambia lo que está entre [corchetes] por tus datos antes de pegarlo en tu IA."
-                      : null
-                  }
-                />
-              ))
-            )}
-          </div>
-        ) : (
-          <RedeemButton itemId={item.id} cost={item.cost} title={item.title} balance={coins} />
-        )}
+                content &&
+                (item.kind === "link" ? (
+                  <a
+                    href={content}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-2xl border-b-4 border-emerald-700 bg-emerald-500 px-3 py-2.5 text-center text-xs font-extrabold uppercase tracking-wide text-white transition hover:bg-emerald-400 sm:text-sm"
+                  >
+                    Abrir enlace
+                  </a>
+                ) : (
+                  <PurchaseViewer
+                    title={item.title}
+                    emoji={item.emoji}
+                    text={content}
+                    kind={item.kind === "prompt" ? "prompt" : "text"}
+                  />
+                ))
+              )}
+            </>
+          ) : (
+            <>
+              <span className="mx-auto flex w-fit items-center gap-1 rounded-xl bg-black/25 px-2.5 py-1 text-sm font-extrabold text-amber-300">
+                <CoinIcon className="h-4 w-4" /> {item.cost}
+              </span>
+              <RedeemButton itemId={item.id} cost={item.cost} title={item.title} balance={coins} />
+            </>
+          )}
+        </div>
       </li>
     );
   }
@@ -130,7 +132,7 @@ export default async function TiendaPage() {
           <StatsBar completedDays={completedList} coins={coins} lives={lives} />
         </div>
 
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <header className="mb-8 text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Tienda</p>
             <h1 className="mt-1 text-3xl font-extrabold text-white">Canjea tus monedas de oro</h1>
@@ -178,7 +180,7 @@ export default async function TiendaPage() {
               {resources.length > 0 && (
                 <section>
                   <h2 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-white/50">Recursos</h2>
-                  <ul className="grid gap-4 sm:grid-cols-2">{resources.map(renderItem)}</ul>
+                  <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">{resources.map(renderItem)}</ul>
                 </section>
               )}
               {icons.length > 0 && (
@@ -186,7 +188,7 @@ export default async function TiendaPage() {
                   <h2 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-white/50">
                     Iconos de perfil
                   </h2>
-                  <ul className="grid gap-4 sm:grid-cols-2">{icons.map(renderItem)}</ul>
+                  <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">{icons.map(renderItem)}</ul>
                 </section>
               )}
             </div>
